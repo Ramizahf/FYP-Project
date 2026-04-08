@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Log In — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --teal:#0D6E6E; --teal-lt:#14A097; --teal-bg:#E6F4F4;
+      --amber:#E8833A; --amber-lt:#FFB347;
+      --dark:#0F2027; --mid:#1E3A3A;
+      --text:#2C2C2C; --muted:#6B7B7B;
+      --white:#FFFFFF; --cream:#F9F5F0; --border:#D4E8E8;
+      --error:#c0392b; --error-bg:#fdecea;
+      --success:#1a9a55; --success-bg:#e6faf0;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);min-height:100vh;display:flex;flex-direction:column}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo .dot{color:var(--amber)}
+    .btn-nav{display:inline-flex;align-items:center;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;background:var(--teal);color:var(--white);transition:background .2s,transform .15s}
+    .btn-nav:hover{background:var(--mid);transform:translateY(-1px)}
+
+    .page-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:70px}
+
+    /* LEFT */
+    .left-panel{background:linear-gradient(160deg,var(--dark) 0%,var(--mid) 55%,#1a4a4a 100%);display:flex;flex-direction:column;justify-content:center;padding:60px 10%;position:relative;overflow:hidden}
+    .left-panel::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.18) 0%,transparent 65%);animation:pulse 7s ease-in-out infinite}
+    .left-panel::after{content:'';position:absolute;bottom:-120px;left:5%;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.1) 0%,transparent 65%);animation:pulse 9s ease-in-out infinite reverse}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+    .left-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,131,58,.2);border:1px solid rgba(232,131,58,.45);color:var(--amber-lt);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:6px 16px;border-radius:100px;text-transform:uppercase;margin-bottom:32px;width:fit-content;position:relative;z-index:1}
+    .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .left-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,3vw,3.2rem);font-weight:900;line-height:1.15;color:var(--white);margin-bottom:20px;position:relative;z-index:1}
+    .left-title .accent{color:var(--teal-lt)}
+    .left-title .accent2{color:var(--amber-lt)}
+    .left-sub{font-size:.93rem;color:rgba(255,255,255,.58);line-height:1.75;margin-bottom:44px;position:relative;z-index:1;max-width:400px}
+
+    .role-cards{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+    .role-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 20px;transition:background .2s}
+    .role-card:hover{background:rgba(255,255,255,.1)}
+    .role-card h4{font-size:.92rem;font-weight:700;color:var(--white);margin-bottom:5px}
+    .role-card p{font-size:.78rem;color:rgba(255,255,255,.52);line-height:1.55}
+
+    /* RIGHT */
+    .right-panel{display:flex;align-items:center;justify-content:center;padding:50px 5%;background:var(--cream)}
+    .form-card{background:var(--white);border-radius:24px;border:1px solid var(--border);padding:44px 40px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(13,110,110,.07)}
+
+    .form-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+    .form-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .form-sub{font-size:.88rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
+
+
+
+    .form-group{margin-bottom:18px}
+    label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
+    select,input[type=email],input[type=password]{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--white);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+    select:focus,input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,110,110,.1)}
+    input.error,select.error{border-color:var(--error)}
+    .field-error{font-size:.75rem;color:var(--error);margin-top:4px;display:none}
+    .field-error.show{display:block}
+
+    .pw-wrap{position:relative}
+    .pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--teal);font-size:.82rem;font-weight:600;padding:4px}
+    .pw-toggle:hover{text-decoration:underline}
+
+    .forgot-row{text-align:right;margin-top:-10px;margin-bottom:20px}
+    .forgot-row a{font-size:.78rem;color:var(--teal);text-decoration:none}
+    .forgot-row a:hover{text-decoration:underline}
+
+    .alert{border-radius:10px;padding:12px 16px;font-size:.84rem;margin-bottom:18px;display:none;gap:8px;align-items:flex-start}
+    .alert.show{display:flex}
+    .alert-error{background:var(--error-bg);color:var(--error);border:1px solid rgba(192,57,43,.2)}
+    .alert-success{background:var(--success-bg);color:var(--success);border:1px solid rgba(26,154,85,.2)}
+
+    .btn-submit{width:100%;padding:14px;border-radius:10px;background:var(--teal);color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;border:none;cursor:pointer;transition:background .2s,transform .15s,box-shadow .15s;margin-top:4px}
+    .btn-submit:hover{background:var(--mid);transform:translateY(-1px);box-shadow:0 8px 24px rgba(13,110,110,.25)}
+
+    .register-link{text-align:center;margin-top:22px;font-size:.84rem;color:var(--muted)}
+    .register-link a{color:var(--teal);font-weight:600;text-decoration:none}
+    .register-link a:hover{text-decoration:underline}
+
+    /* WELCOME */
+    .welcome-screen{display:none;text-align:center;padding:10px 0}
+    .welcome-icon{font-size:3.2rem;margin-bottom:14px}
+    .welcome-screen h3{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .welcome-screen p{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
+    .welcome-name{color:var(--teal);font-weight:700}
+    .btn-dashboard{display:block;text-align:center;text-decoration:none;padding:14px;border-radius:10px;background:var(--amber);color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;transition:background .2s,transform .15s}
+    .btn-dashboard:hover{background:#d06e28;transform:translateY(-1px)}
+    .logout-link{margin-top:14px;font-size:.78rem}
+    .logout-link a{color:var(--teal);text-decoration:none;cursor:pointer}
+    .logout-link a:hover{text-decoration:underline}
+
+    @media(max-width:900px){
+      .page-wrap{grid-template-columns:1fr}
+      .left-panel{display:none}
+      .right-panel{padding:40px 5% 60px}
+      .form-card{padding:32px 22px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+  <div style="display:flex;align-items:center;gap:24px">
+    <a href="{{ url_for('agents') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Find Agents</a>
+    <a href="{{ url_for('chatbot') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Chatbot</a>
+    <a href="{{ url_for('register') }}" class="btn-nav" id="nav-reg">Register Free</a>
+  </div>
+</nav>
+
+<!-- LANGUAGE BAR -->
+<div style="background:var(--teal);padding:10px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+  <span style="font-size:.75rem;color:rgba(255,255,255,.6)">🌐</span>
+  <span class="lang-pill active" onclick="setLang('en',this)" style="padding:5px 14px;border-radius:100px;background:var(--amber);border:1px solid var(--amber);color:#fff;font-size:.76rem;font-weight:600;cursor:pointer">🇬🇧 English</span>
+  <span class="lang-pill" onclick="setLang('ms',this)" style="padding:5px 14px;border-radius:100px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;cursor:pointer">🇲🇾 Melayu</span>
+  <span class="lang-pill" onclick="setLang('bn',this)" style="padding:5px 14px;border-radius:100px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;cursor:pointer">🇧🇩 বাংলা</span>
+</div>
+
+<div class="page-wrap">
+
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="left-badge"><span class="badge-dot"></span> <span id="l-badge">Secure Access For All Users</span></div>
+    <h1 class="left-title">
+      <span id="l-title1">Log in to your</span><br/>
+      <span class="accent">MigrantSafe</span> <span id="l-title2">account</span><br/>
+      <span id="l-title3">and continue your</span> <span class="accent2" id="l-title4">safe<br/>journey.</span>
+    </h1>
+    <p class="left-sub" id="l-sub">Enter your email and password. Your account type is automatically detected.</p>
+    <div class="role-cards">
+      <div class="role-card">
+        <h4 id="l-r1h">For Migrant Workers</h4>
+        <p id="l-r1p">Check verified agents, send reports, and get guidance in a safer, more organised way.</p>
+      </div>
+      <div class="role-card">
+        <h4 id="l-r2h">For Recruitment Agents</h4>
+        <p id="l-r2p">Access your agency account, manage profile details, and build trust with workers.</p>
+      </div>
+      <div class="role-card">
+        <h4 id="l-r3h">For Admins</h4>
+        <p id="l-r3p">Review reports, update agent verification statuses, and oversee the platform.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="form-card">
+
+      <div class="form-eyebrow" id="l-eyebrow">Welcome Back</div>
+      <h2 class="form-title" id="l-formtitle">Log In</h2>
+      <p class="form-sub" id="l-formsub">Enter your email and password. Your account type is detected automatically.</p>
+
+
+      {% if error %}
+      <div class="alert alert-error show">
+        <span>⚠️</span><span>{{ error }}</span>
+      </div>
+      {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'error' if category == 'danger' else category }} show">
+          <span>{{ '✅' if category == 'success' else ('ℹ️' if category == 'info' else '⚠️') }}</span>
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label for="email" id="l-emaillbl">Email Address</label>
+          <input type="email" id="email" name="email"
+                 placeholder="your@email.com"
+                 autocomplete="email"
+                 value="{{ request.form.get('email', '') }}"
+                 required autofocus/>
+        </div>
+        <div class="form-group">
+          <label for="password" id="l-pwlbl">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password"
+                   placeholder="Enter your password"
+                   autocomplete="current-password" required/>
+            <button type="button" class="pw-toggle" onclick="togglePw(this)" id="l-show">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" id="l-submit">Log In →</button>
+      </form>
+
+      <p class="register-link"><span id="l-noacc">Don't have an account?</span> <a href="{{ url_for('register') }}" id="l-reglink">Register free →</a></p>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const LANG_LOGIN = {
+    en: {
+      badge:'Secure Access For All Users', title1:'Log in to your', title2:'account',
+      title3:'and continue your', title4:'safe journey.',
+      sub:'Enter your email and password. Your account type is detected automatically.',
+      r1h:'For Migrant Workers', r1p:'Check verified agents, send reports, and get guidance safely.',
+      r2h:'For Recruitment Agents', r2p:'Access your agency account and manage your profile.',
+      r3h:'For Admins', r3p:'Review reports and manage the platform.',
+      eyebrow:'Welcome Back', formtitle:'Log In',
+      formsub:'Enter your email and password. Your account type is detected automatically.',
+      emaillbl:'Email Address',
+      submit:'Log In →', noacc:"Don't have an account?", reglink:'Register free →',
+      navreg:'Register Free'
+    },
+    ms: {
+      badge:'Akses Selamat untuk Semua Pengguna', title1:'Log masuk ke akaun',
+      title2:'anda', title3:'dan teruskan', title4:'perjalanan selamat anda.',
+      sub:'Masukkan e-mel dan kata laluan anda. Jenis akaun anda dikesan secara automatik.',
+      r1h:'Untuk Pekerja Asing', r1p:'Semak ejen yang disahkan, hantar laporan, dan dapatkan panduan.',
+      r2h:'Untuk Ejen Pengambilan', r2p:'Akses akaun agensi anda dan urus profil anda.',
+      r3h:'Untuk Admin', r3p:'Semak laporan dan urus platform.',
+      eyebrow:'Selamat Kembali', formtitle:'Log Masuk',
+      formsub:'Masukkan e-mel dan kata laluan anda. Jenis akaun dikesan secara automatik.',
+      emaillbl:'Alamat E-mel', pwlbl:'Kata Laluan', show:'Tunjuk', hide:'Sembunyikan',
+      submit:'Log Masuk →', noacc:'Tiada akaun?', reglink:'Daftar percuma →',
+      navreg:'Daftar Percuma'
+    },
+    bn: {
+      badge:'সকল ব্যবহারকারীর জন্য নিরাপদ অ্যাক্সেস',
+      title1:'আপনার MigrantSafe', title2:'অ্যাকাউন্টে লগ ইন করুন',
+      title3:'এবং আপনার', title4:'নিরাপদ যাত্রা চালিয়ে যান।',
+      sub:'আপনার ইমেইল ও পাসওয়ার্ড দিন। আপনার অ্যাকাউন্টের ধরন স্বয়ংক্রিয়ভাবে শনাক্ত হবে।',
+      r1h:'অভিবাসী শ্রমিকদের জন্য', r1p:'যাচাইকৃত এজেন্ট চেক করুন, রিপোর্ট করুন এবং গাইডেন্স পান।',
+      r2h:'নিয়োগ এজেন্টদের জন্য', r2p:'আপনার এজেন্সি অ্যাকাউন্ট অ্যাক্সেস করুন এবং প্রোফাইল পরিচালনা করুন।',
+      r3h:'অ্যাডমিনদের জন্য', r3p:'রিপোর্ট পর্যালোচনা করুন এবং প্ল্যাটফর্ম পরিচালনা করুন।',
+      eyebrow:'আবার স্বাগতম', formtitle:'লগ ইন',
+      formsub:'আপনার ইমেইল ও পাসওয়ার্ড দিন। অ্যাকাউন্টের ধরন স্বয়ংক্রিয়ভাবে শনাক্ত হবে।',
+      emaillbl:'ইমেইল ঠিকানা', pwlbl:'পাসওয়ার্ড', show:'দেখান', hide:'লুকান',
+      submit:'লগ ইন করুন →', noacc:'অ্যাকাউন্ট নেই?', reglink:'বিনামূল্যে নিবন্ধন করুন →',
+      navreg:'বিনামূল্যে নিবন্ধন'
+    }
+  };
+
+  let currentLang = 'en';
+
+  function setLang(lang, btn) {
+    currentLang = lang;
+    const T = LANG_LOGIN[lang];
+    document.querySelectorAll('.lang-pill').forEach(p => {
+      p.style.background = 'rgba(255,255,255,.15)';
+      p.style.borderColor = 'rgba(255,255,255,.2)';
+    });
+    btn.style.background = 'var(--amber)';
+    btn.style.borderColor = 'var(--amber)';
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+    set('l-badge', T.badge); set('l-title1', T.title1); set('l-title2', T.title2);
+    set('l-title3', T.title3); set('l-title4', T.title4); set('l-sub', T.sub);
+    set('l-r1h', T.r1h); set('l-r1p', T.r1p); set('l-r2h', T.r2h); set('l-r2p', T.r2p);
+    set('l-r3h', T.r3h); set('l-r3p', T.r3p);
+    set('l-eyebrow', T.eyebrow); set('l-formtitle', T.formtitle); set('l-formsub', T.formsub);
+    set('l-emaillbl', T.emaillbl); set('l-pwlbl', T.pwlbl);
+    set('l-submit', T.submit); set('l-noacc', T.noacc); set('l-reglink', T.reglink);
+    set('nav-reg', T.navreg);
+    const showBtn = document.getElementById('l-show');
+    if (showBtn) showBtn.textContent = T.show;
+  }
+
+  function togglePw(btn) {
+    const inp = document.getElementById('password');
+    const T = LANG_LOGIN[currentLang];
+    if (inp.type === 'password') { inp.type = 'text';     btn.textContent = T.hide || 'Hide'; }
+    else                         { inp.type = 'password'; btn.textContent = T.show || 'Show'; }
+  }
+</script>
+</body>
+</html>

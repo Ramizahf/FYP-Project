@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Chatbot — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --teal:#0D6E6E; --teal-lt:#14A097; --teal-bg:#E6F4F4;
+      --amber:#E8833A; --amber-lt:#FFB347;
+      --dark:#0F2027; --mid:#1E3A3A;
+      --text:#2C2C2C; --muted:#6B7B7B;
+      --white:#FFFFFF; --cream:#F9F5F0; --border:#D4E8E8;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;flex-direction:column;overflow:hidden}
+
+    /* ── NAVBAR ── */
+    nav{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:64px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06);z-index:100}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo .dot{color:var(--amber)}
+    .nav-links{display:flex;align-items:center;gap:24px}
+    .nav-links a{font-size:.86rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--teal)}
+    .nav-links a.active{color:var(--teal);font-weight:600}
+    .nav-cta{display:flex;gap:8px}
+    .btn{display:inline-flex;align-items:center;padding:8px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+    .btn-outline:hover{background:var(--teal-bg)}
+    .btn-primary{background:var(--teal);color:var(--white)}
+    .btn-primary:hover{background:var(--mid)}
+
+    /* ── MAIN LAYOUT ── */
+    .chat-layout{flex:1;display:grid;grid-template-columns:300px 1fr;overflow:hidden;min-height:0}
+
+    /* ── LEFT PANEL ── */
+    .left-panel{background:linear-gradient(175deg,var(--dark) 0%,var(--mid) 55%,#1a4a4a 100%);display:flex;flex-direction:column;padding:0;overflow:hidden;position:relative}
+    .left-panel::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.18) 0%,transparent 70%);pointer-events:none}
+    .left-panel::after{content:'';position:absolute;bottom:-80px;left:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.1) 0%,transparent 70%);pointer-events:none}
+
+    .lp-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:28px 24px;overflow-y:auto}
+
+    .lp-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(232,131,58,.2);border:1px solid rgba(232,131,58,.4);color:var(--amber-lt);font-size:.68rem;font-weight:700;letter-spacing:.1em;padding:5px 12px;border-radius:100px;text-transform:uppercase;margin-bottom:20px;width:fit-content}
+    .lp-dot{width:6px;height:6px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .lp-title{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:900;color:var(--white);line-height:1.25;margin-bottom:10px}
+    .lp-title .accent{color:var(--teal-lt)}
+    .lp-sub{font-size:.8rem;color:rgba(255,255,255,.52);line-height:1.7;margin-bottom:24px}
+
+    /* Language selector */
+    .lang-section{margin-bottom:24px}
+    .lang-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px}
+    .lang-btns{display:flex;flex-direction:column;gap:6px}
+    .lang-btn{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif}
+    .lang-btn:hover{background:rgba(255,255,255,.12)}
+    .lang-btn.active{background:rgba(20,160,151,.25);border-color:rgba(20,160,151,.5)}
+    .lang-flag{font-size:1rem}
+    .lang-name{font-size:.84rem;font-weight:600;color:var(--white)}
+    .lang-native{font-size:.72rem;color:rgba(255,255,255,.42)}
+
+    /* Quick prompts */
+    .prompts-section{flex:1}
+    .prompts-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px}
+    .prompt-btn{display:flex;align-items:flex-start;gap:9px;width:100%;padding:11px 12px;margin-bottom:7px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:all .2s}
+    .prompt-btn:hover{background:rgba(255,255,255,.11);border-color:rgba(20,160,151,.4);transform:translateX(3px)}
+    .prompt-icon{font-size:.95rem;flex-shrink:0;margin-top:1px}
+    .prompt-text{font-size:.78rem;color:rgba(255,255,255,.72);line-height:1.45}
+
+    /* Info pills */
+    .lp-info{margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+    .info-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.04);margin-bottom:6px}
+    .info-pill-icon{font-size:.8rem}
+    .info-pill-text{font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.4}
+
+    /* ── RIGHT PANEL (CHAT) ── */
+    .chat-panel{display:flex;flex-direction:column;background:var(--cream);overflow:hidden;min-height:0}
+
+    /* Chat header */
+    .chat-header{flex-shrink:0;background:var(--white);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .chat-header-left{display:flex;align-items:center;gap:14px}
+    .bot-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(13,110,110,.25)}
+    .bot-info-name{font-size:.95rem;font-weight:700;color:var(--dark)}
+    .bot-info-status{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--muted);margin-top:2px}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:#1a9a55;animation:pulse-dot 2s infinite}
+    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+    .chat-header-right{display:flex;align-items:center;gap:8px}
+    .hdr-btn{padding:7px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+    .hdr-clear{background:var(--cream);color:var(--muted);border:1px solid var(--border)}
+    .hdr-clear:hover{color:var(--dark);border-color:var(--text)}
+    .hdr-lang-badge{background:var(--teal-bg);color:var(--teal);border:1px solid var(--border);font-size:.72rem;padding:5px 11px;border-radius:100px;font-weight:700}
+
+    /* Messages area */
+    .messages{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+    .messages::-webkit-scrollbar{width:5px}
+    .messages::-webkit-scrollbar-track{background:transparent}
+    .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+    /* Welcome card */
+    .welcome-card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;max-width:480px;margin:0 auto}
+    .wc-icon{font-size:2.4rem;margin-bottom:12px}
+    .wc-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .wc-sub{font-size:.84rem;color:var(--muted);line-height:1.65;margin-bottom:18px}
+    .wc-topics{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+    .wc-topic{background:var(--teal-bg);color:var(--teal);font-size:.73rem;font-weight:600;padding:4px 11px;border-radius:100px;border:1px solid var(--border)}
+
+    /* Message bubbles */
+    .msg-row{display:flex;align-items:flex-end;gap:10px;animation:msgIn .3s ease both}
+    @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .msg-row.user{flex-direction:row-reverse}
+    .msg-avatar{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+    .bot-msg-avatar{background:linear-gradient(135deg,var(--teal),var(--teal-lt));box-shadow:0 2px 8px rgba(13,110,110,.2)}
+    .user-msg-avatar{background:var(--amber);box-shadow:0 2px 8px rgba(232,131,58,.25)}
+    .msg-bubble{max-width:72%;padding:13px 16px;border-radius:16px;font-size:.88rem;line-height:1.65;position:relative}
+    .bot-bubble{background:var(--white);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+    .user-bubble{background:var(--teal);border-bottom-right-radius:4px;color:var(--white)}
+    .msg-time{font-size:.65rem;color:var(--muted);margin-top:5px;display:block}
+    .user-bubble .msg-time{color:rgba(255,255,255,.55);text-align:right}
+
+    /* Typing indicator */
+    .typing-row{display:flex;align-items:flex-end;gap:10px}
+    .typing-bubble{background:var(--white);border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;padding:14px 18px;display:flex;gap:5px;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+    .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:typing 1.2s infinite}
+    .typing-dot:nth-child(2){animation-delay:.18s}
+    .typing-dot:nth-child(3){animation-delay:.36s}
+    @keyframes typing{0%,80%,100%{transform:scale(1);opacity:.4}40%{transform:scale(1.2);opacity:1}}
+
+    /* Input area */
+    .input-area{flex-shrink:0;background:var(--white);border-top:1px solid var(--border);padding:16px 28px}
+    .input-row{display:flex;gap:10px;align-items:flex-end}
+    .input-wrap{flex:1;position:relative}
+    #chatInput{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--cream);resize:none;max-height:120px;line-height:1.5;transition:border-color .2s,box-shadow .2s;overflow-y:auto}
+    #chatInput:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,110,110,.08);background:var(--white)}
+    .input-hint{font-size:.69rem;color:var(--muted);margin-top:7px}
+    .send-btn{width:46px;height:46px;border-radius:12px;background:var(--teal);border:none;color:var(--white);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;box-shadow:0 4px 12px rgba(13,110,110,.25)}
+    .send-btn:hover{background:var(--mid);transform:translateY(-1px);box-shadow:0 6px 18px rgba(13,110,110,.35)}
+    .send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+    /* Toast */
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:10px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.22);opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;pointer-events:none}
+    #toast.show{opacity:1;transform:translateY(0)}
+
+    /* Responsive */
+    @media(max-width:860px){
+      .chat-layout{grid-template-columns:1fr}
+      .left-panel{display:none}
+      body{overflow:auto}
+      .chat-panel{height:calc(100vh - 64px)}
+    }
+    @media(max-width:500px){
+      .nav-links{display:none}
+      .messages{padding:16px}
+      .input-area{padding:12px 16px}
+      .chat-header{padding:12px 16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('agents') }}">Find Agents</a>
+    <a href="{{ url_for('chatbot') }}" class="active">Chatbot</a>
+    <a href="{{ url_for('migration_guide') }}">Migration Guide</a>
+  </div>
+  <div class="nav-cta">
+    <a href="{{ url_for('login') }}" class="btn btn-outline">Log In</a>
+    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Free</a>
+  </div>
+</nav>
+
+<!-- CHAT LAYOUT -->
+<div class="chat-layout">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="left-panel">
+    <div class="lp-inner">
+
+      <div class="lp-badge"><span class="lp-dot"></span> AI-Powered</div>
+      <h2 class="lp-title">Your <span class="accent">Safe</span> Guide to Working in Malaysia</h2>
+      <p class="lp-sub">Ask anything about recruitment, visas, rights, and fees — in your own language, any time of day.</p>
+
+      <!-- Language Selector -->
+      <div class="lang-section">
+        <div class="lang-label">Choose your language</div>
+        <div class="lang-btns">
+          <button class="lang-btn active" onclick="setLang('en', this)">
+            <span class="lang-flag">🇬🇧</span>
+            <div><div class="lang-name">English</div><div class="lang-native">English</div></div>
+          </button>
+          <button class="lang-btn" onclick="setLang('ms', this)">
+            <span class="lang-flag">🇲🇾</span>
+            <div><div class="lang-name">Bahasa Melayu</div><div class="lang-native">Melayu</div></div>
+          </button>
+          <button class="lang-btn" onclick="setLang('bn', this)">
+            <span class="lang-flag">🇧🇩</span>
+            <div><div class="lang-name">বাংলা</div><div class="lang-native">Bengali</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Prompts -->
+      <div class="prompts-section">
+        <div class="prompts-label" id="quickLabel">Quick questions</div>
+        <button class="prompt-btn" onclick="sendQuick(this.dataset.q)" data-q="How do I check if a recruitment agent is real and safe?">
+          <span class="prompt-icon">🛡️</span>
+          <span class="prompt-text" id="qp1">How do I check if a recruitment agent is real and safe?</span>
+        </button>
+        <button class="prompt-btn" onclick="sendQuick(this.dataset.q)" data-q="Who is responsible for paying recruitment fees — me or the employer?">
+          <span class="prompt-icon">💰</span>
+          <span class="prompt-text" id="qp2">Who pays the recruitment fees — me or the employer?</span>
+        </button>
+        <button class="prompt-btn" onclick="sendQuick(this.dataset.q)" data-q="What documents do I need to work legally in Malaysia?">
+          <span class="prompt-icon">📄</span>
+          <span class="prompt-text" id="qp3">What documents do I need to work in Malaysia?</span>
+        </button>
+        <button class="prompt-btn" onclick="sendQuick(this.dataset.q)" data-q="What are my rights as a migrant worker in Malaysia?">
+          <span class="prompt-icon">⚖️</span>
+          <span class="prompt-text" id="qp4">What are my rights as a migrant worker?</span>
+        </button>
+        <button class="prompt-btn" onclick="sendQuick(this.dataset.q)" data-q="An agent is asking me to pay RM 5,000 upfront. Is this legal?">
+          <span class="prompt-icon">🚨</span>
+          <span class="prompt-text" id="qp5">An agent wants RM 5,000 upfront. Is this legal?</span>
+        </button>
+        <button class="prompt-btn" onclick="sendQuick(this.dataset.q)" data-q="How long does the visa or work permit process take in Malaysia?">
+          <span class="prompt-icon">🗓️</span>
+          <span class="prompt-text" id="qp6">How long does the visa process take?</span>
+        </button>
+      </div>
+
+      <!-- Info Pills -->
+      <div class="lp-info">
+        <div class="info-pill"><span class="info-pill-icon">🔒</span><span class="info-pill-text">Your conversations are private and not shared.</span></div>
+        <div class="info-pill"><span class="info-pill-icon">⚡</span><span class="info-pill-text">Powered by Claude AI — responds within seconds.</span></div>
+        <div class="info-pill"><span class="info-pill-icon">🆓</span><span class="info-pill-text">Completely free to use, always.</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHAT PANEL -->
+  <div class="chat-panel">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="bot-avatar">🤖</div>
+        <div>
+          <div class="bot-info-name">MigrantSafe Assistant</div>
+          <div class="bot-info-status"><span class="status-dot"></span> <span id="statusText">Online — ready to help</span></div>
+        </div>
+      </div>
+      <div class="chat-header-right">
+        <span class="hdr-lang-badge" id="langBadge">🇬🇧 English</span>
+        <button class="hdr-btn hdr-clear" onclick="clearChat()">Clear chat</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+      <!-- Welcome card shown on load -->
+      <div class="welcome-card" id="welcomeCard">
+        <div class="wc-icon">👋</div>
+        <div class="wc-title">Hello! I'm your MigrantSafe Assistant.</div>
+        <div class="wc-sub">I can help you understand your rights, verify agents, learn about visas and documents, and navigate the recruitment process safely in Malaysia. Ask me anything!</div>
+        <div class="wc-topics">
+          <span class="wc-topic">🛡️ Agent Verification</span>
+          <span class="wc-topic">💰 Recruitment Fees</span>
+          <span class="wc-topic">📄 Documents & Visas</span>
+          <span class="wc-topic">⚖️ Worker Rights</span>
+          <span class="wc-topic">🚨 Reporting Fraud</span>
+          <span class="wc-topic">🌏 Multilingual</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-row">
+        <div class="input-wrap">
+          <textarea id="chatInput" rows="1" placeholder="Type your question here… (Press Enter to send)" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send message">➤</button>
+      </div>
+      <div class="input-hint" id="inputHint">Ask in English, Bahasa Melayu, or বাংলা — I understand all three.</div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ═══════════════════════════════════════════
+  //  STATE
+  // ═══════════════════════════════════════════
+  let currentLang = 'en';
+  let isTyping    = false;
+  let messageHistory = []; // full conversation history for the API
+
+  // ═══════════════════════════════════════════
+  //  LANGUAGE CONFIG
+  // ═══════════════════════════════════════════
+
+  // ═══════════════════════════════════════════
+  //  AUTO LANGUAGE DETECTION FROM USER INPUT
+  // ═══════════════════════════════════════════
+  function detectLang(text) {
+    // Bangla Unicode block U+0980-U+09FF
+    if (/[\u0980-\u09FF]/.test(text)) return 'bn';
+    // Malay keyword heuristic
+    const malayWords = ['saya','anda','tak','tidak','boleh','perlu','kenapa','bagaimana','berapa','ejen','majikan','visa','yuran','permit','kerja','hak','apa','siapa','bila','mana'];
+    const lower = text.toLowerCase();
+    const hits = malayWords.filter(w => lower.includes(w)).length;
+    if (hits >= 2) return 'ms';
+    return null;
+  }
+
+  const LANGS = {
+    en: {
+      badge: '🇬🇧 English',
+      status: 'Online — ready to help',
+      hint: 'Ask in English, Bahasa Melayu, or বাংলা — I understand all three.',
+      placeholder: 'Type your question here… (Press Enter to send)',
+      quickLabel: 'Quick questions',
+      prompts: [
+        'How do I check if a recruitment agent is real and safe?',
+        'Who pays the recruitment fees — me or the employer?',
+        'What documents do I need to work in Malaysia?',
+        'What are my rights as a migrant worker?',
+        'An agent wants RM 5,000 upfront. Is this legal?',
+        'How long does the visa process take?'
+      ],
+      systemPrompt: `You are the MigrantSafe AI assistant — a helpful, compassionate, and knowledgeable guide for migrant workers in Malaysia. Your role is to help users understand:
+- How to verify recruitment agents (Verified / Pending / Reported status on MigrantSafe)
+- Recruitment fees (employers must pay, NOT workers — zero-cost migration policy)
+- Work documents and visas in Malaysia (FOMEMA medical check, work permit, VP(TE) visa)
+- Migrant worker rights under Malaysian law (right to keep passport, receive salary, safe working hours)
+- How to report unethical agents using the MigrantSafe platform
+- Common scams and how to avoid them (debt bondage, fake documents, excessive fees)
+
+Rules:
+- Be warm, clear, and simple. Use short paragraphs. Many users have low literacy.
+- Use bullet points and emojis sparingly to make information easier to read.
+- If a question is not related to migrant worker recruitment in Malaysia, politely redirect.
+- If someone describes being in danger or exploited, express concern and advise them to contact the Malaysian Labour Department (JTKSM) at 03-8000 8000 or use the MigrantSafe report form.
+- Never give legal or medical advice — always suggest consulting a professional for those.
+- ALWAYS respond in English only, regardless of what language the user writes in.`
+    },
+    ms: {
+      badge: '🇲🇾 Melayu',
+      status: 'Dalam talian — sedia membantu',
+      hint: 'Tanya dalam Bahasa Melayu, English, atau বাংলা — saya faham ketiga-tiga.',
+      placeholder: 'Taip soalan anda di sini… (Tekan Enter untuk hantar)',
+      quickLabel: 'Soalan pantas',
+      prompts: [
+        'Bagaimana saya boleh semak sama ada ejen pengambilan pekerja adalah sah?',
+        'Siapa yang perlu bayar yuran pengambilan — saya atau majikan?',
+        'Apakah dokumen yang saya perlukan untuk bekerja di Malaysia?',
+        'Apakah hak saya sebagai pekerja migran?',
+        'Ejen minta RM 5,000 pendahuluan. Adakah ini sah di sisi undang-undang?',
+        'Berapa lama proses visa atau permit kerja mengambil masa?'
+      ],
+      systemPrompt: `Anda ialah pembantu AI MigrantSafe — panduan yang membantu, penyayang, dan berpengetahuan untuk pekerja migran di Malaysia. Balas dalam Bahasa Melayu. Bantu pengguna memahami:
+- Cara mengesahkan ejen pengambilan pekerja (status Disahkan / Tertunda / Dilaporkan di MigrantSafe)
+- Yuran pengambilan (majikan yang perlu bayar, BUKAN pekerja — dasar migrasi tanpa kos)
+- Dokumen kerja dan visa di Malaysia (pemeriksaan perubatan FOMEMA, permit kerja, visa VP(TE))
+- Hak pekerja migran di bawah undang-undang Malaysia
+- Cara melaporkan ejen tidak beretika menggunakan platform MigrantSafe
+- Penipuan biasa dan cara mengelakkannya
+
+Peraturan:
+- Gunakan bahasa mudah dan ringkas. Ramai pengguna mempunyai literasi rendah.
+- Jika seseorang dalam bahaya atau dieksploitasi, nasihatkan mereka menghubungi Jabatan Tenaga Kerja (JTKSM) di 03-8000 8000.
+- Jangan berikan nasihat perundangan atau perubatan.
+- PENTING: Sentiasa balas dalam Bahasa Melayu sahaja tanpa pengecualian. Walaupun pengguna menulis dalam bahasa lain, anda MESTI menjawab dalam Bahasa Melayu sepenuhnya.`
+    },
+    bn: {
+      badge: '🇧🇩 বাংলা',
+      status: 'অনলাইন — সাহায্য করতে প্রস্তুত',
+      hint: 'বাংলা, English, বা Bahasa Melayu-তে জিজ্ঞেস করুন — আমি তিনটিই বুঝি।',
+      placeholder: 'এখানে আপনার প্রশ্ন টাইপ করুন… (পাঠাতে Enter চাপুন)',
+      quickLabel: 'দ্রুত প্রশ্ন',
+      prompts: [
+        'আমি কীভাবে যাচাই করব যে একটি রিক্রুটমেন্ট এজেন্ট আসল এবং নিরাপদ?',
+        'রিক্রুটমেন্ট ফি কে দেবে — আমি নাকি নিয়োগকর্তা?',
+        'মালয়েশিয়ায় কাজ করতে আমার কী কী ডকুমেন্ট দরকার?',
+        'একজন অভিবাসী কর্মী হিসেবে আমার কী অধিকার আছে?',
+        'একজন এজেন্ট আমাকে RM ৫,০০০ আগাম দিতে বলছে। এটা কি বৈধ?',
+        'ভিসা বা ওয়ার্ক পারমিট প্রক্রিয়া কতদিন সময় নেয়?'
+      ],
+      systemPrompt: `আপনি MigrantSafe AI সহকারী — মালয়েশিয়ায় অভিবাসী কর্মীদের জন্য একজন সহায়ক, সহানুভূতিশীল এবং জ্ঞানসম্পন্ন গাইড। বাংলায় উত্তর দিন। ব্যবহারকারীদের বুঝতে সাহায্য করুন:
+- রিক্রুটমেন্ট এজেন্ট যাচাই করার পদ্ধতি (MigrantSafe-এ যাচাইকৃত/অপেক্ষমান/রিপোর্টকৃত স্ট্যাটাস)
+- রিক্রুটমেন্ট ফি (নিয়োগকর্তাকে দিতে হবে, কর্মীকে নয় — জিরো-কস্ট মাইগ্রেশন নীতি)
+- মালয়েশিয়ায় কাজের ডকুমেন্ট এবং ভিসা (FOMEMA মেডিকেল চেক, ওয়ার্ক পারমিট, VP(TE) ভিসা)
+- মালয়েশিয়ার আইনের অধীনে অভিবাসী কর্মীদের অধিকার
+- অনৈতিক এজেন্ট রিপোর্ট করার পদ্ধতি
+- সাধারণ প্রতারণা এবং সেগুলো এড়ানোর উপায়
+
+নিয়মাবলী:
+- সহজ এবং সংক্ষিপ্ত ভাষা ব্যবহার করুন।
+- কেউ বিপদে থাকলে বা শোষণের শিকার হলে, তাদের জনশক্তি বিভাগ (JTKSM)-এ 03-8000 8000 নম্বরে যোগাযোগ করতে বলুন।
+- আইনি বা চিকিৎসা পরামর্শ দেবেন না।
+- অত্যন্ত গুরুত্বপূর্ণ: সর্বদা শুধুমাত্র বাংলায় উত্তর দিন। ব্যবহারকারী যে ভাষায়ই লিখুক না কেন, আপনাকে অবশ্যই সম্পূর্ণ বাংলায় উত্তর দিতে হবে। এটি বাধ্যতামূলক।`
+    }
+  };
+
+  // ═══════════════════════════════════════════
+  //  LANGUAGE SWITCH
+  // ═══════════════════════════════════════════
+  function setLang(lang, btnEl) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    const cfg = LANGS[lang];
+    document.getElementById('langBadge').textContent    = cfg.badge;
+    document.getElementById('statusText').textContent   = cfg.status;
+    document.getElementById('inputHint').textContent    = cfg.hint;
+    document.getElementById('chatInput').placeholder    = cfg.placeholder;
+    document.getElementById('quickLabel').textContent   = cfg.quickLabel;
+
+    // Update quick prompt texts and data-q
+    const promptBtns = document.querySelectorAll('.prompt-btn');
+    cfg.prompts.forEach((p, i) => {
+      if (promptBtns[i]) {
+        promptBtns[i].dataset.q = p;
+        promptBtns[i].querySelector('.prompt-text').textContent = p;
+      }
+    });
+
+    // Update welcome card sub text
+    const welcomeSubs = {
+      en: "I can help you understand your rights, verify agents, learn about visas and documents, and navigate the recruitment process safely in Malaysia. Ask me anything!",
+      ms: "Saya boleh membantu anda memahami hak anda, mengesahkan ejen, mengetahui tentang visa dan dokumen, serta mengemudi proses pengambilan dengan selamat di Malaysia.",
+      bn: "আমি আপনাকে আপনার অধিকার বুঝতে, এজেন্ট যাচাই করতে, ভিসা ও ডকুমেন্ট সম্পর্কে জানতে এবং মালয়েশিয়ায় নিরাপদে কাজ খোঁজার প্রক্রিয়া বুঝতে সাহায্য করতে পারি।"
+    };
+    const wc = document.querySelector('.wc-sub');
+    if (wc) wc.textContent = welcomeSubs[lang];
+  }
+
+  // ═══════════════════════════════════════════
+  //  SEND / RECEIVE
+  // ═══════════════════════════════════════════
+  function sendQuick(text) {
+    document.getElementById('chatInput').value = text;
+    sendMessage();
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text  = input.value.trim();
+    if (!text || isTyping) return;
+
+    // Auto-detect language from what the user typed and switch if needed
+    const detected = detectLang(text);
+    if (detected && detected !== currentLang) {
+      // Silently switch to the detected language so the response matches
+      currentLang = detected;
+      const langBtnMap = { en: 0, ms: 1, bn: 2 };
+      const btns = document.querySelectorAll('.lang-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      if (btns[langBtnMap[detected]]) btns[langBtnMap[detected]].classList.add('active');
+    }
+
+    // Hide welcome card
+    const wc = document.getElementById('welcomeCard');
+    if (wc) wc.remove();
+
+    // Add user message
+    appendMessage('user', text);
+    messageHistory.push({ role: 'user', content: text });
+    input.value = '';
+    input.style.height = 'auto';
+
+    // Show typing
+    isTyping = true;
+    document.getElementById('sendBtn').disabled = true;
+    const typingEl = showTyping();
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          language: currentLang,
+          history: messageHistory.slice(-6)   // send last 6 turns for context
+        })
+      });
+
+      const data = await response.json();
+      typingEl.remove();
+
+      if (data.response) {
+        const reply = data.response;
+        appendMessage('bot', reply);
+        messageHistory.push({ role: 'assistant', content: reply });
+      } else {
+        appendMessage('bot', getFallback());
+      }
+
+    } catch (err) {
+      typingEl.remove();
+      appendMessage('bot', getFallback());
+    }
+
+    isTyping = false;
+    document.getElementById('sendBtn').disabled = false;
+    input.focus();
+  }
+
+  // ═══════════════════════════════════════════
+  //  DOM HELPERS
+  // ═══════════════════════════════════════════
+  function appendMessage(role, text) {
+    const msgs = document.getElementById('messages');
+    const now  = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+
+    const row = document.createElement('div');
+    row.className = `msg-row ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = `msg-avatar ${role === 'bot' ? 'bot-msg-avatar' : 'user-msg-avatar'}`;
+    avatar.textContent = role === 'bot' ? '🤖' : '🙋';
+
+    const bubble = document.createElement('div');
+    bubble.className = `msg-bubble ${role === 'bot' ? 'bot-bubble' : 'user-bubble'}`;
+
+    // Convert markdown-style line breaks and basic bold
+    const formatted = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+    bubble.innerHTML = formatted + `<span class="msg-time">${now}</span>`;
+
+    if (role === 'bot') {
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+    } else {
+      row.appendChild(bubble);
+      row.appendChild(avatar);
+    }
+
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    const msgs = document.getElementById('messages');
+    const row  = document.createElement('div');
+    row.className = 'typing-row';
+    row.id = 'typingIndicator';
+    row.innerHTML = `
+      <div class="msg-avatar bot-msg-avatar">🤖</div>
+      <div class="typing-bubble">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+    return row;
+  }
+
+  function getFallback() {
+    const fb = {
+      en: "I'm having trouble connecting right now. Please try again in a moment. If you need urgent help, contact the Malaysian Labour Department (JTKSM) at 03-8000 8000.",
+      ms: "Saya menghadapi masalah sambungan sekarang. Sila cuba lagi sebentar. Jika anda memerlukan bantuan segera, hubungi Jabatan Tenaga Kerja (JTKSM) di 03-8000 8000.",
+      bn: "এই মুহূর্তে সংযোগ করতে সমস্যা হচ্ছে। একটু পরে আবার চেষ্টা করুন। জরুরি সাহায্যের জন্য মালয়েশিয়ার জনশক্তি বিভাগ (JTKSM)-এ ০৩-৮০০০ ৮০০০ নম্বরে যোগাযোগ করুন।"
+    };
+    return fb[currentLang] || fb.en;
+  }
+
+  function clearChat() {
+    messageHistory = [];
+    const msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+
+    // Re-add welcome card
+    const card = document.createElement('div');
+    card.className = 'welcome-card';
+    card.id = 'welcomeCard';
+    const subs = {
+      en: "I can help you understand your rights, verify agents, learn about visas and documents, and navigate the recruitment process safely in Malaysia. Ask me anything!",
+      ms: "Saya boleh membantu anda memahami hak anda, mengesahkan ejen, mengetahui tentang visa dan dokumen, serta mengemudi proses pengambilan dengan selamat di Malaysia.",
+      bn: "আমি আপনাকে আপনার অধিকার বুঝতে, এজেন্ট যাচাই করতে, ভিসা ও ডকুমেন্ট সম্পর্কে জানতে এবং মালয়েশিয়ায় নিরাপদে কাজ খোঁজার প্রক্রিয়া বুঝতে সাহায্য করতে পারি।"
+    };
+    card.innerHTML = `
+      <div class="wc-icon">👋</div>
+      <div class="wc-title">Hello! I'm your MigrantSafe Assistant.</div>
+      <div class="wc-sub">${subs[currentLang]}</div>
+      <div class="wc-topics">
+        <span class="wc-topic">🛡️ Agent Verification</span>
+        <span class="wc-topic">💰 Recruitment Fees</span>
+        <span class="wc-topic">📄 Documents & Visas</span>
+        <span class="wc-topic">⚖️ Worker Rights</span>
+        <span class="wc-topic">🚨 Reporting Fraud</span>
+        <span class="wc-topic">🌏 Multilingual</span>
+      </div>`;
+    msgs.appendChild(card);
+    showToast('Chat cleared.');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

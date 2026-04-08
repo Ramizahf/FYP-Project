@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MigrantSafe — Migrant Recruitment Verification Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --teal:#0D6E6E; --teal-lt:#14A097; --teal-bg:#E6F4F4;
+      --amber:#E8833A; --amber-lt:#FFB347;
+      --dark:#0F2027; --mid:#1E3A3A;
+      --text:#2C2C2C; --muted:#6B7B7B;
+      --white:#FFFFFF; --cream:#F9F5F0; --border:#D4E8E8;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);overflow-x:hidden;transition:opacity .22s ease}
+    body.fading{opacity:0}
+
+    /* NAVBAR */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:box-shadow .3s}
+    nav.scrolled{box-shadow:0 4px 24px rgba(13,110,110,.12)}
+    .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo .dot{color:var(--amber)}
+    .nav-links{display:flex;align-items:center;gap:32px}
+    .nav-links a{font-size:.9rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--teal)}
+    .nav-cta{display:flex;gap:10px}
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:transform .15s,box-shadow .15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+    .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+    .btn-outline:hover{background:var(--teal-bg)}
+    .btn-primary{background:var(--teal);color:var(--white)}
+    .btn-primary:hover{background:var(--mid)}
+    .btn-amber{background:var(--amber);color:var(--white)}
+    .btn-amber:hover{background:#d06e28}
+    .btn-lg{padding:14px 32px;font-size:1rem;border-radius:10px}
+
+    /* HERO */
+    .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 5% 60px;background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.25) 0%,transparent 70%);animation:pulse 6s ease-in-out infinite}
+    .hero::after{content:'';position:absolute;bottom:-120px;left:30%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.15) 0%,transparent 70%);animation:pulse 8s ease-in-out infinite reverse}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+    .hero-content{position:relative;z-index:2}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,131,58,.18);border:1px solid rgba(232,131,58,.4);color:var(--amber-lt);font-size:.78rem;font-weight:600;letter-spacing:.08em;padding:6px 14px;border-radius:100px;text-transform:uppercase;margin-bottom:24px;animation:fadeUp .6s ease both}
+    .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,4.5vw,3.8rem);font-weight:900;line-height:1.15;color:var(--white);margin-bottom:20px;animation:fadeUp .7s .1s ease both}
+    .hero-title .accent{color:var(--teal-lt)}
+    .hero-title .accent2{color:var(--amber-lt)}
+    .hero-sub{font-size:1.05rem;font-weight:300;line-height:1.7;color:rgba(255,255,255,.72);max-width:520px;margin-bottom:36px;animation:fadeUp .7s .2s ease both}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:14px;animation:fadeUp .7s .3s ease both}
+    .hero-stats{display:flex;gap:32px;margin-top:52px;animation:fadeUp .7s .4s ease both}
+    .stat{border-left:2px solid rgba(20,160,151,.5);padding-left:16px}
+    .stat-num{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--white)}
+    .stat-label{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+
+    /* hero visual */
+    .hero-visual{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;animation:fadeUp .8s .2s ease both}
+    .card-stack{position:relative;width:340px;height:440px}
+    .vis-card{position:absolute;backdrop-filter:blur(12px);border-radius:20px;padding:24px;transition:transform .3s}
+    .vis-card:nth-child(1){width:300px;height:185px;top:0;right:0;background:linear-gradient(135deg,rgba(20,160,151,.25),rgba(20,160,151,.08));border:1px solid rgba(255,255,255,.12)}
+    .vis-card:nth-child(2){width:320px;height:200px;top:125px;left:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+    .vis-card:nth-child(3){width:280px;height:160px;bottom:0;right:10px;background:linear-gradient(135deg,rgba(232,131,58,.2),rgba(232,131,58,.06));border:1px solid rgba(255,255,255,.1)}
+    .card-stack:hover .vis-card:nth-child(1){transform:translateY(-6px) rotate(1deg)}
+    .card-stack:hover .vis-card:nth-child(2){transform:translateX(-6px)}
+    .card-stack:hover .vis-card:nth-child(3){transform:translateY(6px) rotate(-1deg)}
+    .vis-label{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+    .vis-name{font-size:1rem;font-weight:600;color:var(--white);margin-bottom:4px}
+    .vis-sub{font-size:.8rem;color:rgba(255,255,255,.6)}
+    .vis-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700;margin-top:10px}
+    .v-ok{background:rgba(20,200,100,.2);color:#4ddb8a;border:1px solid rgba(20,200,100,.3)}
+    .v-pend{background:rgba(255,180,50,.2);color:#ffcc55;border:1px solid rgba(255,180,50,.3)}
+    .vis-chat{background:rgba(255,255,255,.1);border-radius:10px;padding:8px 12px;font-size:.78rem;color:rgba(255,255,255,.8);margin-bottom:8px;max-width:220px}
+    .vis-chat.u{background:rgba(20,160,151,.3);margin-left:auto;text-align:right}
+
+    /* LANG STRIP */
+    .lang-strip{background:var(--teal);padding:16px 5%;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+    .lang-strip > span{color:rgba(255,255,255,.75);font-size:.88rem;font-weight:500}
+    .lang-pill{padding:7px 20px;border-radius:100px;background:rgba(255,255,255,.15);color:var(--white);font-size:.84rem;font-weight:600;border:1px solid rgba(255,255,255,.25);cursor:pointer;transition:background .2s,transform .15s;user-select:none}
+    .lang-pill:hover{background:rgba(255,255,255,.25);transform:translateY(-1px)}
+    .lang-pill.active{background:var(--amber);border-color:var(--amber);box-shadow:0 4px 14px rgba(232,131,58,.4)}
+
+    /* SECTIONS */
+    section{padding:90px 5%}
+    .section-tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+    .section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.8rem);font-weight:700;color:var(--dark);line-height:1.2;margin-bottom:16px}
+    .section-sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:540px}
+
+    /* HOW */
+    .how{background:var(--cream)}
+    .how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;margin-top:52px}
+    .step-card{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:32px 24px;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s}
+    .step-card:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(13,110,110,.1)}
+    .step-card::before{content:attr(data-num);position:absolute;top:-10px;right:16px;font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;line-height:1;color:rgba(13,110,110,.06)}
+    .step-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px}
+    .step-card h3{font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--dark)}
+    .step-card p{font-size:.88rem;color:var(--muted);line-height:1.6}
+
+    /* FEATURES */
+    .features-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:52px}
+    .feat-card{border-radius:18px;padding:34px 30px;border:1px solid var(--border);transition:transform .25s,box-shadow .25s}
+    .feat-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,.07)}
+    .feat-card.big{grid-column:span 2;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+    .feat-icon{font-size:2rem;margin-bottom:16px}
+    .feat-card h3{font-size:1.15rem;font-weight:600;color:var(--dark);margin-bottom:8px}
+    .feat-card p{font-size:.88rem;color:var(--muted);line-height:1.65}
+    .feat-demo{background:var(--teal-bg);border-radius:14px;padding:24px}
+    .agent-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--white);border-radius:10px;margin-bottom:10px;border:1px solid var(--border);font-size:.88rem}
+    .agent-row:last-child{margin-bottom:0}
+    .agent-name{font-weight:600;color:var(--dark)}
+    .agent-loc{font-size:.76rem;color:var(--muted);margin-top:2px}
+    .pill{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:100px;white-space:nowrap}
+    .pill-v{background:#e6faf0;color:#1a9a55}
+    .pill-p{background:#fff8e6;color:#b87d00}
+    .pill-r{background:#fdecea;color:#c0392b}
+
+    /* WHO */
+    .who{background:var(--dark)}
+    .who .section-title{color:var(--white)}
+    .who .section-sub{color:rgba(255,255,255,.6)}
+    .who .section-tag{color:var(--teal-lt)}
+    .who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
+    .who-card{border-radius:18px;padding:36px 28px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);transition:background .3s,transform .25s}
+    .who-card:hover{background:rgba(255,255,255,.08);transform:translateY(-4px)}
+    .who-icon{font-size:2.4rem;margin-bottom:20px}
+    .who-card h3{font-size:1.1rem;font-weight:600;color:var(--white);margin-bottom:10px}
+    .who-card p{font-size:.88rem;color:rgba(255,255,255,.58);line-height:1.65}
+    .who-card ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:8px}
+    .who-card ul li{font-size:.84rem;color:rgba(255,255,255,.65);padding-left:18px;position:relative}
+    .who-card ul li::before{content:'→';position:absolute;left:0;color:var(--teal-lt);font-size:.8rem}
+
+    /* CHATBOT */
+    .chatbot-section{background:linear-gradient(135deg,var(--teal-bg) 0%,var(--white) 100%);display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    .chat-window{background:var(--white);border-radius:20px;box-shadow:0 20px 60px rgba(13,110,110,.12);border:1px solid var(--border);overflow:hidden}
+    .chat-header{background:var(--teal);padding:16px 20px;display:flex;align-items:center;gap:12px}
+    .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .chat-info .cname{font-size:.9rem;font-weight:600;color:var(--white)}
+    .chat-info .cstatus{font-size:.72rem;color:rgba(255,255,255,.7)}
+    .online-dot{width:8px;height:8px;border-radius:50%;background:#4ddb8a;display:inline-block;margin-right:4px}
+    .chat-body{padding:20px;display:flex;flex-direction:column;gap:12px;min-height:240px;max-height:300px;overflow-y:auto}
+    .msg{max-width:78%;padding:10px 14px;border-radius:12px;font-size:.85rem;line-height:1.55}
+    .msg.bot{background:var(--teal-bg);color:var(--dark);border-bottom-left-radius:4px;align-self:flex-start}
+    .msg.usr{background:var(--teal);color:var(--white);border-bottom-right-radius:4px;align-self:flex-end}
+    .msg-lang{font-size:.7rem;opacity:.6;margin-top:4px}
+    .chat-input-row{display:flex;padding:12px 16px;gap:10px;border-top:1px solid var(--border)}
+    .chat-input-row input{flex:1;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:.85rem;font-family:inherit;outline:none;color:var(--text)}
+    .chat-input-row input:focus{border-color:var(--teal)}
+    .chat-send{width:36px;height:36px;border-radius:8px;background:var(--teal);color:var(--white);border:none;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    /* SDG */
+    .sdg-section{background:var(--cream);display:flex;align-items:center;gap:60px}
+    .sdg-badge-box{flex-shrink:0;width:160px;height:160px;border-radius:24px;background:linear-gradient(135deg,#0D6E6E,#E8833A);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;box-shadow:0 16px 40px rgba(13,110,110,.25)}
+    .sdg-badge-box .sdg-num{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900}
+    .sdg-badge-box .sdg-lbl{font-size:.68rem;font-weight:600;letter-spacing:.08em;opacity:.85;text-align:center;padding:0 10px}
+    .sdg-content p{font-size:.95rem;color:var(--muted);line-height:1.7;margin-top:12px;max-width:580px}
+
+    /* CTA */
+    .cta-section{background:linear-gradient(135deg,var(--dark),var(--mid));text-align:center;padding:100px 5%}
+    .cta-section h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--white);margin-bottom:18px;line-height:1.2}
+    .cta-section p{font-size:1.05rem;color:rgba(255,255,255,.65);max-width:480px;margin:0 auto 36px;line-height:1.7}
+    .cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+    /* FOOTER */
+    footer{background:var(--dark);padding:52px 5% 28px;border-top:1px solid rgba(255,255,255,.07)}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+    .footer-brand .flogo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--white);margin-bottom:12px}
+    .footer-brand .flogo .dot{color:var(--amber)}
+    .footer-brand p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.65;max-width:260px}
+    .footer-col h4{font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:16px}
+    .footer-col a{display:block;font-size:.84rem;color:rgba(255,255,255,.55);text-decoration:none;margin-bottom:10px;transition:color .2s}
+    .footer-col a:hover{color:var(--teal-lt)}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:rgba(255,255,255,.35);flex-wrap:wrap;gap:12px}
+    .sdg-tag{color:var(--amber);font-weight:600}
+
+    /* ANIMS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity .65s ease,transform .65s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .hero{grid-template-columns:1fr;padding:110px 5% 60px}
+      .hero-visual{display:none}
+      .features-grid{grid-template-columns:1fr}
+      .feat-card.big{grid-column:span 1;grid-template-columns:1fr}
+      .who-grid{grid-template-columns:1fr}
+      .chatbot-section{grid-template-columns:1fr}
+      .sdg-section{flex-direction:column;align-items:flex-start}
+      .footer-grid{grid-template-columns:1fr 1fr}
+      .nav-links{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+  <div class="nav-links">
+    <a href="#how"      data-t="nav_how">How It Works</a>
+    <a href="#features" data-t="nav_feat">Features</a>
+    <a href="#who"      data-t="nav_who">For You</a>
+    <a href="#chatbot"  data-t="nav_chat">Chatbot</a>
+  </div>
+  <div class="nav-cta">
+    <a href="{{ url_for('login') }}"    class="btn btn-outline"  data-t="nav_login">Log In</a>
+    <a href="{{ url_for('register') }}" class="btn btn-primary"  data-t="nav_reg">Register Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="badge-dot"></span><span data-t="badge">Protecting Migrant Workers in Malaysia</span></div>
+    <h1 class="hero-title">
+      <span data-t="h1a">Find </span><span class="accent" data-t="h1b">Trusted</span><span data-t="h1c"> Agents.</span><br/>
+      <span data-t="h1d">Work </span><span class="accent2" data-t="h1e">Safely</span><span>.</span><br/>
+      <span data-t="h1f">Know Your Rights.</span>
+    </h1>
+    <p class="hero-sub" data-t="hero_sub">MigrantSafe helps migrant workers verify recruitment agents, report fraud, and get guidance in their own language — 24 hours a day, for free.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('register') }}" class="btn btn-amber btn-lg" data-t="cta1">Get Started — It's Free</a>
+      <a href="#how" class="btn btn-lg" style="color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.3);" data-t="cta2">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">3M+</div><div class="stat-label" data-t="st1">Migrants in Malaysia</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label" data-t="st2">Languages Supported</div></div>
+      <div class="stat"><div class="stat-num">24/7</div><div class="stat-label" data-t="st3">Chatbot Guidance</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="card-stack">
+      <div class="vis-card">
+        <div class="vis-label" data-t="vc1l">Agent Profile</div>
+        <div class="vis-name">Suria Recruitment Sdn Bhd</div>
+        <div class="vis-sub">Kuala Lumpur · Construction</div>
+        <div class="vis-badge v-ok">✓ <span data-t="vc1b">Verified Agent</span></div>
+      </div>
+      <div class="vis-card">
+        <div class="vis-label" data-t="vc2l">AI Chatbot Support</div>
+        <div class="vis-chat" data-t="vc2q">When will my visa arrive?</div>
+        <div class="vis-chat u" data-t="vc2a">2–4 weeks after medical check ✓</div>
+      </div>
+      <div class="vis-card">
+        <div class="vis-label" data-t="vc3l">Reporting Status</div>
+        <div class="vis-name" data-t="vc3n">Agent Flagged</div>
+        <div class="vis-sub" data-t="vc3s">Under admin review · 2 reports</div>
+        <div class="vis-badge v-pend">⏳ <span data-t="vc3b">Under Review</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LANG STRIP -->
+<div class="lang-strip">
+  <span data-t="lang_label">Available in:</span>
+  <span class="lang-pill active" onclick="setLang('en')">🇬🇧 English</span>
+  <span class="lang-pill"        onclick="setLang('ms')">🇲🇾 Bahasa Melayu</span>
+  <span class="lang-pill"        onclick="setLang('bn')">🇧🇩 বাংলা</span>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="reveal">
+    <div class="section-tag" data-t="how_tag">Simple Steps</div>
+    <h2 class="section-title" data-t="how_h">How MigrantSafe Works</h2>
+    <p class="section-sub" data-t="how_p">Anyone can use this platform — no technical skills needed. Just follow these 4 simple steps.</p>
+  </div>
+  <div class="how-grid">
+    <div class="step-card reveal" data-num="01"><div class="step-icon" style="background:#e6f4f4">🧑‍💼</div><h3 data-t="s1h">Create Your Account</h3><p data-t="s1p">Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.</p></div>
+    <div class="step-card reveal" data-num="02"><div class="step-icon" style="background:#fff3e6">🔍</div><h3 data-t="s2h">Search for Agents</h3><p data-t="s2p">Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.</p></div>
+    <div class="step-card reveal" data-num="03"><div class="step-icon" style="background:#e6f4f4">🚨</div><h3 data-t="s3h">Report Bad Actors</h3><p data-t="s3p">If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.</p></div>
+    <div class="step-card reveal" data-num="04"><div class="step-icon" style="background:#fff3e6">💬</div><h3 data-t="s4h">Ask the Chatbot</h3><p data-t="s4p">Have a question about visas, contracts, or fees? Ask our AI chatbot in English, Malay, or Bangla — anytime.</p></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <div class="section-tag" data-t="feat_tag">Platform Features</div>
+    <h2 class="section-title" data-t="feat_h">Everything You Need, In One Place</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card big reveal">
+      <div>
+        <div class="feat-icon">🛡️</div>
+        <h3 data-t="f1h">Agent Verification System</h3>
+        <p data-t="f1p">Every recruitment agent on MigrantSafe has a clear status badge. Before you trust an agent with your money and future, check if they are officially verified, still under review, or have been reported by other workers.</p>
+        <br/><p style="font-size:.84rem;color:var(--muted)" data-t="f1s">Admins can update statuses based on reports and investigations — keeping the database trustworthy.</p>
+        <br/><a href="{{ url_for('agents') }}" class="btn btn-primary" style="margin-top:8px" data-t="f1btn">Browse Agents →</a>
+      </div>
+      <div class="feat-demo">
+        <div class="agent-row"><div><div class="agent-name">Suria Recruitment Sdn Bhd</div><div class="agent-loc">📍 Kuala Lumpur</div></div><span class="pill pill-v" data-t="pv">✓ Verified</span></div>
+        <div class="agent-row"><div><div class="agent-name">Bintang Labour Agency</div><div class="agent-loc">📍 Selangor</div></div><span class="pill pill-p" data-t="pp">⏳ Pending</span></div>
+        <div class="agent-row"><div><div class="agent-name">FastWork Services</div><div class="agent-loc">📍 Johor Bahru</div></div><span class="pill pill-r" data-t="pr">⚠ Reported</span></div>
+        <div class="agent-row"><div><div class="agent-name">Harapan Recruitment</div><div class="agent-loc">📍 Penang</div></div><span class="pill pill-v" data-t="pv2">✓ Verified</span></div>
+      </div>
+    </div>
+    <div class="feat-card reveal" style="background:var(--cream)">
+      <div class="feat-icon">📝</div><h3 data-t="f2h">Report Suspicious Agents</h3>
+      <p data-t="f2p">Been cheated, overcharged, or misled? Submit a report. We collect the details and alert the admin. Other workers can see flagged agents before it's too late.</p>
+      <br/><p style="font-size:.82rem;color:var(--muted)" data-t="f2s">Your identity stays protected — reports are reviewed confidentially.</p>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-icon">🌏</div><h3 data-t="f3h">Multilingual Interface</h3>
+      <p data-t="f3p">The platform works in English, Bahasa Melayu, and বাংলা (Bangla). Switch languages with one click — no need to struggle with unfamiliar words.</p>
+    </div>
+    <div class="feat-card reveal" style="background:var(--teal-bg)">
+      <div class="feat-icon">🔐</div><h3 data-t="f4h">Secure Login &amp; Roles</h3>
+      <p data-t="f4p">Three types of accounts — Migrant Worker, Recruitment Agent, and Admin. Each role sees only what is relevant to them. Your password is encrypted and safe.</p>
+    </div>
+    <div class="feat-card reveal" style="background:var(--dark);border-color:rgba(255,255,255,.08)">
+      <div class="feat-icon">📊</div>
+      <h3 style="color:var(--white)" data-t="f5h">Admin Dashboard</h3>
+      <p style="color:rgba(255,255,255,.6)" data-t="f5p">Admins can view all reports, update agent statuses, manage user accounts, and keep the platform clean and trustworthy — from a simple, organised dashboard.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section class="who" id="who">
+  <div class="reveal">
+    <div class="section-tag" data-t="who_tag">Who Can Use MigrantSafe</div>
+    <h2 class="section-title" data-t="who_h">Built for Everyone in the Recruitment Journey</h2>
+    <p class="section-sub" data-t="who_p">Whether you are a worker seeking a safer path, an agent building trust, or an admin keeping things fair — MigrantSafe is for you.</p>
+  </div>
+  <div class="who-grid">
+    <div class="who-card reveal">
+      <div class="who-icon">👷</div><h3 data-t="w1h">Migrant Workers</h3>
+      <p data-t="w1p">Looking for safe, verified work in Malaysia? This platform helps you check agents before trusting them.</p>
+      <ul><li data-t="w1l1">Verify agent legitimacy</li><li data-t="w1l2">Report fraud or overcharging</li><li data-t="w1l3">Get guidance in Bangla / Malay</li><li data-t="w1l4">Understand your documents</li><li data-t="w1l5">Ask the chatbot anytime</li></ul>
+    </div>
+    <div class="who-card reveal">
+      <div class="who-icon">🏢</div><h3 data-t="w2h">Recruitment Agents</h3>
+      <p data-t="w2p">Licensed and ethical? Create a verified profile to build trust with workers and grow your business legitimately.</p>
+      <ul><li data-t="w2l1">Register your agency</li><li data-t="w2l2">Build a transparent profile</li><li data-t="w2l3">Get verified badge from admin</li><li data-t="w2l4">Connect with workers</li><li data-t="w2l5">Boost credibility</li></ul>
+    </div>
+    <div class="who-card reveal">
+      <div class="who-icon">⚖️</div><h3 data-t="w3h">Admins &amp; Reviewers</h3>
+      <p data-t="w3p">Monitor the platform, review reports, and ensure the verification system stays accurate and up to date.</p>
+      <ul><li data-t="w3l1">Review incoming reports</li><li data-t="w3l2">Update agent statuses</li><li data-t="w3l3">Manage user accounts</li><li data-t="w3l4">Keep data trustworthy</li><li data-t="w3l5">Dashboard overview</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- CHATBOT -->
+<section class="chatbot-section" id="chatbot">
+  <div class="reveal">
+    <div class="section-tag" data-t="ch_tag">AI Chatbot</div>
+    <h2 class="section-title" data-t="ch_h">Ask Anything, Anytime, In Your Language</h2>
+    <p class="section-sub" data-t="ch_p">Our built-in chatbot answers your questions about recruitment, visas, contracts, and your rights — in English, Malay, and Bangla. No waiting. No cost.</p>
+    <br/>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:8px">
+      <li style="font-size:.9rem;color:var(--muted);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:var(--teal)">✓</span><span data-t="cl1">Available 24 hours, 7 days a week</span></li>
+      <li style="font-size:.9rem;color:var(--muted);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:var(--teal)">✓</span><span data-t="cl2">Understands Bangla, Malay, and English</span></li>
+      <li style="font-size:.9rem;color:var(--muted);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:var(--teal)">✓</span><span data-t="cl3">Guides you step by step</span></li>
+      <li style="font-size:.9rem;color:var(--muted);padding-left:20px;position:relative"><span style="position:absolute;left:0;color:var(--teal)">✓</span><span data-t="cl4">No ads, no fees, no sign-up needed to chat</span></li>
+    </ul>
+    <br/><a href="{{ url_for('chatbot') }}" class="btn btn-primary btn-lg" style="margin-top:16px" data-t="ch_btn">Try the Chatbot →</a>
+  </div>
+  <div class="reveal">
+    <div class="chat-window">
+      <div class="chat-header">
+        <div class="chat-avatar">🤖</div>
+        <div class="chat-info">
+          <div class="cname">MigrantSafe Assistant</div>
+          <div class="cstatus"><span class="online-dot"></span><span data-t="ch_online">Online — Ready to Help</span></div>
+        </div>
+      </div>
+      <div class="chat-body" id="chatDemo"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Type your question here..." onkeydown="if(event.key==='Enter')sendDemo()"/>
+        <button class="chat-send" onclick="sendDemo()">➤</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SDG -->
+<section class="sdg-section reveal">
+  <div class="sdg-badge-box"><div class="sdg-num">8</div><div class="sdg-lbl">SDG DECENT WORK &amp; GROWTH</div></div>
+  <div class="sdg-content">
+    <div class="section-tag" data-t="sdg_tag">Our Mission</div>
+    <h2 class="section-title" style="font-size:1.9rem" data-t="sdg_h">Aligned with UN SDG 8</h2>
+    <p data-t="sdg_p">MigrantSafe directly supports Target 8.8 of the United Nations Sustainable Development Goals — protecting the rights of all workers, including migrant workers, and promoting safe working environments. By reducing exploitation, improving transparency, and giving workers access to verified information, we work toward a more just and ethical labour market in Malaysia.</p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 data-t="cta_h">Ready to Work Safely?<br/>Join MigrantSafe Today.</h2>
+  <p data-t="cta_p">It's free, it's simple, and it could protect you from exploitation. Register in under 2 minutes.</p>
+  <div class="cta-btns">
+    <a href="{{ url_for('register') }}" class="btn btn-amber btn-lg" data-t="cta_b1">Create Free Account</a>
+    <a href="{{ url_for('agents') }}" class="btn btn-lg" style="color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.3)" data-t="cta_b2">Browse Agents</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="flogo">Migrant<span class="dot">Safe</span></div>
+      <p data-t="ft_desc">A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="ft_h1">Platform</h4>
+      <a href="{{ url_for('register') }}" data-t="ft_reg">Register</a>
+      <a href="{{ url_for('login') }}"    data-t="ft_login">Login</a>
+      <a href="{{ url_for('agents') }}"   data-t="ft_agents">Agent Directory</a>
+      <a href="{{ url_for('chatbot') }}"  data-t="ft_chatbot">Chatbot</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="ft_h2">For Workers</h4>
+      <a href="{{ url_for('agents') }}" data-t="ft_w1">How to Verify Agents</a>
+      <a href="{{ url_for('chatbot') }}" data-t="ft_w2">Recruitment Guide</a>
+      <a href="{{ url_for('agents') }}" data-t="ft_w3">Report an Agent</a>
+      <a href="{{ url_for('chatbot') }}" data-t="ft_w4">Know Your Rights</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="ft_h3">Languages</h4>
+      <a href="#" onclick="setLang('en');return false">🇬🇧 English</a>
+      <a href="#" onclick="setLang('ms');return false">🇲🇾 Bahasa Melayu</a>
+      <a href="#" onclick="setLang('bn');return false">🇧🇩 বাংলা</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span data-t="ft_copy">© 2025 MigrantSafe · Final Year Project · APU Malaysia</span>
+    <span>Supporting <span class="sdg-tag" data-t="ft_sdg">SDG 8 — Decent Work &amp; Economic Growth</span></span>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     TRANSLATION ENGINE
+═══════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────────────────
+// ALL TRANSLATIONS
+// ──────────────────────────────────────────────────────────
+const T = {
+  en: {
+    nav_how:"How It Works", nav_feat:"Features", nav_who:"For You", nav_chat:"Chatbot",
+    nav_login:"Log In", nav_reg:"Register Free",
+    badge:"Protecting Migrant Workers in Malaysia",
+    h1a:"Find ", h1b:"Trusted", h1c:" Agents.", h1d:"Work ", h1e:"Safely", h1f:"Know Your Rights.",
+    hero_sub:"MigrantSafe helps migrant workers verify recruitment agents, report fraud, and get guidance in their own language — 24 hours a day, for free.",
+    cta1:"Get Started — It's Free", cta2:"See How It Works",
+    st1:"Migrants in Malaysia", st2:"Languages Supported", st3:"Chatbot Guidance",
+    vc1l:"Agent Profile", vc1b:"Verified Agent",
+    vc2l:"AI Chatbot Support", vc2q:"When will my visa arrive?", vc2a:"2–4 weeks after medical check ✓",
+    vc3l:"Reporting Status", vc3n:"Agent Flagged", vc3s:"Under admin review · 2 reports", vc3b:"Under Review",
+    lang_label:"Available in:",
+    how_tag:"Simple Steps", how_h:"How MigrantSafe Works",
+    how_p:"Anyone can use this platform — no technical skills needed. Just follow these 4 simple steps.",
+    s1h:"Create Your Account",    s1p:"Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.",
+    s2h:"Search for Agents",      s2p:"Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.",
+    s3h:"Report Bad Actors",      s3p:"If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.",
+    s4h:"Ask the Chatbot",        s4p:"Have a question about visas, contracts, or fees? Ask our AI chatbot in English, Malay, or Bangla — anytime.",
+    feat_tag:"Platform Features", feat_h:"Everything You Need, In One Place",
+    f1h:"Agent Verification System",
+    f1p:"Every recruitment agent on MigrantSafe has a clear status badge. Before you trust an agent with your money and future, check if they are officially verified, still under review, or have been reported by other workers.",
+    f1s:"Admins can update statuses based on reports and investigations — keeping the database trustworthy.",
+    f1btn:"Browse Agents →",
+    pv:"✓ Verified", pp:"⏳ Pending", pr:"⚠ Reported", pv2:"✓ Verified",
+    f2h:"Report Suspicious Agents",
+    f2p:"Been cheated, overcharged, or misled? Submit a report. We collect the details and alert the admin. Other workers can see flagged agents before it's too late.",
+    f2s:"Your identity stays protected — reports are reviewed confidentially.",
+    f3h:"Multilingual Interface",
+    f3p:"The platform works in English, Bahasa Melayu, and বাংলা (Bangla). Switch languages with one click — no need to struggle with unfamiliar words.",
+    f4h:"Secure Login & Roles",
+    f4p:"Three types of accounts — Migrant Worker, Recruitment Agent, and Admin. Each role sees only what is relevant to them. Your password is encrypted and safe.",
+    f5h:"Admin Dashboard",
+    f5p:"Admins can view all reports, update agent statuses, manage user accounts, and keep the platform clean and trustworthy — from a simple, organised dashboard.",
+    who_tag:"Who Can Use MigrantSafe", who_h:"Built for Everyone in the Recruitment Journey",
+    who_p:"Whether you are a worker seeking a safer path, an agent building trust, or an admin keeping things fair — MigrantSafe is for you.",
+    w1h:"Migrant Workers", w1p:"Looking for safe, verified work in Malaysia? This platform helps you check agents before trusting them.",
+    w1l1:"Verify agent legitimacy", w1l2:"Report fraud or overcharging", w1l3:"Get guidance in Bangla / Malay", w1l4:"Understand your documents", w1l5:"Ask the chatbot anytime",
+    w2h:"Recruitment Agents", w2p:"Licensed and ethical? Create a verified profile to build trust with workers and grow your business legitimately.",
+    w2l1:"Register your agency", w2l2:"Build a transparent profile", w2l3:"Get verified badge from admin", w2l4:"Connect with workers", w2l5:"Boost credibility",
+    w3h:"Admins & Reviewers", w3p:"Monitor the platform, review reports, and ensure the verification system stays accurate and up to date.",
+    w3l1:"Review incoming reports", w3l2:"Update agent statuses", w3l3:"Manage user accounts", w3l4:"Keep data trustworthy", w3l5:"Dashboard overview",
+    ch_tag:"AI Chatbot", ch_h:"Ask Anything, Anytime, In Your Language",
+    ch_p:"Our built-in chatbot answers your questions about recruitment, visas, contracts, and your rights — in English, Malay, and Bangla. No waiting. No cost.",
+    cl1:"Available 24 hours, 7 days a week", cl2:"Understands Bangla, Malay, and English",
+    cl3:"Guides you step by step", cl4:"No ads, no fees, no sign-up needed to chat",
+    ch_btn:"Try the Chatbot →", ch_online:"Online — Ready to Help",
+    ch_placeholder:"Type your question here...",
+    bot_hi:"Hello! I'm here to help you. Ask me anything about recruitment, visas, or your rights. 😊",
+    bot_lang:"English", bot_answered:"Answered in English",
+    demo_q:"How do I check if an agent is real?",
+    demo_a:"Great question! Go to the Agent Verification page. Search the agent's name. If they have a green ✓ badge, they are officially verified. If you see ⚠ Reported — avoid them!",
+    sdg_tag:"Our Mission", sdg_h:"Aligned with UN SDG 8",
+    sdg_p:"MigrantSafe directly supports Target 8.8 of the United Nations Sustainable Development Goals — protecting the rights of all workers, including migrant workers, and promoting safe working environments. By reducing exploitation, improving transparency, and giving workers access to verified information, we work toward a more just and ethical labour market in Malaysia.",
+    cta_h:"Ready to Work Safely?<br/>Join MigrantSafe Today.",
+    cta_p:"It's free, it's simple, and it could protect you from exploitation. Register in under 2 minutes.",
+    cta_b1:"Create Free Account", cta_b2:"Browse Agents",
+    ft_desc:"A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.",
+    ft_h1:"Platform", ft_h2:"For Workers", ft_h3:"Languages",
+    ft_reg:"Register", ft_login:"Login", ft_agents:"Agent Directory", ft_chatbot:"Chatbot",
+    ft_w1:"How to Verify Agents", ft_w2:"Recruitment Guide", ft_w3:"Report an Agent", ft_w4:"Know Your Rights",
+    ft_copy:"© 2025 MigrantSafe · Final Year Project · APU Malaysia",
+    ft_sdg:"SDG 8 — Decent Work & Economic Growth",
+    r_default:"Thank you for your question! For a full answer, please use the chatbot page. 😊",
+    r_visa:"Your visa application usually takes 2–6 weeks. Make sure your medical check is complete first!",
+    r_agent:"To check if an agent is verified, go to the Agent Directory and look for the green ✓ Verified badge.",
+    r_fee:"Recruitment fees should be paid by the EMPLOYER, not by you. If an agent asks you to pay large fees — please report them!",
+    r_report:"To report an agent, log in and click 'Report Agent' on their profile. Our admin team will review it.",
+  },
+  ms: {
+    nav_how:"Cara Berfungsi", nav_feat:"Ciri-ciri", nav_who:"Untuk Anda", nav_chat:"Chatbot",
+    nav_login:"Log Masuk", nav_reg:"Daftar Percuma",
+    badge:"Melindungi Pekerja Asing di Malaysia",
+    h1a:"Cari ", h1b:"Ejen Dipercayai", h1c:".", h1d:"Bekerja ", h1e:"dengan Selamat", h1f:"Ketahui Hak Anda.",
+    hero_sub:"MigrantSafe membantu pekerja asing mengesahkan ejen pengambilan, melaporkan penipuan, dan mendapatkan panduan dalam bahasa mereka sendiri — 24 jam sehari, secara percuma.",
+    cta1:"Mulakan — Percuma", cta2:"Lihat Cara Ia Berfungsi",
+    st1:"Pekerja Asing di Malaysia", st2:"Bahasa Disokong", st3:"Panduan Chatbot",
+    vc1l:"Profil Ejen", vc1b:"Ejen Disahkan",
+    vc2l:"Sokongan Chatbot AI", vc2q:"Bilakah visa saya tiba?", vc2a:"2–4 minggu selepas pemeriksaan perubatan ✓",
+    vc3l:"Status Laporan", vc3n:"Ejen Ditandakan", vc3s:"Dalam semakan admin · 2 laporan", vc3b:"Dalam Semakan",
+    lang_label:"Tersedia dalam:",
+    how_tag:"Langkah Mudah", how_h:"Cara MigrantSafe Berfungsi",
+    how_p:"Sesiapa pun boleh menggunakan platform ini — tiada kemahiran teknikal diperlukan. Ikuti sahaja 4 langkah mudah ini.",
+    s1h:"Buat Akaun Anda",      s1p:"Daftar sebagai pekerja asing atau ejen pengambilan. Ia percuma sepenuhnya dan mengambil masa kurang dari 2 minit.",
+    s2h:"Cari Ejen",            s2p:"Layari pangkalan data agensi pengambilan kami. Lihat status pengesahan mereka — Disahkan, Belum Disahkan, atau Dilaporkan.",
+    s3h:"Laporkan Ejen Palsu",  s3p:"Jika ejen menipu atau mengelirukan anda, isi borang laporan mudah. Admin akan menyemaknya dan mengemas kini status ejen.",
+    s4h:"Tanya Chatbot",        s4p:"Ada soalan mengenai visa, kontrak, atau yuran? Tanya chatbot AI kami bila-bila masa.",
+    feat_tag:"Ciri Platform", feat_h:"Semua yang Anda Perlukan, Di Satu Tempat",
+    f1h:"Sistem Pengesahan Ejen",
+    f1p:"Setiap ejen pengambilan di MigrantSafe mempunyai lencana status yang jelas. Semak sama ada mereka disahkan secara rasmi, masih dalam semakan, atau telah dilaporkan oleh pekerja lain sebelum mempercayai mereka.",
+    f1s:"Admin boleh mengemas kini status berdasarkan laporan dan siasatan — memastikan pangkalan data boleh dipercayai.",
+    f1btn:"Semak Ejen →",
+    pv:"✓ Disahkan", pp:"⏳ Belum Disahkan", pr:"⚠ Dilaporkan", pv2:"✓ Disahkan",
+    f2h:"Laporkan Ejen Mencurigakan",
+    f2p:"Ditipu, dicaj berlebihan, atau diperdaya? Hantar laporan. Kami kumpulkan maklumat dan maklumkan admin. Pekerja lain boleh melihat ejen yang ditandakan sebelum terlambat.",
+    f2s:"Identiti anda dilindungi — laporan disemak secara sulit.",
+    f3h:"Antara Muka Berbilang Bahasa",
+    f3p:"Platform ini berfungsi dalam Bahasa Inggeris, Bahasa Melayu, dan বাংলা (Bangla). Tukar bahasa dengan satu klik.",
+    f4h:"Log Masuk Selamat & Peranan",
+    f4p:"Tiga jenis akaun — Pekerja Asing, Ejen Pengambilan, dan Admin. Kata laluan anda disulitkan dan selamat.",
+    f5h:"Papan Pemuka Admin",
+    f5p:"Admin boleh melihat semua laporan, mengemas kini status ejen, mengurus akaun pengguna dari papan pemuka yang mudah.",
+    who_tag:"Siapa Boleh Guna MigrantSafe", who_h:"Dibina untuk Semua dalam Proses Pengambilan",
+    who_p:"Sama ada anda pekerja, ejen, atau admin — MigrantSafe untuk anda.",
+    w1h:"Pekerja Asing", w1p:"Mencari kerja yang selamat dan disahkan di Malaysia? Platform ini membantu anda menyemak ejen sebelum mempercayai mereka.",
+    w1l1:"Sahkan kesahihan ejen", w1l2:"Laporkan penipuan atau caj berlebihan", w1l3:"Dapatkan panduan dalam Bangla / Melayu", w1l4:"Fahami dokumen anda", w1l5:"Tanya chatbot bila-bila masa",
+    w2h:"Ejen Pengambilan", w2p:"Berlesen dan beretika? Buat profil yang disahkan untuk membina kepercayaan dengan pekerja.",
+    w2l1:"Daftarkan agensi anda", w2l2:"Bina profil yang telus", w2l3:"Dapatkan lencana disahkan daripada admin", w2l4:"Hubungi pekerja", w2l5:"Tingkatkan kredibiliti",
+    w3h:"Admin & Pengulas", w3p:"Pantau platform, semak laporan, dan pastikan sistem pengesahan sentiasa tepat.",
+    w3l1:"Semak laporan masuk", w3l2:"Kemas kini status ejen", w3l3:"Urus akaun pengguna", w3l4:"Pastikan data boleh dipercayai", w3l5:"Gambaran papan pemuka",
+    ch_tag:"Chatbot AI", ch_h:"Tanya Apa Sahaja, Bila-bila Masa, Dalam Bahasa Anda",
+    ch_p:"Chatbot kami menjawab soalan anda tentang pengambilan, visa, kontrak, dan hak anda — dalam Bahasa Inggeris, Melayu, dan Bangla. Tiada tunggu. Tiada kos.",
+    cl1:"Tersedia 24 jam, 7 hari seminggu", cl2:"Faham Bangla, Melayu, dan Inggeris",
+    cl3:"Panduan langkah demi langkah", cl4:"Tiada iklan, tiada yuran, tiada pendaftaran untuk bersembang",
+    ch_btn:"Cuba Chatbot →", ch_online:"Dalam Talian — Sedia Membantu",
+    ch_placeholder:"Taip soalan anda di sini...",
+    bot_hi:"Helo! Saya di sini untuk membantu anda. Tanya saya apa sahaja tentang pengambilan, visa, atau hak anda. 😊",
+    bot_lang:"Bahasa Melayu", bot_answered:"Dijawab dalam Bahasa Melayu",
+    demo_q:"Bagaimana saya tahu ejen ini benar-benar sah?",
+    demo_a:"Soalan yang baik! Pergi ke halaman Pengesahan Ejen. Cari nama ejen. Jika ada tanda ✓ hijau, ejen itu sah. Jika ada ⚠ Dilaporkan — elakkan mereka!",
+    sdg_tag:"Misi Kami", sdg_h:"Sejajar dengan SDG 8 PBB",
+    sdg_p:"MigrantSafe secara langsung menyokong Sasaran 8.8 Matlamat Pembangunan Mampan PBB — melindungi hak semua pekerja, termasuk pekerja asing, dan menggalakkan persekitaran kerja yang selamat. Kami bekerja ke arah pasaran buruh yang lebih adil dan beretika di Malaysia.",
+    cta_h:"Bersedia untuk Bekerja dengan Selamat?<br/>Sertai MigrantSafe Hari Ini.",
+    cta_p:"Ia percuma, mudah, dan boleh melindungi anda daripada eksploitasi. Daftar dalam masa kurang dari 2 minit.",
+    cta_b1:"Buat Akaun Percuma", cta_b2:"Semak Ejen",
+    ft_desc:"Platform berbilang bahasa yang membantu pekerja asing di Malaysia mencari ejen yang disahkan dan memahami hak mereka.",
+    ft_h1:"Platform", ft_h2:"Untuk Pekerja", ft_h3:"Bahasa",
+    ft_reg:"Daftar", ft_login:"Log Masuk", ft_agents:"Direktori Ejen", ft_chatbot:"Chatbot",
+    ft_w1:"Cara Sahkan Ejen", ft_w2:"Panduan Pengambilan", ft_w3:"Laporkan Ejen", ft_w4:"Ketahui Hak Anda",
+    ft_copy:"© 2025 MigrantSafe · Projek Tahun Akhir · APU Malaysia",
+    ft_sdg:"SDG 8 — Kerja Layak & Pertumbuhan Ekonomi",
+    r_default:"Terima kasih atas soalan anda! Untuk jawapan penuh, sila gunakan halaman chatbot. 😊",
+    r_visa:"Permohonan visa anda biasanya mengambil masa 2–6 minggu. Pastikan pemeriksaan perubatan anda selesai terlebih dahulu!",
+    r_agent:"Untuk menyemak sama ada ejen disahkan, pergi ke Direktori Ejen dan cari lencana hijau ✓ Disahkan.",
+    r_fee:"Yuran pengambilan perlu dibayar oleh MAJIKAN, bukan oleh anda. Jika ejen meminta anda membayar yuran besar — sila laporkan mereka!",
+    r_report:"Untuk melaporkan ejen, log masuk dan klik 'Laporkan Ejen' pada profil mereka.",
+  },
+  bn: {
+    nav_how:"কীভাবে কাজ করে", nav_feat:"বৈশিষ্ট্য", nav_who:"আপনার জন্য", nav_chat:"চ্যাটবট",
+    nav_login:"লগ ইন", nav_reg:"বিনামূল্যে নিবন্ধন",
+    badge:"মালয়েশিয়ায় অভিবাসী শ্রমিকদের সুরক্ষা",
+    h1a:"বিশ্বস্ত ", h1b:"এজেন্ট", h1c:" খুঁজুন।", h1d:"", h1e:"নিরাপদে কাজ করুন", h1f:"আপনার অধিকার জানুন।",
+    hero_sub:"MigrantSafe অভিবাসী শ্রমিকদের নিয়োগ এজেন্ট যাচাই করতে, প্রতারণা রিপোর্ট করতে এবং তাদের নিজের ভাষায় গাইডেন্স পেতে সাহায্য করে — দিনে ২৪ ঘণ্টা, বিনামূল্যে।",
+    cta1:"শুরু করুন — বিনামূল্যে", cta2:"কীভাবে কাজ করে দেখুন",
+    st1:"মালয়েশিয়ায় অভিবাসী", st2:"ভাষা সমর্থিত", st3:"চ্যাটবট গাইডেন্স",
+    vc1l:"এজেন্ট প্রোফাইল", vc1b:"যাচাইকৃত এজেন্ট",
+    vc2l:"AI চ্যাটবট সহায়তা", vc2q:"আমার ভিসা কখন আসবে?", vc2a:"মেডিকেলের পর ২–৪ সপ্তাহ ✓",
+    vc3l:"রিপোর্টের অবস্থা", vc3n:"এজেন্ট চিহ্নিত", vc3s:"অ্যাডমিন পর্যালোচনায় · ২টি রিপোর্ট", vc3b:"পর্যালোচনাধীন",
+    lang_label:"পাওয়া যাচ্ছে:",
+    how_tag:"সহজ পদক্ষেপ", how_h:"MigrantSafe কীভাবে কাজ করে",
+    how_p:"যে কেউ এই প্ল্যাটফর্ম ব্যবহার করতে পারবেন — কোনো প্রযুক্তিগত দক্ষতার প্রয়োজন নেই। শুধু এই ৪টি সহজ পদক্ষেপ অনুসরণ করুন।",
+    s1h:"আপনার অ্যাকাউন্ট তৈরি করুন", s1p:"অভিবাসী শ্রমিক বা নিয়োগ এজেন্ট হিসেবে নিবন্ধন করুন। এটি সম্পূর্ণ বিনামূল্যে এবং ২ মিনিটেরও কম সময় নেয়।",
+    s2h:"এজেন্ট খুঁজুন",            s2p:"আমাদের নিয়োগ সংস্থার ডেটাবেস ব্রাউজ করুন। তাদের যাচাইকরণ স্ট্যাটাস দেখুন — যাচাইকৃত, মুলতুবি, বা রিপোর্টেড।",
+    s3h:"খারাপ এজেন্ট রিপোর্ট করুন", s3p:"যদি কোনো এজেন্ট আপনাকে প্রতারণা করে, একটি সহজ রিপোর্ট ফর্ম পূরণ করুন। অ্যাডমিন এটি পর্যালোচনা করবে।",
+    s4h:"চ্যাটবটকে জিজ্ঞাসা করুন",  s4p:"ভিসা, চুক্তি বা ফি সম্পর্কে প্রশ্ন আছে? আমাদের AI চ্যাটবটকে বাংলায় জিজ্ঞাসা করুন — যেকোনো সময়।",
+    feat_tag:"প্ল্যাটফর্ম বৈশিষ্ট্য", feat_h:"আপনার যা দরকার সবকিছু, এক জায়গায়",
+    f1h:"এজেন্ট যাচাইকরণ সিস্টেম",
+    f1p:"MigrantSafe-এ প্রতিটি নিয়োগ এজেন্টের একটি স্পষ্ট স্ট্যাটাস ব্যাজ আছে। আপনার অর্থ ও ভবিষ্যৎ এজেন্টের উপর ন্যস্ত করার আগে, তারা যাচাইকৃত কিনা পরীক্ষা করুন।",
+    f1s:"অ্যাডমিনরা রিপোর্ট ও তদন্তের ভিত্তিতে স্ট্যাটাস আপডেট করতে পারবেন — ডেটাবেসকে বিশ্বাসযোগ্য রাখতে।",
+    f1btn:"এজেন্ট দেখুন →",
+    pv:"✓ যাচাইকৃত", pp:"⏳ মুলতুবি", pr:"⚠ রিপোর্টেড", pv2:"✓ যাচাইকৃত",
+    f2h:"সন্দেহজনক এজেন্ট রিপোর্ট করুন",
+    f2p:"প্রতারিত, অতিরিক্ত চার্জ, বা বিভ্রান্ত হয়েছেন? একটি রিপোর্ট জমা দিন। আমরা বিবরণ সংগ্রহ করি এবং অ্যাডমিনকে সতর্ক করি।",
+    f2s:"আপনার পরিচয় সুরক্ষিত থাকে — রিপোর্ট গোপনীয়ভাবে পর্যালোচনা করা হয়।",
+    f3h:"বহুভাষিক ইন্টারফেস",
+    f3p:"প্ল্যাটফর্মটি ইংরেজি, বাহাসা মেলায়ু এবং বাংলায় কাজ করে। এক ক্লিকে ভাষা পরিবর্তন করুন।",
+    f4h:"নিরাপদ লগইন ও ভূমিকা",
+    f4p:"তিন ধরনের অ্যাকাউন্ট — অভিবাসী শ্রমিক, নিয়োগ এজেন্ট এবং অ্যাডমিন। আপনার পাসওয়ার্ড এনক্রিপ্টেড এবং নিরাপদ।",
+    f5h:"অ্যাডমিন ড্যাশবোর্ড",
+    f5p:"অ্যাডমিনরা সমস্ত রিপোর্ট দেখতে পারবেন, এজেন্টের স্ট্যাটাস আপডেট করতে পারবেন — একটি সহজ ড্যাশবোর্ড থেকে।",
+    who_tag:"কারা MigrantSafe ব্যবহার করতে পারবেন", who_h:"নিয়োগ প্রক্রিয়ার সবার জন্য তৈরি",
+    who_p:"আপনি শ্রমিক, এজেন্ট বা অ্যাডমিন যাই হোন — MigrantSafe আপনার জন্য।",
+    w1h:"অভিবাসী শ্রমিক", w1p:"মালয়েশিয়ায় নিরাপদ, যাচাইকৃত কাজ খুঁজছেন? এই প্ল্যাটফর্ম আপনাকে বিশ্বাস করার আগে এজেন্ট পরীক্ষা করতে সাহায্য করে।",
+    w1l1:"এজেন্টের বৈধতা যাচাই করুন", w1l2:"প্রতারণা বা অতিরিক্ত চার্জ রিপোর্ট করুন", w1l3:"বাংলা / মালয়তে গাইডেন্স পান", w1l4:"আপনার নথি বুঝুন", w1l5:"যেকোনো সময় চ্যাটবটকে জিজ্ঞাসা করুন",
+    w2h:"নিয়োগ এজেন্ট", w2p:"লাইসেন্সপ্রাপ্ত এবং নৈতিক? একটি যাচাইকৃত প্রোফাইল তৈরি করুন এবং বৈধভাবে আপনার ব্যবসা বাড়ান।",
+    w2l1:"আপনার সংস্থা নিবন্ধন করুন", w2l2:"স্বচ্ছ প্রোফাইল তৈরি করুন", w2l3:"অ্যাডমিনের কাছ থেকে যাচাই ব্যাজ পান", w2l4:"শ্রমিকদের সাথে সংযুক্ত হন", w2l5:"বিশ্বাসযোগ্যতা বাড়ান",
+    w3h:"অ্যাডমিন ও পর্যালোচক", w3p:"প্ল্যাটফর্ম পর্যবেক্ষণ করুন, রিপোর্ট পর্যালোচনা করুন এবং যাচাইকরণ সিস্টেম সঠিক রাখুন।",
+    w3l1:"আগত রিপোর্ট পর্যালোচনা করুন", w3l2:"এজেন্টের স্ট্যাটাস আপডেট করুন", w3l3:"ব্যবহারকারী অ্যাকাউন্ট পরিচালনা করুন", w3l4:"তথ্য বিশ্বাসযোগ্য রাখুন", w3l5:"ড্যাশবোর্ড ওভারভিউ",
+    ch_tag:"AI চ্যাটবট", ch_h:"যেকোনো সময়, যেকোনো কিছু জিজ্ঞাসা করুন, আপনার ভাষায়",
+    ch_p:"আমাদের চ্যাটবট নিয়োগ, ভিসা, চুক্তি এবং আপনার অধিকার সম্পর্কে আপনার প্রশ্নের উত্তর দেয় — বাংলায়। কোনো অপেক্ষা নেই। কোনো খরচ নেই।",
+    cl1:"সপ্তাহে ৭ দিন, ২৪ ঘণ্টা উপলব্ধ", cl2:"বাংলা, মালয় এবং ইংরেজি বোঝে",
+    cl3:"ধাপে ধাপে গাইড করে", cl4:"কোনো বিজ্ঞাপন নেই, কোনো ফি নেই, সাইন-আপের প্রয়োজন নেই",
+    ch_btn:"চ্যাটবট ব্যবহার করুন →", ch_online:"অনলাইন — সাহায্য করতে প্রস্তুত",
+    ch_placeholder:"এখানে আপনার প্রশ্ন টাইপ করুন...",
+    bot_hi:"হ্যালো! আমি আপনাকে সাহায্য করতে এখানে আছি। নিয়োগ, ভিসা বা আপনার অধিকার সম্পর্কে যেকোনো কিছু জিজ্ঞাসা করুন। 😊",
+    bot_lang:"বাংলা", bot_answered:"বাংলায় উত্তর দেওয়া হয়েছে",
+    demo_q:"আমি কীভাবে বুঝব এজেন্টটি আসল?",
+    demo_a:"চমৎকার প্রশ্ন! এজেন্ট যাচাইকরণ পাতায় যান। এজেন্টের নাম খুঁজুন। সবুজ ✓ ব্যাজ থাকলে তারা যাচাইকৃত। ⚠ রিপোর্টেড দেখলে — দূরে থাকুন!",
+    sdg_tag:"আমাদের লক্ষ্য", sdg_h:"জাতিসংঘের SDG ৮-এর সাথে সামঞ্জস্যপূর্ণ",
+    sdg_p:"MigrantSafe সরাসরি জাতিসংঘের টেকসই উন্নয়ন লক্ষ্যমাত্রার ৮.৮ লক্ষ্যমাত্রাকে সমর্থন করে — অভিবাসী শ্রমিকসহ সকল শ্রমিকের অধিকার রক্ষা করা এবং নিরাপদ কর্মপরিবেশ উন্নীত করা। আমরা মালয়েশিয়ায় একটি ন্যায্য ও নৈতিক শ্রমবাজারের দিকে কাজ করছি।",
+    cta_h:"নিরাপদে কাজ করতে প্রস্তুত?<br/>আজই MigrantSafe-এ যোগ দিন।",
+    cta_p:"এটি বিনামূল্যে, সহজ এবং এটি আপনাকে শোষণ থেকে রক্ষা করতে পারে। ২ মিনিটেরও কম সময়ে নিবন্ধন করুন।",
+    cta_b1:"বিনামূল্যে অ্যাকাউন্ট তৈরি করুন", cta_b2:"এজেন্ট দেখুন",
+    ft_desc:"একটি বহুভাষিক প্ল্যাটফর্ম যা মালয়েশিয়ায় অভিবাসী শ্রমিকদের যাচাইকৃত এজেন্ট খুঁজে পেতে এবং তাদের অধিকার বুঝতে সহায়তা করে।",
+    ft_h1:"প্ল্যাটফর্ম", ft_h2:"শ্রমিকদের জন্য", ft_h3:"ভাষা",
+    ft_reg:"নিবন্ধন", ft_login:"লগ ইন", ft_agents:"এজেন্ট ডিরেক্টরি", ft_chatbot:"চ্যাটবট",
+    ft_w1:"এজেন্ট যাচাই করার উপায়", ft_w2:"নিয়োগ গাইড", ft_w3:"এজেন্ট রিপোর্ট করুন", ft_w4:"আপনার অধিকার জানুন",
+    ft_copy:"© ২০২৫ MigrantSafe · চূড়ান্ত বর্ষ প্রকল্প · APU মালয়েশিয়া",
+    ft_sdg:"SDG ৮ — সম্মানজনক কাজ ও অর্থনৈতিক প্রবৃদ্ধি",
+    r_default:"আপনার প্রশ্নের জন্য ধন্যবাদ! সম্পূর্ণ উত্তরের জন্য চ্যাটবট পাতায় যান। 😊",
+    r_visa:"আপনার ভিসা আবেদন সাধারণত ২–৬ সপ্তাহ সময় নেয়। প্রথমে মেডিকেল চেক সম্পন্ন করুন!",
+    r_agent:"এজেন্ট যাচাইকৃত কিনা জানতে এজেন্ট ডিরেক্টরিতে যান এবং সবুজ ✓ ব্যাজ খুঁজুন।",
+    r_fee:"নিয়োগ ফি নিয়োগকর্তা দেবেন, আপনি নন। বড় ফি চাইলে — দয়া করে রিপোর্ট করুন!",
+    r_report:"এজেন্ট রিপোর্ট করতে লগ ইন করুন এবং তাদের প্রোফাইলে 'রিপোর্ট করুন' ক্লিক করুন।",
+  }
+};
+
+// ──────────────────────────────────────────────────────────
+// APPLY TRANSLATIONS
+// ──────────────────────────────────────────────────────────
+let lang = 'en';
+
+function applyLang(l) {
+  const D = T[l];
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const k = el.getAttribute('data-t');
+    if (D[k] !== undefined) el.innerHTML = D[k];
+  });
+  document.querySelectorAll('[data-t-ph]').forEach(el => {
+    const k = el.getAttribute('data-t-ph');
+    if (D[k] !== undefined) el.placeholder = D[k];
+  });
+  // chatbot placeholder separately
+  const inp = document.getElementById('chatInput');
+  if (inp) inp.placeholder = D.ch_placeholder;
+  // reset demo chat
+  buildDemoChat(l);
+}
+
+function buildDemoChat(l) {
+  const D = T[l];
+  const body = document.getElementById('chatDemo');
+  body.innerHTML = `
+    <div class="msg bot">${D.bot_hi}<div class="msg-lang">${D.bot_lang}</div></div>
+    <div class="msg usr">${D.demo_q}</div>
+    <div class="msg bot">${D.demo_a}<div class="msg-lang">${D.bot_answered}</div></div>`;
+  body.scrollTop = body.scrollHeight;
+}
+
+function setLang(l) {
+  if (l === lang) return;
+  lang = l;
+  document.body.classList.add('fading');
+  setTimeout(() => {
+    applyLang(l);
+    document.querySelectorAll('.lang-pill').forEach((p,i) => {
+      p.classList.toggle('active', ['en','ms','bn'][i] === l);
+    });
+    document.body.classList.remove('fading');
+  }, 220);
+}
+
+// ──────────────────────────────────────────────────────────
+// DEMO CHATBOT
+// ──────────────────────────────────────────────────────────
+function sendDemo() {
+  const inp  = document.getElementById('chatInput');
+  const body = document.getElementById('chatDemo');
+  const text = inp.value.trim();
+  if (!text) return;
+  const D = T[lang];
+
+  const um = document.createElement('div');
+  um.className = 'msg usr';
+  um.textContent = text;
+  body.appendChild(um);
+
+  const low = text.toLowerCase();
+  let reply = D.r_default;
+  if (/visa|ভিসা|tempoh/.test(low))                        reply = D.r_visa;
+  else if (/agent|ejen|এজেন্ট|verify|sahkan|যাচাই/.test(low)) reply = D.r_agent;
+  else if (/fee|money|pay|yuran|টাকা|ফি|bayar/.test(low))  reply = D.r_fee;
+  else if (/report|lapor|রিপোর্ট/.test(low))               reply = D.r_report;
+
+  setTimeout(() => {
+    const bm = document.createElement('div');
+    bm.className = 'msg bot';
+    bm.innerHTML = `${reply}<div class="msg-lang">${D.bot_answered}</div>`;
+    body.appendChild(bm);
+    body.scrollTop = body.scrollHeight;
+  }, 700);
+
+  inp.value = '';
+  body.scrollTop = body.scrollHeight;
+}
+
+// ──────────────────────────────────────────────────────────
+// INIT & SCROLL
+// ──────────────────────────────────────────────────────────
+buildDemoChat('en');
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>

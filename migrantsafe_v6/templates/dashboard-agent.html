@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agent Dashboard — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--teal:#0D6E6E;--teal-lt:#14A097;--teal-bg:#E6F4F4;--amber:#E8833A;--amber-lt:#FFB347;--dark:#0F2027;--mid:#1E3A3A;--text:#2C2C2C;--muted:#6B7B7B;--white:#FFFFFF;--cream:#F9F5F0;--border:#D4E8E8;--sw:260px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;min-height:100vh}
+    .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
+    .sb-logo{padding:22px 24px 18px;font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--white);text-decoration:none;display:block;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-logo .dot{color:var(--amber)}
+    .sb-section{padding:18px 16px 6px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+    .sb-item{display:flex;align-items:center;gap:11px;padding:10px 14px;margin:2px 8px;border-radius:9px;font-size:.86rem;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:background .18s,color .18s;text-decoration:none}
+    .sb-item:hover{background:rgba(255,255,255,.07);color:var(--white)}
+    .sb-item.active{background:rgba(232,131,58,.2);color:var(--amber-lt);font-weight:600}
+    .sb-icon{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+    .sb-footer{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.07)}
+    .sb-user{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.05);margin-bottom:8px}
+    .sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--white);flex-shrink:0}
+    .sb-uname{font-size:.8rem;font-weight:600;color:var(--white)}
+    .sb-urole{font-size:.68rem;color:rgba(255,255,255,.4)}
+    .sb-logout{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.8rem;display:block;text-align:center;text-decoration:none;transition:all .18s}
+    .sb-logout:hover{background:rgba(255,255,255,.09);color:var(--white)}
+    .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column}
+    .lang-bar{background:var(--amber);padding:10px 32px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+    .lang-bar .lbl{font-size:.72rem;color:rgba(255,255,255,.8);font-weight:600}
+    .lang-pill{padding:4px 13px;border-radius:100px;background:rgba(255,255,255,.2);color:var(--white);font-size:.74rem;font-weight:600;border:1px solid rgba(255,255,255,.3);cursor:pointer;transition:background .2s}
+    .lang-pill:hover{background:rgba(255,255,255,.35)}
+    .lang-pill.active{background:var(--teal);border-color:var(--teal)}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(249,245,240,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .topbar h1{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark)}
+    .topbar p{font-size:.76rem;color:var(--muted);margin-top:1px}
+    .notif{width:34px;height:34px;border-radius:8px;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;position:relative}
+    .notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+    .content{padding:28px 32px;flex:1}
+    .page{display:none}.page.active{display:block}
+    .banner{background:linear-gradient(130deg,#1a2e1a 0%,#1E3A2A 60%,#1a4a2a 100%);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;overflow:hidden}
+    .banner::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.18) 0%,transparent 70%)}
+    .banner h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--white);margin-bottom:5px}
+    .banner p{font-size:.86rem;color:rgba(255,255,255,.58);line-height:1.6}
+    .banner-badge{background:rgba(232,131,58,.22);border:1px solid rgba(232,131,58,.45);color:var(--amber-lt);font-size:.72rem;font-weight:700;padding:5px 13px;border-radius:100px;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;z-index:1}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+    .stat{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 18px;transition:transform .2s,box-shadow .2s}
+    .stat:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,110,110,.08)}
+    .stat-icon{font-size:1.3rem;margin-bottom:10px}
+    .stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+    .stat-lbl{font-size:.75rem;color:var(--muted)}
+    .stat-sub{font-size:.7rem;color:#1a9a55;margin-top:3px;font-weight:600}
+    .qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    .qa{background:var(--white);border:1.5px solid var(--border);border-radius:13px;padding:18px 14px;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;transition:all .18s}
+    .qa:hover{border-color:var(--amber);background:#fff8f0;transform:translateY(-2px);box-shadow:0 5px 16px rgba(232,131,58,.1)}
+    .qa-icon{font-size:1.4rem;margin-bottom:7px}
+    .qa-lbl{font-size:.78rem;font-weight:600;color:var(--dark)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+    .card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px}
+    .card-hdr{font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:14px}
+    .pill{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;white-space:nowrap}
+    .pv{background:#e6faf0;color:#1a9a55}.pp{background:#fff8e6;color:#b87d00}.pr{background:#fdecea;color:#c0392b}
+    .act{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+    .act:last-child{border-bottom:none}
+    .act-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+    .ico-g{background:#e6faf0}.ico-a{background:#fff3e6}.ico-b{background:#e6f0ff}.ico-r{background:#fdecea}
+    .act-title{font-size:.83rem;font-weight:600;color:var(--dark)}
+    .act-sub{font-size:.73rem;color:var(--muted);margin-top:2px}
+    .act-time{margin-left:auto;font-size:.7rem;color:var(--muted);flex-shrink:0}
+    .status-card{border-radius:14px;padding:20px 22px;margin-bottom:18px;display:flex;align-items:center;gap:16px}
+    .status-card.pending{background:#fff8e6;border:1.5px solid #f5d06a}
+    .status-card.verified{background:#e6faf0;border:1.5px solid #6adba4}
+    .status-card.reported{background:#fdecea;border:1.5px solid #f5a0a0}
+    .status-icon{font-size:1.8rem;flex-shrink:0}
+    .status-title{font-size:.92rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+    .status-sub{font-size:.8rem;color:var(--muted);line-height:1.5}
+    .rform .fg{margin-bottom:14px}
+    .rform label{display:block;font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:5px}
+    .rform input,.rform select,.rform textarea{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s;resize:vertical;background:var(--white)}
+    .rform input:focus,.rform select:focus,.rform textarea:focus{border-color:var(--teal)}
+    .btn-amber{padding:11px 26px;background:var(--amber);color:var(--white);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .18s}
+    .btn-amber:hover{background:#d06e28}
+    .empty-state{text-align:center;padding:36px 20px;color:var(--muted)}
+    .empty-icon{font-size:2.2rem;margin-bottom:10px}
+    .prof-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+    .prof-row:last-child{border-bottom:none}
+    .prof-lbl{font-size:.8rem;color:var(--muted)}
+    .prof-val{font-size:.86rem;font-weight:600;color:var(--dark)}
+    .sec-hdr{margin-bottom:18px}
+    .sec-hdr h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+    .sec-hdr p{font-size:.83rem;color:var(--muted)}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:11px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.22);opacity:0;transform:translateY(10px);transition:opacity .28s,transform .28s;pointer-events:none}
+    #toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:860px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stats{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <a href="{{ url_for('index') }}" class="sb-logo">Migrant<span class="dot">Safe</span></a>
+  <div class="sb-section" data-t="sb_main">Main</div>
+  <button class="sb-item active" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_home">Dashboard</span></button>
+  <button class="sb-item" onclick="go('profile-agency',this)"><span class="sb-icon">🏢</span> <span data-t="sb_profile_agency">My Agency Profile</span></button>
+  <button class="sb-item" onclick="go('reviews',this)"><span class="sb-icon">⭐</span> <span data-t="sb_reviews">Reviews & Reports</span></button>
+  <div class="sb-section" data-t="sb_account">Account</div>
+  <button class="sb-item" onclick="go('settings',this)"><span class="sb-icon">⚙️</span> <span data-t="sb_settings">Account Settings</span></button>
+  <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> <span data-t="sb_back">Back to Homepage</span></a>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">{{ current_user.name[0].upper() if current_user.name else 'A' }}</div>
+      <div>
+        <div class="sb-uname">{{ current_user.name or 'Agent' }}</div>
+        <div class="sb-urole" data-t="role_label">Recruitment Agent</div>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="sb-logout" data-t="logout">← Log Out</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="lang-bar">
+    <span class="lbl">🌐</span>
+    <span class="lang-pill active" onclick="setLang('en',this)">🇬🇧 English</span>
+    <span class="lang-pill" onclick="setLang('ms',this)">🇲🇾 Melayu</span>
+    <span class="lang-pill" onclick="setLang('bn',this)">🇧🇩 বাংলা</span>
+  </div>
+
+  <div class="topbar">
+    <div><h1 id="tbTitle" data-t="page_home">Dashboard</h1><p>Hello, {{ current_user.name or 'there' }} 👋</p></div>
+    <div class="notif">🔔<span class="notif-dot"></span></div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="page active" id="p-home">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div style="background:{{ '#e6faf0' if category == 'success' else '#fdecea' }};border:1px solid {{ '#b6eace' if category == 'success' else '#f5b9b4' }};color:{{ '#1a9a55' if category == 'success' else '#c0392b' }};border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.88rem;display:flex;align-items:center;gap:8px;">
+          <span>{{ '✅' if category == 'success' else '⚠️' }}</span><span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      {% endwith %}
+
+      <div class="banner">
+        <div style="position:relative;z-index:1">
+          <h2>Welcome back, {{ current_user.name or 'there' }}!</h2>
+          <p data-t="banner_sub">Manage your agency profile and track your verification status.</p>
+        </div>
+        <div class="banner-badge" data-t="role_label">Recruitment Agent</div>
+      </div>
+
+      {% if agent %}{% set s = agent['verification_status'] %}
+        {% if s == 'verified' %}
+        <div class="status-card verified"><div class="status-icon">✅</div><div><div class="status-title" data-t="status_verified_title">Verification Status: Verified ✓</div><div class="status-sub" data-t="status_verified_sub">Your agency has been verified. Workers can now trust your profile.</div></div></div>
+        {% elif s == 'reported' %}
+        <div class="status-card reported"><div class="status-icon">⚠️</div><div><div class="status-title" data-t="status_reported_title">Verification Status: Reported</div><div class="status-sub" data-t="status_reported_sub">Your agency has received worker reports. An admin is reviewing the situation.</div></div></div>
+        {% else %}
+        <div class="status-card pending"><div class="status-icon">⏳</div><div><div class="status-title" data-t="status_pending_title">Verification Status: Pending</div><div class="status-sub" data-t="status_pending_sub">Your agency is awaiting admin review. Make sure your JTK number is correct in your Agency Profile.</div></div></div>
+        {% endif %}
+      {% else %}
+      <div class="status-card pending"><div class="status-icon">⏳</div><div><div class="status-title" data-t="status_noprofile_title">Profile Not Yet Completed</div><div class="status-sub" data-t="status_noprofile_sub">Go to "My Agency Profile" and fill in your JTK registration number to begin verification.</div></div></div>
+      {% endif %}
+
+      <div class="stats">
+        <div class="stat"><div class="stat-icon">👁️</div><div class="stat-val">{{ profile_views }}</div><div class="stat-lbl" data-t="s_views">Profile Views</div></div>
+        <div class="stat"><div class="stat-icon">⭐</div><div class="stat-val">{{ average_rating if average_rating is not none else 'N/A' }}</div><div class="stat-lbl" data-t="s_rating">Average Rating</div></div>
+        <div class="stat"><div class="stat-icon">🚨</div><div class="stat-val">{{ open_report_count }}</div><div class="stat-lbl" data-t="s_reports">Reports Against Agency</div></div>
+        <div class="stat"><div class="stat-icon">📋</div><div class="stat-val">{{ '✓' if agent and agent['verification_status']=='verified' else '⏳' }}</div><div class="stat-lbl" data-t="s_status">Verification Status</div></div>
+      </div>
+
+      <div class="sec-hdr"><h2 data-t="qa_title">Quick Actions</h2></div>
+      <div class="qa-grid">
+        <button class="qa" onclick="go('profile-agency',null)"><div class="qa-icon">🏢</div><div class="qa-lbl" data-t="q_edit">Edit Agency Profile</div></button>
+        <button class="qa" onclick="go('reviews',null)"><div class="qa-icon">⭐</div><div class="qa-lbl" data-t="q_reviews">View Reviews</div></button>
+        <button class="qa" onclick="go('settings',null)"><div class="qa-icon">⚙️</div><div class="qa-lbl" data-t="q_settings">Account Settings</div></button>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-hdr" data-t="recent_activity">Recent Activity</div>
+          <div class="act"><div class="act-ico ico-a">⏳</div><div><div class="act-title" data-t="act1_title">Verification Pending</div><div class="act-sub" data-t="act1_sub">Admin has received your registration</div></div><div class="act-time" data-t="act1_time">Ongoing</div></div>
+          <div class="act"><div class="act-ico ico-g">✅</div><div><div class="act-title" data-t="act2_title">Account Created</div><div class="act-sub" data-t="act2_sub">Welcome to MigrantSafe!</div></div><div class="act-time" data-t="act2_time">Today</div></div>
+          <div class="act"><div class="act-ico ico-b">👁️</div><div><div class="act-title" data-t="act3_title">Profile Views</div><div class="act-sub" data-t="act3_sub">{{ profile_views }} view(s) recorded</div></div><div class="act-time" data-t="act3_time">Total</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr" data-t="checklist_title">Verification Checklist</div>
+          <div class="act"><div class="act-ico ico-g">✅</div><div><div class="act-title" data-t="chk1_title">Account Registered</div><div class="act-sub" data-t="chk1_sub">You have an active account</div></div></div>
+          <div class="act"><div class="act-ico ico-a">⏳</div><div><div class="act-title" data-t="chk2_title">JTK Number Submitted</div><div class="act-sub" data-t="chk2_sub">Awaiting admin confirmation</div></div></div>
+          <div class="act"><div class="act-ico ico-a">⏳</div><div><div class="act-title" data-t="chk3_title">Agency Profile Completed</div><div class="act-sub" data-t="chk3_sub">Go to 'My Agency Profile' to fill in details</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENCY PROFILE -->
+    <div class="page" id="p-profile-agency">
+      <div class="sec-hdr"><h2 data-t="profile_agency_title">My Agency Profile</h2><p data-t="profile_agency_sub">This is what migrant workers see when they look up your agency.</p></div>
+      <div class="card" style="max-width:580px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div><div style="font-size:1rem;font-weight:700;color:var(--dark)">{{ agent['agency_name'] if agent else current_user.name or 'Your Agency' }}</div><div style="font-size:.78rem;color:var(--muted);margin-top:3px" data-t="listed_on">Listed on MigrantSafe</div></div>
+          <span class="pill {{ 'pv' if agent and agent['verification_status']=='verified' else 'pp' if not agent or agent['verification_status']=='pending' else 'pr' }}">{{ '✓ Verified' if agent and agent['verification_status']=='verified' else '⏳ Pending' if not agent or agent['verification_status']=='pending' else '⚠ Reported' }}</span>
+        </div>
+        <div class="rform">
+          <div class="fg"><label data-t="form_agency_name">Agency / Company Name *</label><input type="text" id="aName" placeholder="e.g. Suria Recruitment Sdn Bhd" value="{{ agent['agency_name'] if agent else '' }}"/></div>
+          <div class="fg"><label data-t="form_jtk">JTK Registration Number *</label><input type="text" id="aJTK" placeholder="e.g. JTK 012345" value="{{ agent['license_number'] if agent else '' }}"/></div>
+          <div class="fg"><label data-t="form_state">State / Location *</label>
+            <select id="aState">
+              <option value="">— Select state —</option>
+              {% for s in ['Kuala Lumpur','Selangor','Johor','Penang','Perak','Sabah','Sarawak','Other'] %}
+              <option value="{{ s }}" {{ 'selected' if agent and agent['state'] == s else '' }}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="fg"><label data-t="form_industry">Industry / Sector</label><input type="text" id="aIndustry" placeholder="e.g. Construction, Hospitality" value="{{ agent['industry'] if agent else '' }}"/></div>
+          <div class="fg"><label data-t="form_phone">Office Phone Number</label><input type="tel" id="aPhone" placeholder="+60 3-1234 5678" value="{{ agent['phone'] if agent else '' }}"/></div>
+          <div class="fg"><label data-t="form_desc">Brief Description</label><textarea id="aDesc" rows="3" placeholder="Describe your agency…">{{ agent['description'] if agent else '' }}</textarea></div>
+          <button class="btn-amber" onclick="saveProfile()" data-t="save_btn">Save Profile →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="page" id="p-reviews">
+      <div class="sec-hdr"><h2 data-t="reviews_title">Reviews & Reports</h2><p data-t="reviews_sub">Feedback and reports from migrant workers about your agency.</p></div>
+      <div class="card">
+        <div class="card-hdr" data-t="reports_against">Reports Against Your Agency</div>
+        {% if reports %}
+          {% for r in reports %}
+          <div class="act">
+            <div class="act-ico {{ 'ico-r' if r['status']=='open' else 'ico-g' }}">{{ '⚠️' if r['status']=='open' else '✅' }}</div>
+            <div style="flex:1">
+              <div class="act-title">{{ r['report_reason'] }}</div>
+              <div class="act-sub">{{ r['description'][:120] }}{% if r['description']|length > 120 %}…{% endif %}</div>
+              <div class="act-sub" style="margin-top:4px">{{ r['created_at'][:10] if r['created_at'] else '—' }}</div>
+            </div>
+            <span class="pill {{ 'pr' if r['status']=='open' else 'pv' if r['status']=='resolved' else 'pp' }}" style="flex-shrink:0">{{ '⚠ Open' if r['status']=='open' else '✅ Resolved' if r['status']=='resolved' else '— Dismissed' }}</span>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="empty-state"><div class="empty-icon">🛡️</div><p style="font-weight:600;color:var(--dark);margin-bottom:6px" data-t="no_reports">No reports filed</p><p style="font-size:.82rem" data-t="no_reports_sub">Your agency has no reports. Keep up ethical recruitment practices!</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="p-settings">
+      <div class="sec-hdr"><h2 data-t="settings_title">Account Settings</h2><p data-t="settings_sub">Manage your login details and account information.</p></div>
+      <div class="card" style="max-width:480px">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:700;color:var(--white)">{{ current_user.name[0].upper() if current_user.name else 'A' }}</div>
+          <div><div style="font-size:1rem;font-weight:700;color:var(--dark)">{{ current_user.name or '—' }}</div><div style="font-size:.78rem;color:var(--muted)" data-t="role_label">Recruitment Agent</div></div>
+        </div>
+        <div class="prof-row"><span class="prof-lbl" data-t="lbl_email">Email</span><span class="prof-val">{{ current_user.email or '—' }}</span></div>
+        <div class="prof-row"><span class="prof-lbl" data-t="lbl_role">Role</span><span class="prof-val" data-t="role_label">Recruitment Agent</span></div>
+        <div class="prof-row"><span class="prof-lbl" data-t="lbl_status">Verification Status</span><span class="pill {{ 'pv' if agent and agent['verification_status']=='verified' else 'pp' if not agent or agent['verification_status']=='pending' else 'pr' }}">{{ '✓ Verified' if agent and agent['verification_status']=='verified' else '⏳ Pending' if not agent or agent['verification_status']=='pending' else '⚠ Reported' }}</span></div>
+        <a href="{{ url_for('logout') }}" class="sb-logout" style="display:inline-block;margin-top:18px;padding:9px 22px;width:auto" data-t="logout">Log Out</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+<div id="toast"></div>
+
+<script>
+const T = {
+  en: {
+    sb_main:'Main', sb_home:'Dashboard', sb_profile_agency:'My Agency Profile',
+    sb_reviews:'Reviews & Reports', sb_account:'Account', sb_settings:'Account Settings',
+    sb_back:'Back to Homepage', role_label:'Recruitment Agent', logout:'← Log Out',
+    page_home:'Dashboard', page_profile_agency:'My Agency Profile',
+    page_reviews:'Reviews & Reports', page_settings:'Account Settings',
+    banner_sub:'Manage your agency profile and track your verification status.',
+    status_verified_title:'Verification Status: Verified ✓', status_verified_sub:'Your agency has been verified. Workers can now trust your profile.',
+    status_pending_title:'Verification Status: Pending', status_pending_sub:'Your agency is awaiting admin review. Make sure your JTK number is correct.',
+    status_reported_title:'Verification Status: Reported', status_reported_sub:'Your agency has received worker reports. An admin is reviewing the situation.',
+    status_noprofile_title:'Profile Not Yet Completed', status_noprofile_sub:'Go to "My Agency Profile" and fill in your JTK registration number to begin verification.',
+    s_views:'Profile Views', s_rating:'Average Rating', s_reports:'Reports Against Agency', s_status:'Verification Status',
+    qa_title:'Quick Actions', q_edit:'Edit Agency Profile', q_reviews:'View Reviews', q_settings:'Account Settings',
+    recent_activity:'Recent Activity',
+    act1_title:'Verification Pending', act1_sub:'Admin has received your registration', act1_time:'Ongoing',
+    act2_title:'Account Created', act2_sub:'Welcome to MigrantSafe!', act2_time:'Today',
+    act3_title:'Profile Views', act3_sub:'view(s) recorded', act3_time:'Total',
+    checklist_title:'Verification Checklist',
+    chk1_title:'Account Registered', chk1_sub:'You have an active account',
+    chk2_title:'JTK Number Submitted', chk2_sub:'Awaiting admin confirmation',
+    chk3_title:'Agency Profile Completed', chk3_sub:"Go to 'My Agency Profile' to fill in details",
+    profile_agency_title:'My Agency Profile', profile_agency_sub:'This is what migrant workers see when they look up your agency.',
+    listed_on:'Listed on MigrantSafe', form_agency_name:'Agency / Company Name *',
+    form_jtk:'JTK Registration Number *', form_state:'State / Location *',
+    form_industry:'Industry / Sector', form_phone:'Office Phone Number',
+    form_desc:'Brief Description', save_btn:'Save Profile →',
+    reviews_title:'Reviews & Reports', reviews_sub:'Feedback from migrant workers about your agency.',
+    reports_against:'Reports Against Your Agency',
+    no_reports:'No reports filed', no_reports_sub:'Your agency has no reports. Keep up ethical recruitment practices!',
+    settings_title:'Account Settings', settings_sub:'Manage your login details and account information.',
+    lbl_email:'Email', lbl_role:'Role', lbl_status:'Verification Status',
+  },
+  ms: {
+    sb_main:'Utama', sb_home:'Papan Pemuka', sb_profile_agency:'Profil Agensi Saya',
+    sb_reviews:'Ulasan & Laporan', sb_account:'Akaun', sb_settings:'Tetapan Akaun',
+    sb_back:'Kembali ke Laman Utama', role_label:'Ejen Pengambilan', logout:'← Log Keluar',
+    page_home:'Papan Pemuka', page_profile_agency:'Profil Agensi Saya',
+    page_reviews:'Ulasan & Laporan', page_settings:'Tetapan Akaun',
+    banner_sub:'Urus profil agensi anda dan pantau status pengesahan anda.',
+    status_verified_title:'Status Pengesahan: Disahkan ✓', status_verified_sub:'Agensi anda telah disahkan. Pekerja kini boleh mempercayai profil anda.',
+    status_pending_title:'Status Pengesahan: Belum Disahkan', status_pending_sub:'Agensi anda sedang menunggu semakan admin. Pastikan nombor JTK anda betul.',
+    status_reported_title:'Status Pengesahan: Dilaporkan', status_reported_sub:'Agensi anda telah menerima laporan pekerja. Admin sedang menyemak situasi ini.',
+    status_noprofile_title:'Profil Belum Lengkap', status_noprofile_sub:'Pergi ke "Profil Agensi Saya" dan isi nombor pendaftaran JTK anda untuk memulakan pengesahan.',
+    s_views:'Paparan Profil', s_rating:'Penilaian Purata', s_reports:'Laporan Terhadap Agensi', s_status:'Status Pengesahan',
+    qa_title:'Tindakan Pantas', q_edit:'Edit Profil Agensi', q_reviews:'Lihat Ulasan', q_settings:'Tetapan Akaun',
+    recent_activity:'Aktiviti Terkini',
+    act1_title:'Pengesahan Belum Selesai', act1_sub:'Admin telah menerima pendaftaran anda', act1_time:'Berterusan',
+    act2_title:'Akaun Dibuat', act2_sub:'Selamat datang ke MigrantSafe!', act2_time:'Hari ini',
+    act3_title:'Paparan Profil', act3_sub:'paparan direkodkan', act3_time:'Jumlah',
+    checklist_title:'Senarai Semak Pengesahan',
+    chk1_title:'Akaun Didaftarkan', chk1_sub:'Anda mempunyai akaun aktif',
+    chk2_title:'Nombor JTK Diserahkan', chk2_sub:'Menunggu pengesahan admin',
+    chk3_title:'Profil Agensi Lengkap', chk3_sub:"Pergi ke 'Profil Agensi Saya' untuk isi butiran",
+    profile_agency_title:'Profil Agensi Saya', profile_agency_sub:'Ini yang pekerja asing lihat apabila mereka mencari agensi anda.',
+    listed_on:'Disenaraikan di MigrantSafe', form_agency_name:'Nama Agensi / Syarikat *',
+    form_jtk:'Nombor Pendaftaran JTK *', form_state:'Negeri / Lokasi *',
+    form_industry:'Industri / Sektor', form_phone:'Nombor Telefon Pejabat',
+    form_desc:'Keterangan Ringkas', save_btn:'Simpan Profil →',
+    reviews_title:'Ulasan & Laporan', reviews_sub:'Maklum balas daripada pekerja asing tentang agensi anda.',
+    reports_against:'Laporan Terhadap Agensi Anda',
+    no_reports:'Tiada laporan difailkan', no_reports_sub:'Agensi anda tiada laporan. Teruskan amalan pengambilan yang beretika!',
+    settings_title:'Tetapan Akaun', settings_sub:'Urus maklumat log masuk dan akaun anda.',
+    lbl_email:'E-mel', lbl_role:'Peranan', lbl_status:'Status Pengesahan',
+  },
+  bn: {
+    sb_main:'প্রধান', sb_home:'ড্যাশবোর্ড', sb_profile_agency:'আমার এজেন্সি প্রোফাইল',
+    sb_reviews:'রিভিউ ও রিপোর্ট', sb_account:'অ্যাকাউন্ট', sb_settings:'অ্যাকাউন্ট সেটিংস',
+    sb_back:'হোমপেজে ফিরুন', role_label:'রিক্রুটমেন্ট এজেন্ট', logout:'← লগ আউট',
+    page_home:'ড্যাশবোর্ড', page_profile_agency:'আমার এজেন্সি প্রোফাইল',
+    page_reviews:'রিভিউ ও রিপোর্ট', page_settings:'অ্যাকাউন্ট সেটিংস',
+    banner_sub:'আপনার এজেন্সি প্রোফাইল পরিচালনা করুন এবং যাচাইকরণ স্ট্যাটাস ট্র্যাক করুন।',
+    status_verified_title:'যাচাইকরণ স্ট্যাটাস: যাচাইকৃত ✓', status_verified_sub:'আপনার এজেন্সি যাচাই করা হয়েছে। শ্রমিকরা এখন আপনার প্রোফাইল বিশ্বাস করতে পারবে।',
+    status_pending_title:'যাচাইকরণ স্ট্যাটাস: অপেক্ষমান', status_pending_sub:'আপনার এজেন্সি অ্যাডমিন পর্যালোচনার অপেক্ষায় আছে। আপনার JTK নম্বর সঠিক আছে কিনা নিশ্চিত করুন।',
+    status_reported_title:'যাচাইকরণ স্ট্যাটাস: রিপোর্টকৃত', status_reported_sub:'আপনার এজেন্সির বিরুদ্ধে শ্রমিকদের রিপোর্ট দাখিল হয়েছে। অ্যাডমিন পরিস্থিতি পর্যালোচনা করছে।',
+    status_noprofile_title:'প্রোফাইল এখনো পূরণ হয়নি', status_noprofile_sub:'"আমার এজেন্সি প্রোফাইল"-এ যান এবং যাচাইকরণ শুরু করতে JTK নিবন্ধন নম্বর পূরণ করুন।',
+    s_views:'প্রোফাইল ভিউ', s_rating:'গড় রেটিং', s_reports:'এজেন্সির বিরুদ্ধে রিপোর্ট', s_status:'যাচাইকরণ স্ট্যাটাস',
+    qa_title:'দ্রুত কাজ', q_edit:'এজেন্সি প্রোফাইল সম্পাদনা', q_reviews:'রিভিউ দেখুন', q_settings:'অ্যাকাউন্ট সেটিংস',
+    recent_activity:'সাম্প্রতিক কার্যক্রম',
+    act1_title:'যাচাইকরণ অপেক্ষমান', act1_sub:'অ্যাডমিন আপনার নিবন্ধন পেয়েছে', act1_time:'চলমান',
+    act2_title:'অ্যাকাউন্ট তৈরি', act2_sub:'MigrantSafe-এ স্বাগতম!', act2_time:'আজ',
+    act3_title:'প্রোফাইল ভিউ', act3_sub:'ভিউ রেকর্ড করা হয়েছে', act3_time:'মোট',
+    checklist_title:'যাচাইকরণ চেকলিস্ট',
+    chk1_title:'অ্যাকাউন্ট নিবন্ধিত', chk1_sub:'আপনার একটি সক্রিয় অ্যাকাউন্ট আছে',
+    chk2_title:'JTK নম্বর জমা দেওয়া হয়েছে', chk2_sub:'অ্যাডমিন নিশ্চিতকরণের অপেক্ষায়',
+    chk3_title:'এজেন্সি প্রোফাইল সম্পূর্ণ', chk3_sub:"বিবরণ পূরণ করতে 'আমার এজেন্সি প্রোফাইল'-এ যান",
+    profile_agency_title:'আমার এজেন্সি প্রোফাইল', profile_agency_sub:'অভিবাসী শ্রমিকরা আপনার এজেন্সি খুঁজলে এটি দেখতে পাবে।',
+    listed_on:'MigrantSafe-এ তালিকাভুক্ত', form_agency_name:'এজেন্সি / কোম্পানির নাম *',
+    form_jtk:'JTK নিবন্ধন নম্বর *', form_state:'রাজ্য / অবস্থান *',
+    form_industry:'শিল্প / খাত', form_phone:'অফিসের ফোন নম্বর',
+    form_desc:'সংক্ষিপ্ত বিবরণ', save_btn:'প্রোফাইল সংরক্ষণ করুন →',
+    reviews_title:'রিভিউ ও রিপোর্ট', reviews_sub:'আপনার এজেন্সি সম্পর্কে অভিবাসী শ্রমিকদের মতামত।',
+    reports_against:'আপনার এজেন্সির বিরুদ্ধে রিপোর্ট',
+    no_reports:'কোনো রিপোর্ট দাখিল হয়নি', no_reports_sub:'আপনার এজেন্সির কোনো রিপোর্ট নেই। নৈতিক নিয়োগ অনুশীলন চালিয়ে যান!',
+    settings_title:'অ্যাকাউন্ট সেটিংস', settings_sub:'আপনার লগইন তথ্য এবং অ্যাকাউন্টের বিবরণ পরিচালনা করুন।',
+    lbl_email:'ইমেইল', lbl_role:'ভূমিকা', lbl_status:'যাচাইকরণ স্ট্যাটাস',
+  }
+};
+
+const PAGE_TITLES = {
+  en:{ home:'Dashboard', 'profile-agency':'My Agency Profile', reviews:'Reviews & Reports', settings:'Account Settings' },
+  ms:{ home:'Papan Pemuka', 'profile-agency':'Profil Agensi Saya', reviews:'Ulasan & Laporan', settings:'Tetapan Akaun' },
+  bn:{ home:'ড্যাশবোর্ড', 'profile-agency':'আমার এজেন্সি প্রোফাইল', reviews:'রিভিউ ও রিপোর্ট', settings:'অ্যাকাউন্ট সেটিংস' }
+};
+
+let currentLang = 'en', currentPage = 'home';
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const D = T[lang];
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const k = el.getAttribute('data-t');
+    if (D[k] !== undefined) el.textContent = D[k];
+  });
+  const tt = document.getElementById('tbTitle');
+  if (tt && PAGE_TITLES[lang][currentPage]) tt.textContent = PAGE_TITLES[lang][currentPage];
+}
+
+function go(id, btn) {
+  currentPage = id;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const tt = document.getElementById('tbTitle');
+  if (tt && PAGE_TITLES[currentLang][id]) tt.textContent = PAGE_TITLES[currentLang][id];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function saveProfile() {
+  const agency_name    = document.getElementById('aName')?.value.trim() || '';
+  const license_number = document.getElementById('aJTK')?.value.trim()  || '';
+  const state          = document.getElementById('aState')?.value        || '';
+  const industry       = document.getElementById('aIndustry')?.value.trim() || '';
+  const phone          = document.getElementById('aPhone')?.value.trim() || '';
+  const description    = document.getElementById('aDesc')?.value.trim()  || '';
+  if (!agency_name)    { toast('⚠️ Agency name is required.');              return; }
+  if (!license_number) { toast('⚠️ JTK registration number is required.'); return; }
+  if (!state)          { toast('⚠️ Please select your state.');             return; }
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '{{ url_for("update_agent_profile") }}';
+  [['agency_name', agency_name], ['license_number', license_number],
+   ['state', state], ['industry', industry], ['phone', phone], ['description', description]]
+  .forEach(([name, value]) => {
+    const inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = name; inp.value = value;
+    form.appendChild(inp);
+  });
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+  window.addEventListener('DOMContentLoaded', () => toast("{{ message|replace('"', '\\"') }}"));
+  {% endfor %}
+{% endwith %}
+</script>
+</body>
+</html>

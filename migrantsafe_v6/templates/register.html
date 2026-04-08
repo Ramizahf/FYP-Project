@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --teal:#0D6E6E; --teal-lt:#14A097; --teal-bg:#E6F4F4;
+      --amber:#E8833A; --amber-lt:#FFB347;
+      --dark:#0F2027; --mid:#1E3A3A;
+      --text:#2C2C2C; --muted:#6B7B7B;
+      --white:#FFFFFF; --cream:#F9F5F0; --border:#D4E8E8;
+      --error:#c0392b; --error-bg:#fdecea;
+      --success:#1a9a55; --success-bg:#e6faf0;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);min-height:100vh;display:flex;flex-direction:column}
+
+    /* NAVBAR */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo .dot{color:var(--amber)}
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:transform .15s,box-shadow .15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+    .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+    .btn-outline:hover{background:var(--teal-bg)}
+
+    /* PAGE LAYOUT */
+    .page-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:70px}
+
+    /* LEFT PANEL */
+    .left-panel{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);display:flex;flex-direction:column;justify-content:center;padding:60px 8%;position:relative;overflow:hidden}
+    .left-panel::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.2) 0%,transparent 70%);animation:pulse 6s ease-in-out infinite}
+    .left-panel::after{content:'';position:absolute;bottom:-100px;left:10%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.12) 0%,transparent 70%);animation:pulse 8s ease-in-out infinite reverse}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+    .left-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,131,58,.18);border:1px solid rgba(232,131,58,.4);color:var(--amber-lt);font-size:.75rem;font-weight:600;letter-spacing:.08em;padding:6px 14px;border-radius:100px;text-transform:uppercase;margin-bottom:28px}
+    .badge-dot{width:7px;height:7px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .left-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,2.5vw,2.8rem);font-weight:900;color:var(--white);line-height:1.2;margin-bottom:16px;position:relative;z-index:1}
+    .left-title .accent{color:var(--teal-lt)}
+    .left-sub{font-size:.95rem;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:40px;position:relative;z-index:1}
+
+    .trust-items{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+    .trust-item{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:14px 16px}
+    .trust-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px}
+    .trust-text strong{display:block;font-size:.88rem;font-weight:600;color:var(--white);margin-bottom:2px}
+    .trust-text span{font-size:.78rem;color:rgba(255,255,255,.55)}
+
+    /* RIGHT PANEL — FORM */
+    .right-panel{display:flex;align-items:center;justify-content:center;padding:40px 5%}
+    .form-card{background:var(--white);border-radius:24px;border:1px solid var(--border);padding:44px 40px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(13,110,110,.08)}
+
+    .form-header{margin-bottom:32px}
+    .form-header h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--dark);margin-bottom:6px}
+    .form-header p{font-size:.88rem;color:var(--muted)}
+    .form-header p a{color:var(--teal);font-weight:600;text-decoration:none}
+    .form-header p a:hover{text-decoration:underline}
+
+    /* ROLE SELECTOR */
+    .role-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+    .role-btn{border:2px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--white)}
+    .role-btn:hover{border-color:var(--teal);background:var(--teal-bg)}
+    .role-btn.active{border-color:var(--teal);background:var(--teal-bg);box-shadow:0 0 0 3px rgba(13,110,110,.1)}
+    .role-btn .role-icon{font-size:1.5rem;margin-bottom:6px}
+    .role-btn .role-label{font-size:.82rem;font-weight:600;color:var(--dark)}
+    .role-btn .role-desc{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+    /* FORM FIELDS */
+    .form-group{margin-bottom:18px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
+    label .required{color:var(--amber);margin-left:2px}
+    input,select{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--white);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+    input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,110,110,.1)}
+    input.error,select.error{border-color:var(--error)}
+    .field-error{font-size:.75rem;color:var(--error);margin-top:4px;display:none}
+    .field-error.show{display:block}
+
+    /* PASSWORD STRENGTH */
+    .pw-wrap{position:relative}
+    .pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:4px}
+    .strength-bar{height:4px;border-radius:2px;background:var(--border);margin-top:8px;overflow:hidden}
+    .strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+    .strength-text{font-size:.72rem;color:var(--muted);margin-top:4px}
+
+    /* ALERT */
+    .alert{border-radius:10px;padding:12px 16px;font-size:.84rem;margin-bottom:20px;display:none}
+    .alert.show{display:flex;align-items:flex-start;gap:8px}
+    .alert-error{background:var(--error-bg);color:var(--error);border:1px solid rgba(192,57,43,.2)}
+    .alert-success{background:var(--success-bg);color:var(--success);border:1px solid rgba(26,154,85,.2)}
+
+    /* DIVIDER */
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+    .divider span{font-size:.78rem;color:var(--muted);white-space:nowrap}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* SUBMIT */
+    .btn-submit{width:100%;padding:14px;border-radius:10px;background:var(--teal);color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;border:none;cursor:pointer;transition:background .2s,transform .15s,box-shadow .15s;margin-top:4px}
+    .btn-submit:hover{background:var(--mid);transform:translateY(-1px);box-shadow:0 8px 24px rgba(13,110,110,.25)}
+    .btn-submit:disabled{background:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+
+    /* TERMS */
+    .checkbox-wrap{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px}
+    .checkbox-wrap input[type=checkbox]{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--teal);cursor:pointer}
+    .checkbox-wrap label{font-size:.8rem;color:var(--muted);cursor:pointer;margin-bottom:0}
+    .checkbox-wrap label a{color:var(--teal);text-decoration:none}
+    .checkbox-wrap label a:hover{text-decoration:underline}
+
+    /* SUCCESS STATE */
+    .success-screen{display:none;text-align:center;padding:20px 0}
+    .success-screen .success-icon{font-size:3.5rem;margin-bottom:16px}
+    .success-screen h3{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .success-screen p{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .page-wrap{grid-template-columns:1fr}
+      .left-panel{display:none}
+      .right-panel{padding:40px 5% 60px}
+      .form-card{padding:32px 24px}
+    }
+    @media(max-width:480px){
+      .form-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+  <div style="display:flex;align-items:center;gap:24px">
+    <a href="{{ url_for('agents') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Find Agents</a>
+    <a href="{{ url_for('chatbot') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Chatbot</a>
+    <a href="{{ url_for('login') }}" class="btn btn-outline" id="r-login-btn">Log In</a>
+  </div>
+</nav>
+
+<!-- LANGUAGE BAR -->
+<div style="background:var(--teal);padding:10px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+  <span style="font-size:.75rem;color:rgba(255,255,255,.6)">🌐</span>
+  <span class="r-lang active" onclick="setRegLang('en',this)" style="padding:5px 14px;border-radius:100px;background:var(--amber);border:1px solid var(--amber);color:#fff;font-size:.76rem;font-weight:600;cursor:pointer">🇬🇧 English</span>
+  <span class="r-lang" onclick="setRegLang('ms',this)" style="padding:5px 14px;border-radius:100px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;cursor:pointer">🇲🇾 Melayu</span>
+  <span class="r-lang" onclick="setRegLang('bn',this)" style="padding:5px 14px;border-radius:100px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.76rem;font-weight:600;cursor:pointer">🇧🇩 বাংলা</span>
+</div>
+
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-badge"><span class="badge-dot"></span> <span id="r-badge">Free & Secure Registration</span></div>
+    <h1 class="left-title"><span id="r-title">Join </span><span class="accent">MigrantSafe</span> <span id="r-title2">and Work with Confidence</span></h1>
+    <p class="left-sub" id="r-sub">Create your free account in under 2 minutes. Verify agents, report fraud, and get guidance in your language — all in one safe place.</p>
+    <div class="trust-items">
+      <div class="trust-item">
+        <span class="trust-icon">🔒</span>
+        <div class="trust-text">
+          <strong id="r-t1h">Your data is private</strong>
+          <span id="r-t1p">We never share your personal information with agents or employers</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🌐</span>
+        <div class="trust-text">
+          <strong>3 languages supported</strong>
+          <span>Use the platform in English, Bahasa Melayu, or বাংলা</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">✅</span>
+        <div class="trust-text">
+          <strong>100% free, always</strong>
+          <span>No hidden fees. MigrantSafe is free for all migrant workers</span>
+        </div>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🛡️</span>
+        <div class="trust-text">
+          <strong>SDG 8 aligned</strong>
+          <span>Built to promote decent work and protect labour rights in Malaysia</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-card">
+
+      <!-- FORM VIEW -->
+      <div id="formView">
+        <div class="form-header">
+          <h2 id="r-formtitle">Create Your Account</h2>
+          <p><span id="r-haveacc">Already have one?</span> <a href="{{ url_for('login') }}" id="r-loginlink">Log in here →</a></p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error show" role="alert">
+          <span>⚠️</span>
+          <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('register') }}" id="regForm">
+
+          <!-- ROLE SELECTOR -->
+          <p style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:10px"><span id="r-roleas">I am registering as:</span> <span style="color:var(--amber)">*</span></p>
+          <div class="role-selector">
+            <div class="role-btn {% if not form_data or form_data.get('role','worker') == 'worker' %}active{% endif %}"
+                 id="role-worker" onclick="selectRole('worker')">
+              <div class="role-icon">👷</div>
+              <div class="role-label" id="r-wlbl">Migrant Worker</div>
+              <div class="role-desc" id="r-wdesc">Looking for safe work</div>
+            </div>
+            <div class="role-btn {% if form_data and form_data.get('role') == 'agent' %}active{% endif %}"
+                 id="role-agent" onclick="selectRole('agent')">
+              <div class="role-icon">🏢</div>
+              <div class="role-label" id="r-albl">Recruitment Agent</div>
+              <div class="role-desc" id="r-adesc">Register my agency</div>
+            </div>
+          </div>
+          <input type="hidden" id="selectedRole" name="role"
+                 value="{{ form_data.get('role', 'worker') if form_data else 'worker' }}"/>
+
+          <!-- WORKER FIELDS -->
+          <div id="workerFields" {% if form_data and form_data.get('role') == 'agent' %}style="display:none"{% endif %}>
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name <span class="required">*</span></label>
+                <input type="text" name="first_name" id="firstName"
+                       placeholder="e.g. Ramizah" autocomplete="given-name"
+                       value="{{ form_data.get('first_name','') if form_data else '' }}"/>
+              </div>
+              <div class="form-group">
+                <label>Last Name <span class="required">*</span></label>
+                <input type="text" name="last_name" id="lastName"
+                       placeholder="e.g. Ferdous" autocomplete="family-name"
+                       value="{{ form_data.get('last_name','') if form_data else '' }}"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Country of Origin <span class="required">*</span></label>
+              <select name="country" id="country">
+                <option value="">— Select your country —</option>
+                {% for c in ['Bangladesh','Indonesia','Nepal','Myanmar','Philippines','India','Vietnam','Pakistan','Other'] %}
+                <option value="{{ c }}" {{ 'selected' if form_data and form_data.get('country') == c else '' }}>{{ c }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Phone Number <span class="required">*</span></label>
+              <input type="tel" name="phone" id="phone"
+                     placeholder="+60 12-345 6789" autocomplete="tel"
+                     value="{{ form_data.get('phone','') if form_data else '' }}"/>
+            </div>
+          </div>
+
+          <!-- AGENT FIELDS -->
+          <div id="agentFields" {% if not form_data or form_data.get('role','worker') != 'agent' %}style="display:none"{% endif %}>
+            <div class="form-group">
+              <label>Agency / Company Name <span class="required">*</span></label>
+              <input type="text" name="agency_name" id="agencyName"
+                     placeholder="e.g. Suria Recruitment Sdn Bhd"
+                     value="{{ form_data.get('agency_name','') if form_data else '' }}"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>JTK Registration No. <span class="required">*</span></label>
+                <input type="text" name="reg_num" id="regNum"
+                       placeholder="e.g. JTKSM/P/2024/0001"
+                       value="{{ form_data.get('reg_num','') if form_data else '' }}"/>
+              </div>
+              <div class="form-group">
+                <label>State / Location <span class="required">*</span></label>
+                <select name="agent_state" id="agentState">
+                  <option value="">— Select state —</option>
+                  {% for s in ['Kuala Lumpur','Selangor','Johor','Penang','Perak','Sabah','Sarawak','Other'] %}
+                  <option value="{{ s }}" {{ 'selected' if form_data and form_data.get('agent_state') == s else '' }}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- SHARED FIELDS -->
+          <div class="form-group">
+            <label>Email Address <span class="required">*</span></label>
+            <input type="email" name="email" id="email"
+                   placeholder="you@example.com" autocomplete="email"
+                   value="{{ form_data.get('email','') if form_data else '' }}"/>
+          </div>
+
+          <div class="form-group">
+            <label>Password <span class="required">*</span></label>
+            <div class="pw-wrap">
+              <input type="password" name="password" id="password"
+                     placeholder="At least 8 characters"
+                     autocomplete="new-password"
+                     oninput="checkStrength(this.value)"/>
+              <button type="button" class="pw-toggle"
+                      onclick="togglePw('password',this)">👁️</button>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <div class="strength-text" id="strengthText">Min. 8 characters, one uppercase letter, one number</div>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password <span class="required">*</span></label>
+            <div class="pw-wrap">
+              <input type="password" name="confirm_password" id="confirmPassword"
+                     placeholder="Repeat your password"
+                     autocomplete="new-password"/>
+              <button type="button" class="pw-toggle"
+                      onclick="togglePw('confirmPassword',this)">👁️</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">Create Free Account →</button>
+
+          <div class="divider"><span>or</span></div>
+          <p style="text-align:center;font-size:.82rem;color:var(--muted)">By registering, you confirm you are 18 years or older.</p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentRole = 'worker';
+
+  function selectRole(role) {
+    currentRole = role;
+    document.getElementById('selectedRole').value = role;
+    document.getElementById('role-worker').classList.toggle('active', role === 'worker');
+    document.getElementById('role-agent').classList.toggle('active', role === 'agent');
+    document.getElementById('workerFields').style.display = role === 'worker' ? '' : 'none';
+    document.getElementById('agentFields').style.display  = role === 'agent'  ? '' : 'none';
+  }
+
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
+    else                         { inp.type = 'password'; btn.textContent = '👁️'; }
+  }
+
+  function checkStrength(val) {
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    let score = 0;
+    if (val.length >= 8)           score++;
+    if (/[A-Z]/.test(val))         score++;
+    if (/[0-9]/.test(val))         score++;
+    if (/[^A-Za-z0-9]/.test(val))  score++;
+    const colors = ['', '#c0392b','#e8833a','#f0c040','#1a9a55'];
+    const labels = {
+      en: ['','Weak — add numbers or symbols','Fair — add uppercase letters','Good — add a special character','Strong password ✓'],
+      ms: ['','Lemah — tambah nombor atau simbol','Sederhana — tambah huruf besar','Baik — tambah watak khas','Kata laluan kuat ✓'],
+      bn: ['','দুর্বল — সংখ্যা বা চিহ্ন যোগ করুন','মাঝারি — বড় হাতের অক্ষর যোগ করুন','ভালো — বিশেষ চিহ্ন যোগ করুন','শক্তিশালী পাসওয়ার্ড ✓']
+    };
+    const strengthLabels = labels[currentRegLang] || labels.en;
+    fill.style.width      = score * 25 + '%';
+    fill.style.background = colors[score] || '';
+    text.textContent      = val.length ? strengthLabels[score] : (currentRegLang === 'bn' ? 'কমপক্ষে ৮ অক্ষর ব্যবহার করুন' : currentRegLang === 'ms' ? 'Gunakan sekurang-kurangnya 8 aksara' : 'Use at least 8 characters');
+    text.style.color      = colors[score] || 'var(--muted)';
+    if (!val.length) {
+      text.textContent = currentRegLang === 'bn'
+        ? 'কমপক্ষে ৮ অক্ষর, একটি বড় হাতের অক্ষর এবং একটি সংখ্যা'
+        : currentRegLang === 'ms'
+        ? 'Min. 8 aksara, satu huruf besar, satu nombor'
+        : 'Min. 8 characters, one uppercase letter, one number';
+      text.style.color = 'var(--muted)';
+    }
+  }
+
+  // ── MULTILINGUAL ──────────────────────────────────────────
+  let currentRegLang = 'en';
+
+  const LANG_REG = {
+    en: {
+      badge:'Free & Secure Registration', title:'Join ', title2:'and Work with Confidence',
+      sub:'Create your free account in under 2 minutes. Verify agents, report fraud, and get guidance in your language.',
+      t1h:'Your data is private', t1p:'We never share your personal information with agents or employers',
+      t2h:'3 languages supported', t2p:'Use the platform in English, Bahasa Melayu, or বাংলা',
+      t3h:'100% free, always', t3p:'No hidden fees. MigrantSafe is free for all migrant workers',
+      t4h:'SDG 8 aligned', t4p:'Built to promote decent work and protect labour rights in Malaysia',
+      formtitle:'Create Your Account', haveacc:'Already have one?', loginlink:'Log in here →',
+      roleas:'I am registering as:', wlbl:'Migrant Worker', wdesc:'Looking for safe work',
+      albl:'Recruitment Agent', adesc:'Register my agency', loginbtn:'Log In'
+    },
+    ms: {
+      badge:'Pendaftaran Percuma & Selamat', title:'Sertai ', title2:'dan Bekerja dengan Yakin',
+      sub:'Buat akaun percuma anda dalam masa kurang dari 2 minit. Sahkan ejen, laporkan penipuan, dan dapatkan panduan dalam bahasa anda.',
+      t1h:'Data anda adalah peribadi', t1p:'Kami tidak berkongsi maklumat peribadi anda dengan ejen atau majikan',
+      t2h:'3 bahasa disokong', t2p:'Gunakan platform dalam Bahasa Inggeris, Bahasa Melayu, atau বাংলা',
+      t3h:'100% percuma, sentiasa', t3p:'Tiada yuran tersembunyi. MigrantSafe adalah percuma untuk semua pekerja asing',
+      t4h:'Sejajar dengan SDG 8', t4p:'Dibina untuk menggalakkan kerja yang layak dan melindungi hak buruh di Malaysia',
+      formtitle:'Buat Akaun Anda', haveacc:'Sudah ada akaun?', loginlink:'Log masuk di sini →',
+      roleas:'Saya mendaftar sebagai:', wlbl:'Pekerja Asing', wdesc:'Mencari kerja selamat',
+      albl:'Ejen Pengambilan', adesc:'Daftarkan agensi saya', loginbtn:'Log Masuk'
+    },
+    bn: {
+      badge:'বিনামূল্যে ও নিরাপদ নিবন্ধন', title:'', title2:'MigrantSafe-এ যোগ দিন এবং আত্মবিশ্বাসের সাথে কাজ করুন',
+      sub:'২ মিনিটের কম সময়ে আপনার বিনামূল্যে অ্যাকাউন্ট তৈরি করুন। এজেন্ট যাচাই করুন, প্রতারণা রিপোর্ট করুন এবং আপনার ভাষায় গাইডেন্স পান।',
+      t1h:'আপনার তথ্য ব্যক্তিগত', t1p:'আমরা আপনার ব্যক্তিগত তথ্য কখনো এজেন্ট বা নিয়োগকর্তার সাথে শেয়ার করি না',
+      t2h:'৩টি ভাষা সমর্থিত', t2p:'ইংরেজি, বাহাসা মেলায়ু, বা বাংলায় প্ল্যাটফর্ম ব্যবহার করুন',
+      t3h:'সবসময় ১০০% বিনামূল্যে', t3p:'কোনো লুকানো ফি নেই। MigrantSafe সমস্ত অভিবাসী শ্রমিকদের জন্য বিনামূল্যে',
+      t4h:'SDG ৮-এর সাথে সামঞ্জস্যপূর্ণ', t4p:'মালয়েশিয়ায় শ্রম অধিকার রক্ষায় নির্মিত',
+      formtitle:'আপনার অ্যাকাউন্ট তৈরি করুন', haveacc:'ইতিমধ্যে অ্যাকাউন্ট আছে?', loginlink:'এখানে লগ ইন করুন →',
+      roleas:'আমি নিবন্ধন করছি হিসেবে:', wlbl:'অভিবাসী শ্রমিক', wdesc:'নিরাপদ কাজ খুঁজছি',
+      albl:'নিয়োগ এজেন্ট', adesc:'আমার এজেন্সি নিবন্ধন করুন', loginbtn:'লগ ইন'
+    }
+  };
+
+  function setRegLang(lang, btn) {
+    currentRegLang = lang;
+    const T = LANG_REG[lang];
+    document.querySelectorAll('.r-lang').forEach(p => {
+      p.style.background = 'rgba(255,255,255,.15)';
+      p.style.borderColor = 'rgba(255,255,255,.2)';
+    });
+    btn.style.background = 'var(--amber)';
+    btn.style.borderColor = 'var(--amber)';
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
+    set('r-badge', T.badge); set('r-title', T.title); set('r-title2', T.title2); set('r-sub', T.sub);
+    set('r-t1h', T.t1h); set('r-t1p', T.t1p);
+    const t2h = document.querySelector('[id="r-t2h"]'); if (t2h) t2h.textContent = T.t2h;
+    const t2p = document.querySelector('[id="r-t2p"]'); if (t2p) t2p.textContent = T.t2p;
+    set('r-formtitle', T.formtitle); set('r-haveacc', T.haveacc); set('r-loginlink', T.loginlink);
+    set('r-roleas', T.roleas); set('r-wlbl', T.wlbl); set('r-wdesc', T.wdesc);
+    set('r-albl', T.albl); set('r-adesc', T.adesc);
+    const loginBtn = document.getElementById('r-login-btn');
+    if (loginBtn) loginBtn.textContent = T.loginbtn;
+  }
+</script>
+</body>
+</html>

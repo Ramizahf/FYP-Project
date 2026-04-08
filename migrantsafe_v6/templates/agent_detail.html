@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ agent['agency_name'] }} — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --teal:#0D6E6E; --teal-lt:#14A097; --teal-bg:#E6F4F4;
+      --amber:#E8833A; --amber-lt:#FFB347;
+      --dark:#0F2027; --mid:#1E3A3A;
+      --text:#2C2C2C; --muted:#6B7B7B;
+      --white:#FFFFFF; --cream:#F9F5F0; --border:#D4E8E8;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream)}
+
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06)}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo .dot{color:var(--amber)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s}
+    .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+    .btn-outline:hover{background:var(--teal-bg)}
+    .btn-primary{background:var(--teal);color:var(--white)}
+    .btn-primary:hover{background:var(--mid)}
+    .btn-red{background:#fdecea;color:#c0392b;border:1px solid #f5b9b4}
+    .btn-red:hover{background:#c0392b;color:var(--white)}
+
+    .page-wrap{max-width:860px;margin:0 auto;padding:40px 5% 80px}
+    .back-link{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;color:var(--teal);text-decoration:none;margin-bottom:28px;font-weight:600}
+    .back-link:hover{text-decoration:underline}
+
+    /* HERO CARD */
+    .agent-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);border-radius:20px;padding:36px;margin-bottom:24px;position:relative;overflow:hidden}
+    .agent-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.2) 0%,transparent 70%)}
+    .hero-top{display:flex;align-items:flex-start;gap:20px;position:relative;z-index:1;margin-bottom:20px}
+    .hero-avatar{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+    .hero-name{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--white);margin-bottom:6px}
+    .hero-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:.84rem;color:rgba(255,255,255,.65)}
+    .pill{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:100px;white-space:nowrap}
+    .pv{background:#e6faf0;color:#1a9a55;border:1px solid #b6eace}
+    .pp{background:#fff8e6;color:#b87d00;border:1px solid #fce8a0}
+    .pr{background:#fdecea;color:#c0392b;border:1px solid #f5b9b4}
+
+    /* STATUS BANNER */
+    .status-banner{border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:flex-start;gap:14px}
+    .sb-verified{background:#e6faf0;border:1.5px solid #6adba4}
+    .sb-pending{background:#fff8e6;border:1.5px solid #f5d06a}
+    .sb-reported{background:#fdecea;border:1.5px solid #f5a0a0}
+    .sb-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}
+    .sb-title{font-size:.92rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+    .sb-verified .sb-title{color:#1a6a3a}
+    .sb-pending .sb-title{color:#8a5c00}
+    .sb-reported .sb-title{color:#922b21}
+    .sb-sub{font-size:.82rem;line-height:1.55;color:var(--muted)}
+
+    /* INFO GRID */
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    .info-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .info-card.full{grid-column:span 2}
+    .info-label{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .info-value{font-size:.95rem;font-weight:600;color:var(--dark);line-height:1.5}
+    .info-value a{color:var(--teal);text-decoration:none}
+    .info-value a:hover{text-decoration:underline}
+
+    /* DESCRIPTION */
+    .desc-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px}
+    .desc-card h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:12px}
+    .desc-card p{font-size:.9rem;color:var(--muted);line-height:1.75}
+
+    /* ACTIONS */
+    .actions{display:flex;gap:12px;flex-wrap:wrap}
+
+    /* REPORT WARNING */
+    .report-warning{background:linear-gradient(135deg,#2d1a1a,#3a1e1e);border-radius:14px;padding:22px;margin-bottom:24px;display:flex;align-items:flex-start;gap:14px}
+    .rw-icon{font-size:1.6rem;flex-shrink:0}
+    .rw-title{font-size:.92rem;font-weight:700;color:#ffb4b4;margin-bottom:4px}
+    .rw-sub{font-size:.8rem;color:rgba(255,180,180,.7);line-height:1.55}
+
+    @media(max-width:600px){.info-grid{grid-template-columns:1fr}.info-card.full{grid-column:span 1}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a href="{{ url_for('agents') }}" class="btn btn-outline">← All Agents</a>
+    {% if current_user.is_auth and current_user.role == 'worker' %}
+    <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red">🚨 Report</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <a href="{{ url_for('agents') }}" class="back-link">← Back to Agent Directory</a>
+
+  {# ── HERO ── #}
+  <div class="agent-hero">
+    <div class="hero-top">
+      <div class="hero-avatar">
+        {% if agent['verification_status'] == 'verified' %}🏢
+        {% elif agent['verification_status'] == 'reported' %}⚙️
+        {% else %}⭐{% endif %}
+      </div>
+      <div>
+        <div class="hero-name">{{ agent['agency_name'] }}</div>
+        <div class="hero-meta">
+          <span>📍 {{ agent['state'] or 'Malaysia' }}</span>
+          <span>🏭 {{ agent['industry'] or 'General' }}</span>
+          <span style="position:relative;z-index:1">
+            {% set s = agent['verification_status'] %}
+            <span class="pill {{ 'pv' if s=='verified' else 'pp' if s=='pending' else 'pr' }}">
+              {{ '✓ Verified' if s=='verified' else '⏳ Pending' if s=='pending' else '⚠ Reported' }}
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── STATUS BANNER ── #}
+  {% set s = agent['verification_status'] %}
+  <div class="status-banner {{ 'sb-verified' if s=='verified' else 'sb-pending' if s=='pending' else 'sb-reported' }}">
+    <div class="sb-icon">{{ '✅' if s=='verified' else '⏳' if s=='pending' else '⚠️' }}</div>
+    <div>
+      {% if s == 'verified' %}
+      <div class="sb-title">✓ Verified Agent — Safe to Proceed</div>
+      <div class="sb-sub">This agency has been reviewed and approved by MigrantSafe admins. Always verify all agreements in writing before paying any fees.</div>
+      {% elif s == 'pending' %}
+      <div class="sb-title">⏳ Pending Verification</div>
+      <div class="sb-sub">This agency is under admin review and has not yet been verified. We recommend waiting until verification is complete before making any payments or commitments.</div>
+      {% else %}
+      <div class="sb-title">⚠ Reported — Proceed with Extreme Caution</div>
+      <div class="sb-sub">Worker complaints have been filed against this agency. An admin investigation is active. Do <strong>NOT</strong> engage with this agency or make any payments until the status is cleared.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── REPORTED WARNING ── #}
+  {% if s == 'reported' and report_count > 0 %}
+  <div class="report-warning">
+    <div class="rw-icon">🚨</div>
+    <div>
+      <div class="rw-title">{{ report_count }} open report{{ 's' if report_count != 1 else '' }} filed against this agency</div>
+      <div class="rw-sub">MigrantSafe workers have filed formal complaints. Our admin team is investigating. If you have been affected by this agency, please submit a report to help other workers.</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── DETAILS ── #}
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-label">License / Registration No.</div>
+      <div class="info-value">{{ agent['license_number'] or 'Not provided' }}</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">State / Location</div>
+      <div class="info-value">📍 {{ agent['state'] or '—' }}</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Industry / Sector</div>
+      <div class="info-value">{{ agent['industry'] or '—' }}</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Phone</div>
+      <div class="info-value">
+        {% if agent['phone'] %}
+        <a href="tel:{{ agent['phone'] }}">{{ agent['phone'] }}</a>
+        {% else %}—{% endif %}
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Email</div>
+      <div class="info-value">
+        {% if agent['email'] %}
+        <a href="mailto:{{ agent['email'] }}">{{ agent['email'] }}</a>
+        {% else %}—{% endif %}
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Listed Since</div>
+      <div class="info-value">{{ agent['created_at'][:10] if agent['created_at'] else '—' }}</div>
+    </div>
+  </div>
+
+  {# ── DESCRIPTION ── #}
+  {% if agent['description'] %}
+  <div class="desc-card">
+    <h3>About This Agency</h3>
+    <p>{{ agent['description'] }}</p>
+  </div>
+  {% endif %}
+
+  {# ── ACTIONS ── #}
+  <div class="actions">
+    <a href="{{ url_for('agents') }}" class="btn btn-outline">← Back to Directory</a>
+    {% if current_user.is_auth and current_user.role == 'worker' %}
+    <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red">🚨 Report this Agent</a>
+    {% elif not current_user.is_auth %}
+    <a href="{{ url_for('login') }}" class="btn btn-primary">Log in to Report →</a>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Environment variables — NEVER commit this file
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Database (contains real user data)
+database.db
+
+# VS Code settings
+.vscode/

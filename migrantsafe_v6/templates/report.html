@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report an Agent — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --teal:#0D6E6E; --teal-lt:#14A097; --teal-bg:#E6F4F4;
+      --amber:#E8833A; --amber-lt:#FFB347;
+      --dark:#0F2027; --mid:#1E3A3A;
+      --text:#2C2C2C; --muted:#6B7B7B;
+      --white:#FFFFFF; --cream:#F9F5F0; --border:#D4E8E8;
+      --error:#c0392b; --error-bg:#fdecea;
+      --success:#1a9a55; --success-bg:#e6faf0;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);min-height:100vh}
+
+    /* NAVBAR */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06)}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo .dot{color:var(--amber)}
+
+    /* PAGE */
+    .page-wrap{max-width:680px;margin:0 auto;padding:48px 5% 80px}
+
+    /* HERO BAND */
+    .page-hero{background:linear-gradient(135deg,var(--dark),var(--mid));border-radius:18px;padding:36px 36px 32px;margin-bottom:32px;position:relative;overflow:hidden}
+    .page-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.2) 0%,transparent 70%)}
+    .page-hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(232,131,58,.18);border:1px solid rgba(232,131,58,.35);color:var(--amber-lt);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:5px 13px;border-radius:100px;text-transform:uppercase;margin-bottom:14px}
+    .ph-dot{width:6px;height:6px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .page-hero h1{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--white);margin-bottom:8px;position:relative;z-index:1}
+    .page-hero p{font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.65;max-width:480px;position:relative;z-index:1}
+
+    /* FORM CARD */
+    .form-card{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:36px;box-shadow:0 8px 32px rgba(13,110,110,.06)}
+
+    .form-group{margin-bottom:20px}
+    label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
+    .required{color:var(--amber);margin-left:2px}
+    input,select,textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--cream);outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,110,110,.08);background:var(--white)}
+    .prefilled{background:var(--teal-bg);color:var(--dark);font-weight:600}
+
+    /* ALERT */
+    .alert{border-radius:10px;padding:12px 16px;font-size:.84rem;margin-bottom:20px;display:flex;align-items:flex-start;gap:8px}
+    .alert-warning{background:#fff8e6;color:#b87d00;border:1px solid #fce8a0}
+
+    /* FLASH MESSAGES */
+    .flash{border-radius:10px;padding:12px 16px;font-size:.84rem;margin-bottom:20px;display:flex;align-items:flex-start;gap:8px}
+    .flash-success{background:var(--success-bg);color:var(--success);border:1px solid rgba(26,154,85,.2)}
+    .flash-danger {background:var(--error-bg);color:var(--error);border:1px solid rgba(192,57,43,.2)}
+    .flash-info   {background:var(--teal-bg);color:var(--teal);border:1px solid var(--border)}
+
+    /* SUBMIT BUTTON */
+    .btn-submit{width:100%;padding:14px;border-radius:10px;background:#c0392b;color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;border:none;cursor:pointer;transition:background .2s,transform .15s,box-shadow .15s;margin-top:6px}
+    .btn-submit:hover{background:#a93226;transform:translateY(-1px);box-shadow:0 8px 24px rgba(192,57,43,.3)}
+
+    /* BACK LINK */
+    .back-link{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;color:var(--teal);text-decoration:none;margin-bottom:24px;font-weight:600}
+    .back-link:hover{text-decoration:underline}
+
+    /* SAFETY NOTE */
+    .safety-note{background:var(--teal-bg);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-top:24px;display:flex;align-items:flex-start;gap:12px}
+    .safety-note-icon{font-size:1.3rem;flex-shrink:0}
+    .safety-note-text{font-size:.82rem;color:var(--text);line-height:1.6}
+    .safety-note-text strong{color:var(--dark)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <a href="{{ url_for('agents') }}" style="font-size:.86rem;color:var(--muted);text-decoration:none">Find Agents</a>
+    <a href="{{ url_for('dashboard') }}" style="font-size:.86rem;font-weight:600;color:var(--teal);text-decoration:none">← Dashboard</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-hero-tag"><span class="ph-dot"></span> Confidential Report</div>
+    <h1>🚨 Report an Agent</h1>
+    <p>Your report is reviewed confidentially by our admin team within 48 hours. Your identity is protected — agents cannot see who filed a report.</p>
+  </div>
+
+  <!-- FLASH MESSAGES -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">
+      <span>{{ '✅' if category == 'success' else '⚠️' }}</span>
+      <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- FORM CARD -->
+  <div class="form-card">
+    <form method="POST" action="{{ url_for('submit_report') }}">
+
+      <!-- If a specific agent was linked, pre-fill their info -->
+      {% if agent %}
+      <div class="form-group">
+        <label>Agent / Agency Name <span class="required">*</span></label>
+        <input type="text" name="agent_name" value="{{ agent['agency_name'] }}"
+               class="prefilled" readonly/>
+        <input type="hidden" name="agent_id" value="{{ agent['id'] }}"/>
+      </div>
+      {% else %}
+      <div class="form-group">
+        <label>Agent / Agency Name <span class="required">*</span></label>
+        <input type="text" name="agent_name"
+               placeholder="Enter the name of the agent or agency"
+               list="agentSuggestions"/>
+        <!-- Datalist gives users autocomplete suggestions from the database -->
+        <datalist id="agentSuggestions">
+          {% for a in all_agents %}
+          <option value="{{ a['agency_name'] }}">
+          {% endfor %}
+        </datalist>
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label>Type of Issue <span class="required">*</span></label>
+        <select name="report_reason" required>
+          <option value="">— Select the type of issue —</option>
+          <option>Charged excessive fees</option>
+          <option>Provided false job information</option>
+          <option>Withheld passport or documents</option>
+          <option>Threatened or harassed worker</option>
+          <option>Did not deliver on promises</option>
+          <option>Arranged fraudulent documents</option>
+          <option>Salary not paid or withheld</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Describe what happened <span class="required">*</span></label>
+        <textarea name="description" rows="5"
+                  placeholder="Please describe the incident in as much detail as you can. The more information you provide, the better our admins can investigate."
+                  required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Date of Incident <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="date" name="incident_date"/>
+      </div>
+
+      <div class="alert alert-warning">
+        <span>⚖️</span>
+        <span>By submitting this report, you confirm that the information you have provided is truthful to the best of your knowledge. False reports may be removed.</span>
+      </div>
+
+      <button type="submit" class="btn-submit">Submit Report →</button>
+    </form>
+
+    <div class="safety-note">
+      <span class="safety-note-icon">🔒</span>
+      <div class="safety-note-text">
+        <strong>Your report is confidential.</strong>
+        Agents cannot see your name or who filed a report. If you are in immediate danger, please call the Malaysian Labour Department (JTKSM) at <strong>03-8000 8000</strong> immediately.
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
