@@ -1,11 +1,17 @@
 import json
 import os
+import ssl
 import urllib.error
 import urllib.request
 
 from flask import current_app, jsonify, render_template, request, session
 
 from db import execute_db
+
+try:
+    import certifi
+except ImportError:  # pragma: no cover - optional dependency
+    certifi = None
 
 
 CHATBOT_SYSTEM = {
@@ -206,6 +212,31 @@ def chat_api():
     return jsonify({'response': reply})
 
 
+def chat_health():
+    """Simple live-provider diagnostic for the browser and local testing."""
+    api_key = os.environ.get('OPENCODE_API_KEY', '').strip()
+    model = os.environ.get('OPENCODE_MODEL', 'openai/gpt-oss-120b:free').strip()
+    base_url = os.environ.get('OPENCODE_API_BASE_URL', 'https://openrouter.ai/api/v1').strip().rstrip('/')
+
+    if not api_key:
+        return jsonify({
+            'ok': False,
+            'mode': 'missing_key',
+            'model': model,
+            'base_url': base_url,
+            'message': 'Missing OPENCODE_API_KEY'
+        }), 503
+
+    ok, error_message = _probe_chat_provider(api_key, base_url, model)
+    return jsonify({
+        'ok': ok,
+        'mode': 'live_api' if ok else 'live_api_error',
+        'model': model,
+        'base_url': base_url,
+        'message': 'Live AI service reachable.' if ok else error_message,
+    }), 200 if ok else 503
+
+
 def get_bot_reply(message: str, language: str = 'en', history: list = None) -> str:
     """Call the configured OpenAI-compatible provider, or fall back to local FAQ answers."""
     language = language if language in ('en', 'ms', 'bn') else 'en'
@@ -239,32 +270,17 @@ def get_bot_reply(message: str, language: str = 'en', history: list = None) -> s
             'max_tokens': 600
         }).encode()
 
-        req = urllib.request.Request(
-            f'{base_url}/chat/completions',
-            data=payload,
-            method='POST',
-            headers={
-                'Content-Type': 'application/json',
-                'Authorization': f'Bearer {api_key}',
-                'HTTP-Referer': 'http://localhost',
-                'X-Title': 'MigrantSafe Chatbot'
-            }
-        )
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = json.loads(resp.read())
-                choices = data.get('choices') or []
-                if choices:
-                    content = choices[0].get('message', {}).get('content', '').strip()
-                    if content:
-                        return content
-                current_app.logger.warning("Chat API returned no message content.")
-                return _api_error_reply(language)
+            data = _perform_chat_request(api_key, base_url, payload)
+            choices = data.get('choices') or []
+            if choices:
+                content = choices[0].get('message', {}).get('content', '').strip()
+                if content:
+                    return content
+            current_app.logger.warning("Chat API returned no message content.")
+            return _api_error_reply(language)
         except urllib.error.HTTPError as exc:
-            try:
-                error_body = exc.read().decode('utf-8', errors='replace')
-            except Exception:
-                error_body = '<unreadable error body>'
+            error_body = _read_http_error_body(exc)
             current_app.logger.warning(
                 "Chat API HTTP error %s: %s",
                 exc.code,
@@ -276,6 +292,59 @@ def get_bot_reply(message: str, language: str = 'en', history: list = None) -> s
             return _api_error_reply(language)
 
     return _offline_reply(message, language)
+
+
+def _perform_chat_request(api_key: str, base_url: str, payload: bytes) -> dict:
+    """Execute one OpenAI-compatible chat completions call with explicit TLS settings."""
+    req = urllib.request.Request(
+        f'{base_url}/chat/completions',
+        data=payload,
+        method='POST',
+        headers={
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {api_key}',
+            'HTTP-Referer': request.host_url.rstrip('/'),
+            'Origin': request.host_url.rstrip('/'),
+            'X-Title': 'MigrantSafe Chatbot',
+            'User-Agent': 'MigrantSafe/1.0'
+        }
+    )
+    ssl_context = (
+        ssl.create_default_context(cafile=certifi.where())
+        if certifi is not None
+        else ssl.create_default_context()
+    )
+    with urllib.request.urlopen(req, timeout=20, context=ssl_context) as resp:
+        return json.loads(resp.read())
+
+
+def _probe_chat_provider(api_key: str, base_url: str, model: str) -> tuple[bool, str]:
+    """Low-cost provider probe used by the health endpoint."""
+    payload = json.dumps({
+        'model': model,
+        'messages': [{'role': 'user', 'content': 'Reply with exactly: OK'}],
+        'temperature': 0,
+        'max_tokens': 8
+    }).encode()
+    try:
+        data = _perform_chat_request(api_key, base_url, payload)
+        choices = data.get('choices') or []
+        if choices and choices[0].get('message', {}).get('content', '').strip():
+            return True, ''
+        return False, 'Provider replied without usable message content.'
+    except urllib.error.HTTPError as exc:
+        body = _read_http_error_body(exc)
+        return False, f'HTTP {exc.code}: {body[:300]}'
+    except Exception as exc:
+        return False, str(exc)
+
+
+def _read_http_error_body(exc: urllib.error.HTTPError) -> str:
+    """Best-effort HTTP error body read for logging and diagnostics."""
+    try:
+        return exc.read().decode('utf-8', errors='replace')
+    except Exception:
+        return '<unreadable error body>'
 
 
 def _api_error_reply(language: str) -> str:
@@ -343,3 +412,4 @@ def register_chatbot_routes(app):
     """Register the chatbot page and API endpoints."""
     app.add_url_rule('/chatbot', endpoint='chatbot', view_func=chatbot)
     app.add_url_rule('/api/chat', endpoint='chat_api', view_func=chat_api, methods=['POST'])
+    app.add_url_rule('/api/chat/health', endpoint='chat_health', view_func=chat_health, methods=['GET'])

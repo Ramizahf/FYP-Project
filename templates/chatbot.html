@@ -623,6 +623,28 @@ Peraturan:
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
+
+  async function checkChatHealth() {
+    try {
+      const response = await fetch('/api/chat/health');
+      const data = await response.json();
+      const statusEl = document.getElementById('statusText');
+      if (!statusEl) return;
+
+      if (data.ok) {
+        statusEl.textContent = `Online — ${data.model}`;
+      } else {
+        statusEl.textContent = 'Live AI unavailable — check service';
+        if (data.message) console.warn('Chat health:', data.message);
+      }
+    } catch (err) {
+      const statusEl = document.getElementById('statusText');
+      if (statusEl) statusEl.textContent = 'Service check failed';
+      console.warn('Chat health check failed:', err);
+    }
+  }
+
+  checkChatHealth();
 </script>
 </body>
 </html>
