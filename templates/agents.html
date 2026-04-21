@@ -19,7 +19,7 @@
 
     /* ── NAVBAR ── */
     nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 16px rgba(13,110,110,.06)}
-    .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
     .nav-links{display:flex;align-items:center;gap:28px}
     .nav-links a{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
@@ -166,6 +166,8 @@
     .btn-full{flex:1;padding:11px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:600;cursor:pointer;border:none;text-align:center;transition:all .18s}
     .btn-full-teal{background:var(--teal);color:var(--white)}
     .btn-full-teal:hover{background:var(--mid)}
+    .btn-full-outline{background:transparent;color:var(--teal);border:1.5px solid var(--teal)}
+    .btn-full-outline:hover{background:var(--teal-bg)}
     .btn-full-red{background:#fdecea;color:#c0392b;border:1px solid #f5b9b4}
     .btn-full-red:hover{background:#c0392b;color:var(--white)}
 
@@ -225,12 +227,15 @@
     .fade-in{animation:fadeUp .5s ease both}
     @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav>
-  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+<nav data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
   <div class="nav-links">
     <a href="index.html#how">How It Works</a>
     <a href="{{ url_for('agents') }}" class="active">Find Agents</a>
@@ -468,8 +473,9 @@
         <p id="mDesc" style="font-size:.86rem;color:var(--muted);line-height:1.7"></p>
       </div>
       <div class="modal-actions">
-        <button class="btn-full btn-full-teal" onclick="closeDetailModal()" id="t-mclose">Close</button>
+        <button class="btn-full btn-full-teal" id="mEnquiryBtn">Send Enquiry</button>
         <button class="btn-full btn-full-red" id="mReportBtn" id="t-mreport">🚨 Report this Agent</button>
+        <button class="btn-full btn-full-outline" onclick="closeDetailModal()" id="t-mclose">Close</button>
       </div>
     </div>
   </div>
@@ -697,6 +703,26 @@
     document.getElementById('mReg').textContent   = a.license_number     || '—';
     document.getElementById('mSince').textContent = a.created_at         ? a.created_at.slice(0,10) : '—';
     document.getElementById('mDesc').textContent  = a.description        || 'No description available.';
+
+    // Enquiry button — workers can send directly, guests are sent to login
+    const enquiryBtn = document.getElementById('mEnquiryBtn');
+    {% if current_user.is_auth and current_user.role == 'worker' %}
+    enquiryBtn.style.display = '';
+    enquiryBtn.textContent = 'Send Enquiry';
+    enquiryBtn.onclick = () => {
+      closeDetailModal();
+      window.location.href = '/enquiry?agent_id=' + a.id;
+    };
+    {% elif current_user.is_auth %}
+    enquiryBtn.style.display = 'none';
+    {% else %}
+    enquiryBtn.style.display = '';
+    enquiryBtn.textContent = 'Log in to Send Enquiry';
+    enquiryBtn.onclick = () => {
+      closeDetailModal();
+      window.location.href = '{{ url_for("login") }}';
+    };
+    {% endif %}
 
     // Report button — only shown and linked for authenticated workers
     const reportBtn = document.getElementById('mReportBtn');

@@ -11,7 +11,7 @@
     html{scroll-behavior:smooth}
     body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream)}
     nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06)}
-    .nav-logo{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
     .nav-links{display:flex;align-items:center;gap:24px}
     .nav-links a{font-size:.86rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
@@ -20,22 +20,25 @@
     .btn-primary{background:var(--teal);color:var(--white)}
     .btn-primary:hover{background:var(--mid)}
 
-    /* LANG BAR */
-    .lang-bar{background:var(--teal);padding:12px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px}
-    .lang-pill{padding:6px 16px;border-radius:100px;background:rgba(255,255,255,.15);color:var(--white);font-size:.78rem;font-weight:600;border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:background .2s}
-    .lang-pill:hover{background:rgba(255,255,255,.25)}
-    .lang-pill.active{background:var(--amber);border-color:var(--amber)}
+    .hero-controls{flex-shrink:0;display:flex;flex-direction:column;gap:14px;align-items:stretch;width:min(100%,620px)}
+    .lang-select-wrap{display:grid;grid-template-columns:minmax(220px,1fr) 290px;align-items:center;column-gap:18px;width:100%;padding:18px 20px;border-radius:18px;background:rgba(20,160,151,.22);border:1px solid rgba(255,255,255,.14);box-shadow:0 12px 28px rgba(6,52,55,.18);backdrop-filter:blur(4px)}
+    .lang-select-label{display:block;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.72);white-space:nowrap}
+    .lang-select{width:100%;min-width:0;padding:11px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.14);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;outline:none;cursor:pointer}
+    .lang-select option{color:var(--text);background:var(--white)}
 
     /* HERO */
-    .page-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);padding:56px 5% 52px;position:relative;overflow:hidden}
+    .page-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);padding:56px 5% 52px;position:relative;overflow:hidden;border-radius:0}
     .page-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.2) 0%,transparent 70%)}
-    .ph-inner{position:relative;z-index:1;max-width:680px}
+    .hero-layout{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:28px}
+    .ph-inner{max-width:680px}
+    .hero-lang{flex:0 0 620px;display:flex;justify-content:flex-end;max-width:100%}
     .ph-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(232,131,58,.18);border:1px solid rgba(232,131,58,.35);color:var(--amber-lt);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:5px 13px;border-radius:100px;text-transform:uppercase;margin-bottom:18px}
     .ph-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:900;color:var(--white);line-height:1.2;margin-bottom:10px}
     .ph-sub{font-size:.95rem;color:rgba(255,255,255,.65);line-height:1.7}
 
     /* CONTENT */
     .guide-body{max-width:880px;margin:0 auto;padding:48px 5% 80px}
+    [data-section]{scroll-margin-top:90px}
 
     /* WARNING BOX */
     .warning-box{background:linear-gradient(135deg,#2d1a1a,#3a2020);border-radius:16px;padding:22px 26px;margin-bottom:36px;display:flex;align-items:flex-start;gap:16px}
@@ -83,37 +86,60 @@
     .lang-en,.lang-ms,.lang-bn{display:none}
     .lang-en.visible,.lang-ms.visible,.lang-bn.visible{display:block}
 
-    @media(max-width:600px){.nav-links{display:none}.step-card{flex-direction:column}.step-num{width:32px;height:32px;font-size:.85rem}}
+    @media(max-width:900px){.hero-layout{flex-direction:column}.hero-lang{width:100%;justify-content:flex-start;flex-basis:auto}.hero-controls{width:100%;align-items:stretch}.lang-select-wrap{width:100%;max-width:620px}}
+    @media(max-width:600px){.nav-links{display:none}.step-card{flex-direction:column}.step-num{width:32px;height:32px;font-size:.85rem}.lang-select-wrap{grid-template-columns:1fr;padding:14px 16px;row-gap:10px}.lang-select{width:100%}}
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
-<nav>
-  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+<nav data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
   <div class="nav-links">
     <a href="{{ url_for('agents') }}">Find Agents</a>
     <a href="{{ url_for('chatbot') }}">Chatbot</a>
     <a href="{{ url_for('migration_guide') }}" style="color:var(--teal);font-weight:600">Migration Guide</a>
   </div>
-  {% if current_user.is_auth %}
-  <a href="{{ url_for('dashboard') }}" class="btn btn-primary">My Dashboard</a>
-  {% else %}
-  <a href="{{ url_for('register') }}" class="btn btn-primary">Register Free</a>
-  {% endif %}
+  <div class="nav-cta">
+    {% if current_user.is_auth %}
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">My Dashboard</a>
+    {% else %}
+    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Free</a>
+    {% endif %}
+  </div>
 </nav>
 
-<div class="lang-bar">
-  <span style="font-size:.75rem;color:rgba(255,255,255,.6);margin-right:4px">🌐</span>
-  <span class="lang-pill active" onclick="setLang('en',this)">🇬🇧 English</span>
-  <span class="lang-pill" onclick="setLang('ms',this)">🇲🇾 Melayu</span>
-  <span class="lang-pill" onclick="setLang('bn',this)">🇧🇩 বাংলা</span>
-</div>
-
-<div class="page-hero">
-  <div class="ph-inner">
-    <div class="ph-tag">📖 Complete Guide</div>
-    <h1 class="ph-title" id="heroTitle">Step-by-Step Migration Guide for Malaysia</h1>
-    <p class="ph-sub" id="heroSub">Everything you need to know about the recruitment process, your rights, and how to stay safe — in simple language.</p>
+<div class="page-hero guide-hero">
+  <div class="hero-layout">
+    <div class="ph-inner">
+      <div class="ph-tag">📖 Complete Guide</div>
+      <h1 class="ph-title" id="heroTitle">Step-by-Step Migration Guide for Malaysia</h1>
+      <p class="ph-sub" id="heroSub">Everything you need to know about the recruitment process, your rights, and how to stay safe — in simple language.</p>
+    </div>
+    <div class="hero-lang">
+      <div class="hero-controls">
+        <div class="lang-select-wrap">
+        <label for="guideLangSelect" class="lang-select-label" id="guideLangLabel">Choose a language</label>
+        <select id="guideLangSelect" class="lang-select" onchange="setLang(this.value)">
+          <option value="en">English</option>
+          <option value="ms">Bahasa Melayu</option>
+          <option value="bn">বাংলা</option>
+        </select>
+        </div>
+        <div class="lang-select-wrap">
+          <label for="guideSectionSelect" class="lang-select-label" id="guideSectionLabel">Jump to Section</label>
+          <select id="guideSectionSelect" class="lang-select" onchange="jumpToSection(this.value)">
+            <option value="">Select section</option>
+            <option value="warning">Important Notice</option>
+            <option value="steps">Recruitment Steps</option>
+            <option value="rights">Worker Rights</option>
+            <option value="help">Get Help</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -122,7 +148,7 @@
   <!-- ENGLISH CONTENT -->
   <div class="lang-en visible" id="content-en">
 
-    <div class="warning-box">
+    <div class="warning-box" data-section="warning">
       <div class="wb-icon">🚨</div>
       <div>
         <div class="wb-title">Important: You should NEVER pay recruitment fees</div>
@@ -130,7 +156,7 @@
       </div>
     </div>
 
-    <div class="steps-section">
+    <div class="steps-section" data-section="steps">
       <h2>🗺️ The 7 Steps of Legal Recruitment</h2>
       <p class="intro">Follow these steps in order. Missing any step can make you undocumented. Take your time and ask questions at every stage.</p>
 
@@ -203,7 +229,7 @@
       </div>
     </div>
 
-    <div class="steps-section">
+    <div class="steps-section" data-section="rights">
       <h2>⚖️ Your Rights as a Migrant Worker</h2>
       <p class="intro">You have legal rights in Malaysia. Know them and protect yourself.</p>
       <div class="rights-grid">
@@ -228,7 +254,7 @@
       </div>
     </div>
 
-    <div class="hotline-box">
+    <div class="hotline-box" data-section="help">
       <div class="hl-left">
         <h3>Need Help? Contact JTKSM</h3>
         <p>Malaysian Department of Labour (Jabatan Tenaga Kerja Semenanjung Malaysia)<br>Available Monday–Friday, 8am–5pm</p>
@@ -241,7 +267,7 @@
   <!-- MALAY CONTENT -->
   <div class="lang-ms" id="content-ms">
 
-    <div class="warning-box">
+    <div class="warning-box" data-section="warning">
       <div class="wb-icon">🚨</div>
       <div>
         <div class="wb-title">Penting: Anda TIDAK SEHARUSNYA membayar yuran pengambilan</div>
@@ -249,7 +275,7 @@
       </div>
     </div>
 
-    <div class="steps-section">
+    <div class="steps-section" data-section="steps">
       <h2>🗺️ 7 Langkah Pengambilan Sah</h2>
       <p class="intro">Ikuti langkah-langkah ini mengikut urutan. Melepaskan mana-mana langkah boleh menjadikan anda tidak berdokumen.</p>
 
@@ -268,7 +294,7 @@
       <div class="step-card"><div class="step-num">7</div><div class="step-content"><h3>Tahu Bila Perlu Perbaharui atau Pulang</h3><p>Tinggal melebihi tempoh permit menjadikan anda tidak berdokumen.</p><ul><li>Pantau tarikh tamat VP(TE) anda</li><li>Perbaharui sekurang-kurangnya 3 bulan sebelum tamat</li></ul></div></div>
     </div>
 
-    <div class="steps-section">
+    <div class="steps-section" data-section="rights">
       <h2>⚖️ Hak Anda sebagai Pekerja Asing</h2>
       <div class="rights-grid">
         <div class="right-card"><div class="right-icon">🛂</div><div class="right-title">Simpan Pasport Anda</div><div class="right-desc">Pasport anda milik anda. Tiada majikan atau ejen boleh mengambil atau menahannya.</div></div>
@@ -280,7 +306,7 @@
       </div>
     </div>
 
-    <div class="hotline-box">
+    <div class="hotline-box" data-section="help">
       <div class="hl-left">
         <h3>Perlukan Bantuan? Hubungi JTKSM</h3>
         <p>Jabatan Tenaga Kerja Semenanjung Malaysia<br>Isnin–Jumaat, 8 pagi–5 petang</p>
@@ -293,7 +319,7 @@
   <!-- BANGLA CONTENT -->
   <div class="lang-bn" id="content-bn">
 
-    <div class="warning-box">
+    <div class="warning-box" data-section="warning">
       <div class="wb-icon">🚨</div>
       <div>
         <div class="wb-title">গুরুত্বপূর্ণ: আপনার কখনো রিক্রুটমেন্ট ফি দেওয়া উচিত নয়</div>
@@ -301,7 +327,7 @@
       </div>
     </div>
 
-    <div class="steps-section">
+    <div class="steps-section" data-section="steps">
       <h2>🗺️ বৈধ নিয়োগের ৭টি ধাপ</h2>
       <p class="intro">এই ধাপগুলো ক্রমানুসারে অনুসরণ করুন। যেকোনো ধাপ মিস করলে আপনি অনথিভুক্ত হয়ে যেতে পারেন।</p>
 
@@ -320,7 +346,7 @@
       <div class="step-card"><div class="step-num">৭</div><div class="step-content"><h3>কখন নবায়ন বা ফিরে যেতে হবে তা জানুন</h3><p>পারমিটের মেয়াদ শেষে থাকা আপনাকে অনথিভুক্ত করে দেয়, যা গ্রেফতার ও বহিষ্কারের দিকে নিয়ে যেতে পারে।</p><ul><li>আপনার VP(TE) মেয়াদ শেষের তারিখ সাবধানে লক্ষ্য রাখুন</li><li>মেয়াদ শেষ হওয়ার কমপক্ষে ৩ মাস আগে নবায়ন করুন</li></ul></div></div>
     </div>
 
-    <div class="steps-section">
+    <div class="steps-section" data-section="rights">
       <h2>⚖️ অভিবাসী শ্রমিক হিসেবে আপনার অধিকার</h2>
       <div class="rights-grid">
         <div class="right-card"><div class="right-icon">🛂</div><div class="right-title">পাসপোর্ট রাখুন</div><div class="right-desc">আপনার পাসপোর্ট আপনার সম্পত্তি। কোনো নিয়োগকর্তা বা এজেন্ট আইনিভাবে এটি নিতে বা ধরে রাখতে পারে না।</div></div>
@@ -332,7 +358,7 @@
       </div>
     </div>
 
-    <div class="hotline-box">
+    <div class="hotline-box" data-section="help">
       <div class="hl-left">
         <h3>সাহায্য দরকার? JTKSM-এ যোগাযোগ করুন</h3>
         <p>মালয়েশিয়ার শ্রম বিভাগ (জাবাতান তেনাগা কার্জা সেমেনানজুং মালয়েশিয়া)<br>সোমবার–শুক্রবার, সকাল ৮টা–বিকেল ৫টা</p>
@@ -345,14 +371,70 @@
 </div><!-- /guide-body -->
 
 <script>
-  function setLang(lang, btn) {
+  function updateGuideControls(lang) {
+    const langLabel = document.getElementById('guideLangLabel');
+    const sectionLabel = document.getElementById('guideSectionLabel');
+    const sectionSelect = document.getElementById('guideSectionSelect');
+    const sectionTexts = {
+      en: {
+        langLabel: 'Choose a language',
+        sectionLabel: 'Jump to Section',
+        placeholder: 'Select section',
+        warning: 'Important Notice',
+        steps: 'Recruitment Steps',
+        rights: 'Worker Rights',
+        help: 'Get Help'
+      },
+      ms: {
+        langLabel: 'Pilih bahasa',
+        sectionLabel: 'Pergi ke Bahagian',
+        placeholder: 'Pilih bahagian',
+        warning: 'Notis Penting',
+        steps: 'Langkah Pengambilan',
+        rights: 'Hak Pekerja',
+        help: 'Dapatkan Bantuan'
+      },
+      bn: {
+        langLabel: 'ভাষা নির্বাচন করুন',
+        sectionLabel: 'বিভাগে যান',
+        placeholder: 'বিভাগ নির্বাচন করুন',
+        warning: 'গুরুত্বপূর্ণ নোটিশ',
+        steps: 'নিয়োগের ধাপ',
+        rights: 'শ্রমিকের অধিকার',
+        help: 'সহায়তা নিন'
+      }
+    };
+    const labels = sectionTexts[lang] || sectionTexts.en;
+    if (langLabel) langLabel.textContent = labels.langLabel;
+    if (sectionLabel) sectionLabel.textContent = labels.sectionLabel;
+    if (sectionSelect) {
+      sectionSelect.value = '';
+      const options = sectionSelect.options;
+      if (options[0]) options[0].textContent = labels.placeholder;
+      if (options[1]) options[1].textContent = labels.warning;
+      if (options[2]) options[2].textContent = labels.steps;
+      if (options[3]) options[3].textContent = labels.rights;
+      if (options[4]) options[4].textContent = labels.help;
+    }
+  }
+
+  function jumpToSection(section) {
+    if (!section) return;
+    const visibleContent = document.querySelector('.lang-en.visible, .lang-ms.visible, .lang-bn.visible');
+    if (!visibleContent) return;
+    const target = visibleContent.querySelector(`[data-section="${section}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function setLang(lang) {
     // Hide all content
     document.querySelectorAll('.lang-en,.lang-ms,.lang-bn').forEach(el => el.classList.remove('visible'));
     // Show selected
     document.getElementById('content-' + lang).classList.add('visible');
-    // Update pills
-    document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
+    const select = document.getElementById('guideLangSelect');
+    if (select) select.value = lang;
     // Update hero text
     const titles = {
       en: 'Step-by-Step Migration Guide for Malaysia',
@@ -366,7 +448,10 @@
     };
     document.getElementById('heroTitle').textContent = titles[lang];
     document.getElementById('heroSub').textContent = subs[lang];
+    updateGuideControls(lang);
   }
+
+  updateGuideControls('en');
 </script>
 </body>
 </html>

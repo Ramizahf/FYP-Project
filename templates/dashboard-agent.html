@@ -10,8 +10,11 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;min-height:100vh}
     .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
-    .sb-logo{padding:22px 24px 18px;font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--white);text-decoration:none;display:block;border-bottom:1px solid rgba(255,255,255,.07)}
-    .sb-logo .dot{color:var(--amber)}
+    .sb-logo{padding:18px 20px 16px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-logo-icon{display:block;width:auto;height:2.8rem;object-fit:contain;flex-shrink:0}
+    .sb-logo-text{display:inline-flex;align-items:baseline;line-height:1;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;letter-spacing:-.035em}
+    .sb-logo-main{color:var(--white)}
+    .sb-logo-accent{color:var(--amber);margin-left:-.04em}
     .sb-section{padding:18px 16px 6px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28)}
     .sb-item{display:flex;align-items:center;gap:11px;padding:10px 14px;margin:2px 8px;border-radius:9px;font-size:.86rem;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:background .18s,color .18s;text-decoration:none}
     .sb-item:hover{background:rgba(255,255,255,.07);color:var(--white)}
@@ -49,7 +52,7 @@
     .stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--dark);margin-bottom:3px}
     .stat-lbl{font-size:.75rem;color:var(--muted)}
     .stat-sub{font-size:.7rem;color:#1a9a55;margin-top:3px;font-weight:600}
-    .qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    .qa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
     .qa{background:var(--white);border:1.5px solid var(--border);border-radius:13px;padding:18px 14px;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;transition:all .18s}
     .qa:hover{border-color:var(--amber);background:#fff8f0;transform:translateY(-2px);box-shadow:0 5px 16px rgba(232,131,58,.1)}
     .qa-icon{font-size:1.4rem;margin-bottom:7px}
@@ -81,10 +84,24 @@
     .btn-amber:hover{background:#d06e28}
     .empty-state{text-align:center;padding:36px 20px;color:var(--muted)}
     .empty-icon{font-size:2.2rem;margin-bottom:10px}
+    .warn-box{margin-top:16px;padding:14px 16px;border-radius:12px;background:#fff8e6;border:1px solid #f5d06a;font-size:.82rem;color:#7a5a00;line-height:1.6}
+    .enquiry-card{padding:16px 0;border-bottom:1px solid var(--border)}
+    .enquiry-card:last-child{border-bottom:none;padding-bottom:0}
+    .enquiry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+    .enquiry-subject{font-size:.92rem;font-weight:700;color:var(--dark)}
+    .enquiry-meta{font-size:.75rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+    .enquiry-body{font-size:.84rem;color:var(--muted);line-height:1.65}
+    .reply-box{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--teal-bg);border:1px solid var(--border)}
+    .reply-box strong{display:block;font-size:.8rem;color:var(--dark);margin-bottom:4px}
     .prof-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
     .prof-row:last-child{border-bottom:none}
     .prof-lbl{font-size:.8rem;color:var(--muted)}
     .prof-val{font-size:.86rem;font-weight:600;color:var(--dark)}
+    .job-stack{display:grid;gap:14px}
+    .job-card{border:1px solid var(--border);border-radius:12px;padding:16px;background:var(--white)}
+    .job-title{font-size:.95rem;font-weight:700;color:var(--dark);margin-bottom:4px}
+    .job-meta{font-size:.76rem;color:var(--muted);margin-bottom:10px}
+    .job-desc{font-size:.84rem;color:var(--text);line-height:1.6;white-space:pre-line}
     .sec-hdr{margin-bottom:18px}
     .sec-hdr h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin-bottom:3px}
     .sec-hdr p{font-size:.83rem;color:var(--muted)}
@@ -92,15 +109,19 @@
     #toast.show{opacity:1;transform:translateY(0)}
     @media(max-width:860px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stats{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
 <aside class="sidebar">
-  <a href="{{ url_for('index') }}" class="sb-logo">Migrant<span class="dot">Safe</span></a>
+  <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
   <div class="sb-section" data-t="sb_main">Main</div>
-  <button class="sb-item active" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_home">Dashboard</span></button>
-  <button class="sb-item" onclick="go('profile-agency',this)"><span class="sb-icon">🏢</span> <span data-t="sb_profile_agency">My Agency Profile</span></button>
-  <button class="sb-item" onclick="go('reviews',this)"><span class="sb-icon">⭐</span> <span data-t="sb_reviews">Reviews & Reports</span></button>
+  <button class="sb-item active" data-page-link="home" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_home">Dashboard</span></button>
+  <button class="sb-item" data-page-link="profile-agency" onclick="go('profile-agency',this)"><span class="sb-icon">🏢</span> <span data-t="sb_profile_agency">My Agency Profile</span></button>
+  <button class="sb-item" data-page-link="job-listings" onclick="go('job-listings',this)"><span class="sb-icon">💼</span> <span data-t="sb_job_listings">Job Listings</span></button>
+  <button class="sb-item" data-page-link="worker-preferences" onclick="go('worker-preferences',this)"><span class="sb-icon">👷</span> <span data-t="sb_worker_preferences">Worker Preferences</span></button>
+  <button class="sb-item" data-page-link="reviews" onclick="go('reviews',this)"><span class="sb-icon">⭐</span> <span data-t="sb_reviews">Reviews & Reports</span></button>
   <div class="sb-section" data-t="sb_account">Account</div>
   <button class="sb-item" onclick="go('settings',this)"><span class="sb-icon">⚙️</span> <span data-t="sb_settings">Account Settings</span></button>
   <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> <span data-t="sb_back">Back to Homepage</span></a>
@@ -125,22 +146,22 @@
   </div>
 
   <div class="topbar">
+    <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Toggle sidebar">&#9776;</button>
     <div><h1 id="tbTitle" data-t="page_home">Dashboard</h1><p>Hello, {{ current_user.name or 'there' }} 👋</p></div>
     <div class="notif">🔔<span class="notif-dot"></span></div>
   </div>
 
   <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div style="background:{{ '#e6faf0' if category == 'success' else '#fdecea' }};border:1px solid {{ '#b6eace' if category == 'success' else '#f5b9b4' }};color:{{ '#1a9a55' if category == 'success' else '#c0392b' }};border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.88rem;display:flex;align-items:center;gap:8px;">
+        <span>{{ '✅' if category == 'success' else '⚠️' }}</span><span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    {% endwith %}
 
     <!-- HOME -->
     <div class="page active" id="p-home">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-        <div style="background:{{ '#e6faf0' if category == 'success' else '#fdecea' }};border:1px solid {{ '#b6eace' if category == 'success' else '#f5b9b4' }};color:{{ '#1a9a55' if category == 'success' else '#c0392b' }};border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.88rem;display:flex;align-items:center;gap:8px;">
-          <span>{{ '✅' if category == 'success' else '⚠️' }}</span><span>{{ message }}</span>
-        </div>
-        {% endfor %}
-      {% endwith %}
-
       <div class="banner">
         <div style="position:relative;z-index:1">
           <h2>Welcome back, {{ current_user.name or 'there' }}!</h2>
@@ -171,6 +192,8 @@
       <div class="sec-hdr"><h2 data-t="qa_title">Quick Actions</h2></div>
       <div class="qa-grid">
         <button class="qa" onclick="go('profile-agency',null)"><div class="qa-icon">🏢</div><div class="qa-lbl" data-t="q_edit">Edit Agency Profile</div></button>
+        <button class="qa" onclick="go('job-listings',null)"><div class="qa-icon">💼</div><div class="qa-lbl" data-t="q_job_listings">Manage Job Listings</div></button>
+        <button class="qa" onclick="go('worker-preferences',null)"><div class="qa-icon">👷</div><div class="qa-lbl" data-t="q_worker_preferences">View Worker Preferences</div></button>
         <button class="qa" onclick="go('reviews',null)"><div class="qa-icon">⭐</div><div class="qa-lbl" data-t="q_reviews">View Reviews</div></button>
         <button class="qa" onclick="go('settings',null)"><div class="qa-icon">⚙️</div><div class="qa-lbl" data-t="q_settings">Account Settings</div></button>
       </div>
@@ -218,6 +241,74 @@
       </div>
     </div>
 
+    <!-- JOB LISTINGS -->
+    <div class="page" id="p-job-listings">
+      <div class="sec-hdr"><h2 data-t="job_listings_title">Job Listings</h2><p data-t="job_listings_sub">Publish simple job listings for workers to view.</p></div>
+      <div class="card" style="max-width:640px">
+        <div class="card-hdr" data-t="create_job_listing_title">Create a Job Listing</div>
+        <form method="POST" action="{{ url_for('create_job_listing') }}" class="rform">
+          <div class="fg">
+            <label data-t="form_job_title">Job Title *</label>
+            <input type="text" name="job_title" placeholder="e.g. Warehouse Worker">
+          </div>
+          <div class="fg">
+            <label data-t="form_job_location">Location *</label>
+            <input type="text" name="location" placeholder="e.g. Johor">
+          </div>
+          <div class="fg">
+            <label data-t="form_job_description">Description *</label>
+            <textarea name="description" rows="4" placeholder="Write a short description of the job."></textarea>
+          </div>
+          <button type="submit" class="btn-amber" data-t="publish_job_btn">Publish Job Listing →</button>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div class="card-hdr" data-t="my_job_listings_title">My Job Listings</div>
+        {% if agent_job_listings %}
+        <div class="job-stack">
+          {% for listing in agent_job_listings %}
+          <div class="job-card">
+            <div class="job-title">{{ listing['job_title'] }}</div>
+            <div class="job-meta">{{ listing['location'] }} • {{ listing['created_at'][:10] if listing['created_at'] else '—' }}</div>
+            <div class="job-desc">{{ listing['description'] }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">💼</div>
+          <p style="font-weight:600;color:var(--dark);margin-bottom:6px" data-t="no_job_listings">No job listings yet</p>
+          <p style="font-size:.82rem" data-t="no_job_listings_sub">Your published job listings will appear here.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- WORKER PREFERENCES -->
+    <div class="page" id="p-worker-preferences">
+      <div class="sec-hdr"><h2 data-t="worker_preferences_title">Worker Job Preferences</h2><p data-t="worker_preferences_sub">Workers who have shared the kind of jobs they are looking for.</p></div>
+      <div class="card">
+        {% if worker_preferences %}
+        <div class="job-stack">
+          {% for worker in worker_preferences %}
+          <div class="job-card">
+            <div class="job-title">{{ worker['worker_name'] }}</div>
+            <div class="job-meta">{{ worker['desired_job'] }}{% if worker['preferred_location'] %} • {{ worker['preferred_location'] }}{% endif %}</div>
+            <div class="job-desc">{{ worker['job_description'] or 'No extra details provided.' }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">👷</div>
+          <p style="font-weight:600;color:var(--dark);margin-bottom:6px" data-t="no_worker_preferences">No worker preferences yet</p>
+          <p style="font-size:.82rem" data-t="no_worker_preferences_sub">Workers will appear here after they save their job preferences.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
     <!-- REVIEWS -->
     <div class="page" id="p-reviews">
       <div class="sec-hdr"><h2 data-t="reviews_title">Reviews & Reports</h2><p data-t="reviews_sub">Feedback and reports from migrant workers about your agency.</p></div>
@@ -237,6 +328,62 @@
           {% endfor %}
         {% else %}
         <div class="empty-state"><div class="empty-icon">🛡️</div><p style="font-weight:600;color:var(--dark);margin-bottom:6px" data-t="no_reports">No reports filed</p><p style="font-size:.82rem" data-t="no_reports_sub">Your agency has no reports. Keep up ethical recruitment practices!</p></div>
+        {% endif %}
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div class="card-hdr">Worker Enquiries</div>
+        <div class="warn-box">
+          Keep all communication inside MigrantSafe. Do not ask workers to upload passport copies, bank statements, or other sensitive personal documents in these messages.
+        </div>
+        {% if enquiries %}
+          {% for e in enquiries %}
+          <div class="enquiry-card">
+            <div class="enquiry-top">
+              <div>
+                <div class="enquiry-subject">{{ e['subject'] }}</div>
+                <div class="enquiry-meta">
+                  <span>From: {{ e['worker_name'] }}</span>
+                  <span>{{ e['category'] }}</span>
+                  <span>{{ e['created_at'][:10] if e['created_at'] else '—' }}</span>
+                </div>
+              </div>
+              <span class="pill {{ 'pp' if e['status'] == 'open' else 'pv' if e['status'] == 'replied' else 'pr' }}">
+                {{ 'Open' if e['status'] == 'open' else 'Replied' if e['status'] == 'replied' else 'Closed' }}
+              </span>
+            </div>
+            <div class="enquiry-body">{{ e['message'] }}</div>
+            {% if e['reply_message'] %}
+            <div class="reply-box">
+              <strong>Your Reply</strong>
+              <div class="enquiry-body" style="color:var(--text)">{{ e['reply_message'] }}</div>
+              <div class="enquiry-meta" style="margin-top:8px;margin-bottom:0">
+                <span>Updated: {{ e['replied_at'][:16] if e['replied_at'] else '—' }}</span>
+              </div>
+            </div>
+            {% endif %}
+            <form method="POST" action="{{ url_for('reply_enquiry', enquiry_id=e['id']) }}" class="rform" style="margin-top:12px">
+              <div class="fg">
+                <label>Reply Message</label>
+                <textarea name="reply_message" rows="3" placeholder="Write your reply to this worker...">{{ e['reply_message'] or '' }}</textarea>
+              </div>
+              <div class="fg">
+                <label>Status</label>
+                <select name="status">
+                  <option value="replied" {{ 'selected' if e['status'] == 'replied' else '' }}>Replied</option>
+                  <option value="closed" {{ 'selected' if e['status'] == 'closed' else '' }}>Closed</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-amber">{{ 'Update Reply' if e['reply_message'] else 'Send Reply' }}</button>
+            </form>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">✉️</div>
+          <p style="font-weight:600;color:var(--dark);margin-bottom:6px">No worker enquiries yet</p>
+          <p style="font-size:.82rem">New worker questions will appear here so you can reply inside the platform.</p>
+        </div>
         {% endif %}
       </div>
     </div>
@@ -264,6 +411,7 @@
 const T = {
   en: {
     sb_main:'Main', sb_home:'Dashboard', sb_profile_agency:'My Agency Profile',
+    sb_job_listings:'Job Listings', sb_worker_preferences:'Worker Preferences',
     sb_reviews:'Reviews & Reports', sb_account:'Account', sb_settings:'Account Settings',
     sb_back:'Back to Homepage', role_label:'Recruitment Agent', logout:'← Log Out',
     page_home:'Dashboard', page_profile_agency:'My Agency Profile',
@@ -274,7 +422,7 @@ const T = {
     status_reported_title:'Verification Status: Reported', status_reported_sub:'Your agency has received worker reports. An admin is reviewing the situation.',
     status_noprofile_title:'Profile Not Yet Completed', status_noprofile_sub:'Go to "My Agency Profile" and fill in your JTK registration number to begin verification.',
     s_views:'Profile Views', s_rating:'Average Rating', s_reports:'Reports Against Agency', s_status:'Verification Status',
-    qa_title:'Quick Actions', q_edit:'Edit Agency Profile', q_reviews:'View Reviews', q_settings:'Account Settings',
+    qa_title:'Quick Actions', q_edit:'Edit Agency Profile', q_job_listings:'Manage Job Listings', q_worker_preferences:'View Worker Preferences', q_reviews:'View Reviews', q_settings:'Account Settings',
     recent_activity:'Recent Activity',
     act1_title:'Verification Pending', act1_sub:'Admin has received your registration', act1_time:'Ongoing',
     act2_title:'Account Created', act2_sub:'Welcome to MigrantSafe!', act2_time:'Today',
@@ -288,6 +436,15 @@ const T = {
     form_jtk:'JTK Registration Number *', form_state:'State / Location *',
     form_industry:'Industry / Sector', form_phone:'Office Phone Number',
     form_desc:'Brief Description', save_btn:'Save Profile →',
+    job_listings_title:'Job Listings', job_listings_sub:'Publish simple job listings for workers to view.',
+    create_job_listing_title:'Create a Job Listing', my_job_listings_title:'My Job Listings',
+    form_job_title:'Job Title *', form_job_location:'Location *', form_job_description:'Description *',
+    publish_job_btn:'Publish Job Listing →', no_job_listings:'No job listings yet',
+    no_job_listings_sub:'Your published job listings will appear here.',
+    worker_preferences_title:'Worker Job Preferences',
+    worker_preferences_sub:'Workers who have shared the kind of jobs they are looking for.',
+    no_worker_preferences:'No worker preferences yet',
+    no_worker_preferences_sub:'Workers will appear here after they save their job preferences.',
     reviews_title:'Reviews & Reports', reviews_sub:'Feedback from migrant workers about your agency.',
     reports_against:'Reports Against Your Agency',
     no_reports:'No reports filed', no_reports_sub:'Your agency has no reports. Keep up ethical recruitment practices!',
@@ -296,6 +453,7 @@ const T = {
   },
   ms: {
     sb_main:'Utama', sb_home:'Papan Pemuka', sb_profile_agency:'Profil Agensi Saya',
+    sb_job_listings:'Senarai Kerja', sb_worker_preferences:'Pilihan Pekerja',
     sb_reviews:'Ulasan & Laporan', sb_account:'Akaun', sb_settings:'Tetapan Akaun',
     sb_back:'Kembali ke Laman Utama', role_label:'Ejen Pengambilan', logout:'← Log Keluar',
     page_home:'Papan Pemuka', page_profile_agency:'Profil Agensi Saya',
@@ -306,7 +464,7 @@ const T = {
     status_reported_title:'Status Pengesahan: Dilaporkan', status_reported_sub:'Agensi anda telah menerima laporan pekerja. Admin sedang menyemak situasi ini.',
     status_noprofile_title:'Profil Belum Lengkap', status_noprofile_sub:'Pergi ke "Profil Agensi Saya" dan isi nombor pendaftaran JTK anda untuk memulakan pengesahan.',
     s_views:'Paparan Profil', s_rating:'Penilaian Purata', s_reports:'Laporan Terhadap Agensi', s_status:'Status Pengesahan',
-    qa_title:'Tindakan Pantas', q_edit:'Edit Profil Agensi', q_reviews:'Lihat Ulasan', q_settings:'Tetapan Akaun',
+    qa_title:'Tindakan Pantas', q_edit:'Edit Profil Agensi', q_job_listings:'Urus Senarai Kerja', q_worker_preferences:'Lihat Pilihan Pekerja', q_reviews:'Lihat Ulasan', q_settings:'Tetapan Akaun',
     recent_activity:'Aktiviti Terkini',
     act1_title:'Pengesahan Belum Selesai', act1_sub:'Admin telah menerima pendaftaran anda', act1_time:'Berterusan',
     act2_title:'Akaun Dibuat', act2_sub:'Selamat datang ke MigrantSafe!', act2_time:'Hari ini',
@@ -320,6 +478,15 @@ const T = {
     form_jtk:'Nombor Pendaftaran JTK *', form_state:'Negeri / Lokasi *',
     form_industry:'Industri / Sektor', form_phone:'Nombor Telefon Pejabat',
     form_desc:'Keterangan Ringkas', save_btn:'Simpan Profil →',
+    job_listings_title:'Senarai Kerja', job_listings_sub:'Siarkan senarai kerja ringkas untuk dilihat oleh pekerja.',
+    create_job_listing_title:'Cipta Senarai Kerja', my_job_listings_title:'Senarai Kerja Saya',
+    form_job_title:'Tajuk Kerja *', form_job_location:'Lokasi *', form_job_description:'Penerangan *',
+    publish_job_btn:'Siarkan Senarai Kerja →', no_job_listings:'Belum ada senarai kerja',
+    no_job_listings_sub:'Senarai kerja yang anda siarkan akan muncul di sini.',
+    worker_preferences_title:'Pilihan Kerja Pekerja',
+    worker_preferences_sub:'Pekerja yang telah berkongsi jenis kerja yang mereka cari.',
+    no_worker_preferences:'Belum ada pilihan pekerja',
+    no_worker_preferences_sub:'Pekerja akan muncul di sini selepas mereka menyimpan pilihan kerja.',
     reviews_title:'Ulasan & Laporan', reviews_sub:'Maklum balas daripada pekerja asing tentang agensi anda.',
     reports_against:'Laporan Terhadap Agensi Anda',
     no_reports:'Tiada laporan difailkan', no_reports_sub:'Agensi anda tiada laporan. Teruskan amalan pengambilan yang beretika!',
@@ -328,6 +495,7 @@ const T = {
   },
   bn: {
     sb_main:'প্রধান', sb_home:'ড্যাশবোর্ড', sb_profile_agency:'আমার এজেন্সি প্রোফাইল',
+    sb_job_listings:'চাকরির তালিকা', sb_worker_preferences:'শ্রমিকের পছন্দ',
     sb_reviews:'রিভিউ ও রিপোর্ট', sb_account:'অ্যাকাউন্ট', sb_settings:'অ্যাকাউন্ট সেটিংস',
     sb_back:'হোমপেজে ফিরুন', role_label:'রিক্রুটমেন্ট এজেন্ট', logout:'← লগ আউট',
     page_home:'ড্যাশবোর্ড', page_profile_agency:'আমার এজেন্সি প্রোফাইল',
@@ -338,7 +506,7 @@ const T = {
     status_reported_title:'যাচাইকরণ স্ট্যাটাস: রিপোর্টকৃত', status_reported_sub:'আপনার এজেন্সির বিরুদ্ধে শ্রমিকদের রিপোর্ট দাখিল হয়েছে। অ্যাডমিন পরিস্থিতি পর্যালোচনা করছে।',
     status_noprofile_title:'প্রোফাইল এখনো পূরণ হয়নি', status_noprofile_sub:'"আমার এজেন্সি প্রোফাইল"-এ যান এবং যাচাইকরণ শুরু করতে JTK নিবন্ধন নম্বর পূরণ করুন।',
     s_views:'প্রোফাইল ভিউ', s_rating:'গড় রেটিং', s_reports:'এজেন্সির বিরুদ্ধে রিপোর্ট', s_status:'যাচাইকরণ স্ট্যাটাস',
-    qa_title:'দ্রুত কাজ', q_edit:'এজেন্সি প্রোফাইল সম্পাদনা', q_reviews:'রিভিউ দেখুন', q_settings:'অ্যাকাউন্ট সেটিংস',
+    qa_title:'দ্রুত কাজ', q_edit:'এজেন্সি প্রোফাইল সম্পাদনা', q_job_listings:'চাকরির তালিকা পরিচালনা', q_worker_preferences:'শ্রমিকের পছন্দ দেখুন', q_reviews:'রিভিউ দেখুন', q_settings:'অ্যাকাউন্ট সেটিংস',
     recent_activity:'সাম্প্রতিক কার্যক্রম',
     act1_title:'যাচাইকরণ অপেক্ষমান', act1_sub:'অ্যাডমিন আপনার নিবন্ধন পেয়েছে', act1_time:'চলমান',
     act2_title:'অ্যাকাউন্ট তৈরি', act2_sub:'MigrantSafe-এ স্বাগতম!', act2_time:'আজ',
@@ -352,6 +520,15 @@ const T = {
     form_jtk:'JTK নিবন্ধন নম্বর *', form_state:'রাজ্য / অবস্থান *',
     form_industry:'শিল্প / খাত', form_phone:'অফিসের ফোন নম্বর',
     form_desc:'সংক্ষিপ্ত বিবরণ', save_btn:'প্রোফাইল সংরক্ষণ করুন →',
+    job_listings_title:'চাকরির তালিকা', job_listings_sub:'শ্রমিকদের দেখার জন্য সহজ চাকরির তালিকা প্রকাশ করুন।',
+    create_job_listing_title:'চাকরির তালিকা তৈরি করুন', my_job_listings_title:'আমার চাকরির তালিকা',
+    form_job_title:'চাকরির শিরোনাম *', form_job_location:'অবস্থান *', form_job_description:'বিবরণ *',
+    publish_job_btn:'চাকরির তালিকা প্রকাশ করুন →', no_job_listings:'এখনও কোনো চাকরির তালিকা নেই',
+    no_job_listings_sub:'আপনার প্রকাশিত চাকরির তালিকা এখানে দেখা যাবে।',
+    worker_preferences_title:'শ্রমিকের চাকরির পছন্দ',
+    worker_preferences_sub:'যেসব শ্রমিক তারা কী ধরনের কাজ খুঁজছেন তা শেয়ার করেছেন।',
+    no_worker_preferences:'এখনও কোনো শ্রমিকের পছন্দ নেই',
+    no_worker_preferences_sub:'শ্রমিকরা তাদের চাকরির পছন্দ সংরক্ষণ করলে এখানে দেখা যাবে।',
     reviews_title:'রিভিউ ও রিপোর্ট', reviews_sub:'আপনার এজেন্সি সম্পর্কে অভিবাসী শ্রমিকদের মতামত।',
     reports_against:'আপনার এজেন্সির বিরুদ্ধে রিপোর্ট',
     no_reports:'কোনো রিপোর্ট দাখিল হয়নি', no_reports_sub:'আপনার এজেন্সির কোনো রিপোর্ট নেই। নৈতিক নিয়োগ অনুশীলন চালিয়ে যান!',
@@ -361,11 +538,12 @@ const T = {
 };
 
 const PAGE_TITLES = {
-  en:{ home:'Dashboard', 'profile-agency':'My Agency Profile', reviews:'Reviews & Reports', settings:'Account Settings' },
-  ms:{ home:'Papan Pemuka', 'profile-agency':'Profil Agensi Saya', reviews:'Ulasan & Laporan', settings:'Tetapan Akaun' },
-  bn:{ home:'ড্যাশবোর্ড', 'profile-agency':'আমার এজেন্সি প্রোফাইল', reviews:'রিভিউ ও রিপোর্ট', settings:'অ্যাকাউন্ট সেটিংস' }
+  en:{ home:'Dashboard', 'profile-agency':'My Agency Profile', 'job-listings':'Job Listings', 'worker-preferences':'Worker Preferences', reviews:'Reviews & Reports', settings:'Account Settings' },
+  ms:{ home:'Papan Pemuka', 'profile-agency':'Profil Agensi Saya', 'job-listings':'Senarai Kerja', 'worker-preferences':'Pilihan Pekerja', reviews:'Ulasan & Laporan', settings:'Tetapan Akaun' },
+  bn:{ home:'ড্যাশবোর্ড', 'profile-agency':'আমার এজেন্সি প্রোফাইল', 'job-listings':'চাকরির তালিকা', 'worker-preferences':'শ্রমিকের পছন্দ', reviews:'রিভিউ ও রিপোর্ট', settings:'অ্যাকাউন্ট সেটিংস' }
 };
 
+const initialPage = '{{ initial_page or "home" }}';
 let currentLang = 'en', currentPage = 'home';
 
 function setLang(lang, btn) {
@@ -386,7 +564,8 @@ function go(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('p-' + id).classList.add('active');
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  const activeButton = btn || document.querySelector(`[data-page-link="${id}"]`);
+  if (activeButton) activeButton.classList.add('active');
   const tt = document.getElementById('tbTitle');
   if (tt && PAGE_TITLES[currentLang][id]) tt.textContent = PAGE_TITLES[currentLang][id];
   window.scrollTo({top:0,behavior:'smooth'});
@@ -422,11 +601,7 @@ function toast(m) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-  window.addEventListener('DOMContentLoaded', () => toast("{{ message|replace('"', '\\"') }}"));
-  {% endfor %}
-{% endwith %}
+window.addEventListener('DOMContentLoaded', () => go(initialPage, null));
 </script>
 </body>
 </html>

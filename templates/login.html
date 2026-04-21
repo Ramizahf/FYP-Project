@@ -21,6 +21,8 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
     .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
+    .nav-home-link{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-home-link:hover{color:var(--teal)}
     .btn-nav{display:inline-flex;align-items:center;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;background:var(--teal);color:var(--white);transition:background .2s,transform .15s}
     .btn-nav:hover{background:var(--mid);transform:translateY(-1px)}
 
@@ -54,8 +56,14 @@
     .form-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
     .form-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--dark);margin-bottom:8px}
     .form-sub{font-size:.88rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
-
-
+    .oauth-stack{display:grid;gap:10px;margin-bottom:18px}
+    .btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--white);color:var(--dark);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;text-decoration:none;transition:border-color .2s,box-shadow .2s,transform .15s}
+    .btn-google:hover{border-color:var(--teal);box-shadow:0 12px 24px rgba(13,110,110,.12);transform:translateY(-1px)}
+    .btn-google svg{width:1.1rem;height:1.1rem;flex:0 0 auto}
+    .oauth-note{font-size:.78rem;color:var(--muted);line-height:1.6}
+    .form-divider{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .form-divider span{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
     .form-group{margin-bottom:18px}
     label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
@@ -104,14 +112,18 @@
       .form-card{padding:32px 22px}
     }
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
-<nav>
-  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
-  <div style="display:flex;align-items:center;gap:24px">
-    <a href="{{ url_for('agents') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Find Agents</a>
-    <a href="{{ url_for('chatbot') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Chatbot</a>
+<nav data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}" class="nav-home-link">Back to homepage</a>
+  </div>
+  <div class="nav-cta">
     <a href="{{ url_for('register') }}" class="btn-nav" id="nav-reg">Register Free</a>
   </div>
 </nav>
@@ -134,7 +146,7 @@
       <span class="accent">MigrantSafe</span> <span id="l-title2">account</span><br/>
       <span id="l-title3">and continue your</span> <span class="accent2" id="l-title4">safe<br/>journey.</span>
     </h1>
-    <p class="left-sub" id="l-sub">Enter your email and password. Your account type is automatically detected.</p>
+    <p class="left-sub" id="l-sub">Use your verified Gmail for secure worker sign-in, or continue with your existing email and password for legacy accounts.</p>
     <div class="role-cards">
       <div class="role-card">
         <h4 id="l-r1h">For Migrant Workers</h4>
@@ -157,7 +169,7 @@
 
       <div class="form-eyebrow" id="l-eyebrow">Welcome Back</div>
       <h2 class="form-title" id="l-formtitle">Log In</h2>
-      <p class="form-sub" id="l-formsub">Enter your email and password. Your account type is detected automatically.</p>
+      <p class="form-sub" id="l-formsub">Continue with your verified Gmail first, or use email and password if you already have a MigrantSafe account.</p>
 
 
       {% if error %}
@@ -174,6 +186,21 @@
         </div>
         {% endfor %}
       {% endwith %}
+
+      <div class="oauth-stack">
+        <a href="{{ url_for('google_login') }}" class="btn-google" id="l-google">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-.9 2.4-2 3.2l3.2 2.5c1.9-1.7 3-4.3 3-7.4 0-.7-.1-1.4-.2-2H12z"/>
+            <path fill="#34A853" d="M12 22c2.7 0 4.9-.9 6.5-2.4l-3.2-2.5c-.9.6-2 .9-3.3.9-2.5 0-4.7-1.7-5.4-4H3.3v2.6C4.9 19.8 8.1 22 12 22z"/>
+            <path fill="#4A90E2" d="M6.6 14c-.2-.6-.4-1.3-.4-2s.1-1.4.4-2V7.4H3.3C2.4 9 2 10.5 2 12s.4 3 1.3 4.6L6.6 14z"/>
+            <path fill="#FBBC05" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3.1 14.7 2 12 2 8.1 2 4.9 4.2 3.3 7.4L6.6 10c.7-2.3 2.9-3.9 5.4-3.9z"/>
+          </svg>
+          <span id="l-google-text">Continue with Google</span>
+        </a>
+        <p class="oauth-note" id="l-googlehelp">Only verified Gmail accounts are accepted for Google sign-in. Existing admin and agent accounts can still use email and password.</p>
+      </div>
+
+      <div class="form-divider"><span id="l-divider">Or continue with email</span></div>
 
       <form method="POST" action="{{ url_for('login') }}">
         <div class="form-group">
@@ -207,26 +234,32 @@
     en: {
       badge:'Secure Access For All Users', title1:'Log in to your', title2:'account',
       title3:'and continue your', title4:'safe journey.',
-      sub:'Enter your email and password. Your account type is detected automatically.',
+      sub:'Use your verified Gmail for secure worker sign-in, or continue with your existing email and password for legacy accounts.',
       r1h:'For Migrant Workers', r1p:'Check verified agents, send reports, and get guidance safely.',
       r2h:'For Recruitment Agents', r2p:'Access your agency account and manage your profile.',
       r3h:'For Admins', r3p:'Review reports and manage the platform.',
       eyebrow:'Welcome Back', formtitle:'Log In',
-      formsub:'Enter your email and password. Your account type is detected automatically.',
-      emaillbl:'Email Address',
+      formsub:'Continue with your verified Gmail first, or use email and password if you already have a MigrantSafe account.',
+      emaillbl:'Email Address', pwlbl:'Password', show:'Show', hide:'Hide',
+      google:'Continue with Google',
+      googlehelp:'Only verified Gmail accounts are accepted for Google sign-in. Existing admin and agent accounts can still use email and password.',
+      divider:'Or continue with email',
       submit:'Log In →', noacc:"Don't have an account?", reglink:'Register free →',
       navreg:'Register Free'
     },
     ms: {
       badge:'Akses Selamat untuk Semua Pengguna', title1:'Log masuk ke akaun',
       title2:'anda', title3:'dan teruskan', title4:'perjalanan selamat anda.',
-      sub:'Masukkan e-mel dan kata laluan anda. Jenis akaun anda dikesan secara automatik.',
+      sub:'Gunakan Gmail yang disahkan untuk log masuk pekerja dengan selamat, atau teruskan dengan e-mel dan kata laluan sedia ada untuk akaun lama.',
       r1h:'Untuk Pekerja Asing', r1p:'Semak ejen yang disahkan, hantar laporan, dan dapatkan panduan.',
       r2h:'Untuk Ejen Pengambilan', r2p:'Akses akaun agensi anda dan urus profil anda.',
       r3h:'Untuk Admin', r3p:'Semak laporan dan urus platform.',
       eyebrow:'Selamat Kembali', formtitle:'Log Masuk',
-      formsub:'Masukkan e-mel dan kata laluan anda. Jenis akaun dikesan secara automatik.',
+      formsub:'Teruskan dahulu dengan Gmail yang disahkan, atau gunakan e-mel dan kata laluan jika anda sudah mempunyai akaun MigrantSafe.',
       emaillbl:'Alamat E-mel', pwlbl:'Kata Laluan', show:'Tunjuk', hide:'Sembunyikan',
+      google:'Teruskan dengan Google',
+      googlehelp:'Hanya akaun Gmail yang disahkan diterima untuk log masuk Google. Akaun admin dan ejen sedia ada masih boleh menggunakan e-mel dan kata laluan.',
+      divider:'Atau teruskan dengan e-mel',
       submit:'Log Masuk →', noacc:'Tiada akaun?', reglink:'Daftar percuma →',
       navreg:'Daftar Percuma'
     },
@@ -264,6 +297,7 @@
     set('l-r3h', T.r3h); set('l-r3p', T.r3p);
     set('l-eyebrow', T.eyebrow); set('l-formtitle', T.formtitle); set('l-formsub', T.formsub);
     set('l-emaillbl', T.emaillbl); set('l-pwlbl', T.pwlbl);
+    set('l-google-text', T.google); set('l-googlehelp', T.googlehelp); set('l-divider', T.divider);
     set('l-submit', T.submit); set('l-noacc', T.noacc); set('l-reglink', T.reglink);
     set('nav-reg', T.navreg);
     const showBtn = document.getElementById('l-show');

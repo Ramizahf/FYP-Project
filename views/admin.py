@@ -57,6 +57,7 @@ def delete_agent(agent_id):
         return redirect(url_for('dashboard_admin'))
 
     execute_db("DELETE FROM reports WHERE agent_id = ?", (agent_id,))
+    execute_db("DELETE FROM enquiries WHERE agent_id = ?", (agent_id,))
     execute_db("DELETE FROM agents WHERE id = ?", (agent_id,))
     flash(f'Agent "{agent["agency_name"]}" has been removed from the platform.', 'success')
     return redirect(url_for('dashboard_admin'))
@@ -88,8 +89,14 @@ def admin_delete_user(user_id):
         return redirect(url_for('admin_users'))
 
     name = user['full_name']
+    execute_db(
+        "DELETE FROM enquiries WHERE agent_id IN (SELECT id FROM agents WHERE user_id = ?)",
+        (user_id,)
+    )
+    execute_db("DELETE FROM enquiries WHERE worker_id = ?", (user_id,))
     execute_db("DELETE FROM agents WHERE user_id = ?", (user_id,))
     execute_db("DELETE FROM reports WHERE worker_id = ?", (user_id,))
+    execute_db("DELETE FROM chat_messages WHERE user_id = ?", (user_id,))
     execute_db("DELETE FROM chatbot_logs WHERE user_id = ?", (user_id,))
     execute_db("DELETE FROM users WHERE id = ?", (user_id,))
     flash(f'User "{name}" has been permanently removed.', 'success')

@@ -10,8 +10,11 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;min-height:100vh}
     .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
-    .sb-logo{padding:22px 24px 18px;font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--white);text-decoration:none;display:block;border-bottom:1px solid rgba(255,255,255,.07)}
-    .sb-logo .dot{color:var(--amber)}
+    .sb-logo{padding:18px 20px 16px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-logo-icon{display:block;width:auto;height:2.8rem;object-fit:contain;flex-shrink:0}
+    .sb-logo-text{display:inline-flex;align-items:baseline;line-height:1;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;letter-spacing:-.035em}
+    .sb-logo-main{color:var(--white)}
+    .sb-logo-accent{color:var(--amber);margin-left:-.04em}
     .sb-section{padding:18px 16px 6px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28)}
     .sb-item{display:flex;align-items:center;gap:11px;padding:10px 14px;margin:2px 8px;border-radius:9px;font-size:.86rem;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:background .18s,color .18s;text-decoration:none}
     .sb-item:hover{background:rgba(255,255,255,.07);color:var(--white)}
@@ -86,11 +89,13 @@
     #toast.show{opacity:1;transform:translateY(0)}
     @media(max-width:860px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stats{grid-template-columns:1fr 1fr}.qa-grid{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
 <aside class="sidebar">
-  <a href="{{ url_for('index') }}" class="sb-logo">Migrant<span class="dot">Safe</span></a>
+  <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
   <div class="sb-section" data-t="sb_mgmt">Management</div>
   <button class="sb-item active" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_overview">Overview</span></button>
   <button class="sb-item" onclick="go('agents',this)">
@@ -126,6 +131,7 @@
   </div>
 
   <div class="topbar">
+    <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Toggle sidebar">&#9776;</button>
     <div><h1 id="tbTitle" data-t="page_home">Overview</h1><p>Hello, {{ current_user.name or 'Admin' }} 👋</p></div>
     <div class="notif">🔔<span class="notif-dot"></span></div>
   </div>

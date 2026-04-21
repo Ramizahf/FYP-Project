@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="240" viewBox="0 0 820 240" fill="none" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">MigrantSafe logo</title>
+  <desc id="logoDesc">Shield with check mark and chat bubble beside the MigrantSafe wordmark and tagline.</desc>
+  <defs>
+    <style>
+      .brand-word {
+        font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+        font-size: 90px;
+        font-weight: 800;
+        letter-spacing: -3px;
+      }
+      .brand-tagline {
+        font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: 0;
+      }
+    </style>
+  </defs>
+
+  <g transform="translate(8 8)">
+    <path
+      d="M104 12C130 29 160 39 191 45V109C191 165 154 202 104 224C54 202 17 165 17 109V45C48 39 78 29 104 12Z"
+      fill="#0D5D57"
+    />
+    <path
+      d="M104 30C124 42 146 50 167 55V70C145 64 123 55 104 41C85 55 63 64 41 70V55C62 50 84 42 104 30Z"
+      fill="#0A4E49"
+    />
+    <path
+      d="M32 126C48 99 84 76 144 58C126 101 98 136 68 164C54 154 42 141 32 126Z"
+      fill="#FFFFFF"
+      opacity="0.98"
+    />
+    <path
+      d="M30 130C50 138 68 142 83 142C65 153 47 162 28 167C25 160 22 152 20 143C23 138 26 133 30 130Z"
+      fill="#FFFFFF"
+      opacity="0.9"
+    />
+    <path
+      d="M63 109L85 131L137 75"
+      stroke="#E97B45"
+      stroke-width="16"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <g transform="translate(92 118)">
+      <rect x="0" y="0" width="70" height="46" rx="22" fill="#E97B45" />
+      <path d="M18 42L8 61L31 48" fill="#E97B45" />
+      <ellipse cx="35" cy="23" rx="28" ry="18" fill="#EE8A57" opacity="0.35" />
+    </g>
+  </g>
+
+  <text x="224" y="118" class="brand-word" fill="#0B5A56">
+    Migrant<tspan fill="#E97B45">Safe</tspan>
+  </text>
+  <text x="226" y="176" class="brand-tagline" fill="#0B5A56">
+    Verified Agents &#8226; Chat Support
+  </text>
+</svg>

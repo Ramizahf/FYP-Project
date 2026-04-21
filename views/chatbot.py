@@ -6,7 +6,7 @@ import urllib.request
 
 from flask import current_app, jsonify, render_template, request, session
 
-from db import execute_db
+from db import execute_db, query_db, rows_to_dicts
 
 try:
     import certifi
@@ -37,6 +37,10 @@ CHATBOT_SYSTEM = {
         "Do not give legal or medical advice. Respond in Bangla."
     ),
 }
+
+CHAT_CONTEXT_LIMIT = 12
+MAX_USER_MESSAGE_LENGTH = 1000
+MAX_BOT_MESSAGE_LENGTH = 2000
 
 
 OFFLINE_TOPICS = [
@@ -179,37 +183,124 @@ OFFLINE_TOPICS = [
 ]
 
 
+def _normalize_chat_language(language):
+    """Restrict chat language values to the supported set."""
+    return language if language in ('en', 'ms', 'bn') else 'en'
+
+
+def _sanitize_guest_history(history):
+    """Keep only the recent client-side turns needed for guest chat context."""
+    cleaned_history = []
+    for turn in history or []:
+        role = (turn or {}).get('role', '')
+        content = ((turn or {}).get('content', '') or '').strip()
+        if role in ('user', 'assistant') and content:
+            cleaned_history.append({'role': role, 'content': content[:MAX_BOT_MESSAGE_LENGTH]})
+    return cleaned_history[-CHAT_CONTEXT_LIMIT:]
+
+
+def _get_saved_chat_history(user_id):
+    """Load all saved chat messages for one logged-in user."""
+    if not user_id:
+        return []
+
+    rows = rows_to_dicts(query_db(
+        "SELECT sender, message, language, created_at "
+        "FROM chat_messages WHERE user_id = ? ORDER BY id ASC",
+        (user_id,)
+    ))
+    return [
+        {
+            'sender': row['sender'],
+            'message': row['message'],
+            'language': _normalize_chat_language(row['language']),
+            'created_at': row['created_at'],
+        }
+        for row in rows
+    ]
+
+
+def _get_recent_chat_context(user_id):
+    """Load the recent saved turns that should be sent back to the AI model."""
+    if not user_id:
+        return []
+
+    rows = rows_to_dicts(query_db(
+        "SELECT sender, message FROM chat_messages "
+        "WHERE user_id = ? ORDER BY id DESC LIMIT ?",
+        (user_id, CHAT_CONTEXT_LIMIT)
+    ))
+    rows.reverse()
+
+    conversation = []
+    for row in rows:
+        conversation.append({
+            'role': 'assistant' if row['sender'] == 'bot' else 'user',
+            'content': row['message'],
+        })
+    return conversation
+
+
+def _save_chat_message(user_id, sender, message, language):
+    """Persist one chat bubble for the logged-in user."""
+    if not user_id:
+        return
+
+    max_length = MAX_USER_MESSAGE_LENGTH if sender == 'user' else MAX_BOT_MESSAGE_LENGTH
+    execute_db(
+        "INSERT INTO chat_messages (user_id, sender, message, language) VALUES (?, ?, ?, ?)",
+        (user_id, sender, message[:max_length], _normalize_chat_language(language))
+    )
+
+
 def chatbot():
-    """Public chatbot page."""
-    return render_template('chatbot.html')
+    """Chatbot page with saved history for logged-in users."""
+    user_id = session.get('user_id')
+    chat_history = _get_saved_chat_history(user_id)
+    chat_language = chat_history[-1]['language'] if chat_history else 'en'
+    return render_template(
+        'chatbot.html',
+        chat_history=chat_history,
+        chat_language=chat_language,
+        is_logged_in=bool(user_id),
+    )
 
 
 def chat_api():
     """
     Accepts: { "message": "...", "language": "en|ms|bn", "history": [...] }
     Returns: { "response": "..." }
-    Logs every exchange to chatbot_logs table.
+    Logged-in users get persistent memory from the database.
     """
     data = request.get_json(silent=True) or {}
     message = data.get('message', '').strip()
-    language = data.get('language', 'en')
+    language = _normalize_chat_language(data.get('language', 'en'))
     history = data.get('history', [])
 
     if not message:
         return jsonify({'response': 'Please type a message.'}), 400
 
-    reply = get_bot_reply(message, language, history)
-
     user_id = session.get('user_id')
-    try:
-        execute_db(
-            "INSERT INTO chatbot_logs (user_id, message, response, language) VALUES (?, ?, ?, ?)",
-            (user_id, message[:1000], reply[:2000], language)
-        )
-    except Exception:
-        pass
+    if user_id:
+        conversation_history = _get_recent_chat_context(user_id)
+        _save_chat_message(user_id, 'user', message, language)
+    else:
+        conversation_history = _sanitize_guest_history(history)
+
+    reply = get_bot_reply(message, language, conversation_history)
+
+    if user_id:
+        _save_chat_message(user_id, 'bot', reply, language)
 
     return jsonify({'response': reply})
+
+
+def clear_chat_history():
+    """Delete all saved chatbot messages for the current logged-in user."""
+    user_id = session.get('user_id')
+    if user_id:
+        execute_db("DELETE FROM chat_messages WHERE user_id = ?", (user_id,))
+    return jsonify({'ok': True})
 
 
 def chat_health():
@@ -239,7 +330,7 @@ def chat_health():
 
 def get_bot_reply(message: str, language: str = 'en', history: list = None) -> str:
     """Call the configured OpenAI-compatible provider, or fall back to local FAQ answers."""
-    language = language if language in ('en', 'ms', 'bn') else 'en'
+    language = _normalize_chat_language(language)
     api_key = os.environ.get('OPENCODE_API_KEY', '').strip()
     base_url = os.environ.get(
         'OPENCODE_API_BASE_URL',
@@ -255,7 +346,7 @@ def get_bot_reply(message: str, language: str = 'en', history: list = None) -> s
         messages = [{'role': 'system', 'content': system_prompt}]
 
         if history:
-            for turn in history[-6:]:
+            for turn in history[-CHAT_CONTEXT_LIMIT:]:
                 role = turn.get('role', '')
                 content = turn.get('content', '')
                 if role in ('user', 'assistant') and content:
@@ -412,4 +503,5 @@ def register_chatbot_routes(app):
     """Register the chatbot page and API endpoints."""
     app.add_url_rule('/chatbot', endpoint='chatbot', view_func=chatbot)
     app.add_url_rule('/api/chat', endpoint='chat_api', view_func=chat_api, methods=['POST'])
+    app.add_url_rule('/api/chat/history', endpoint='clear_chat_history', view_func=clear_chat_history, methods=['POST'])
     app.add_url_rule('/api/chat/health', endpoint='chat_health', view_func=chat_health, methods=['GET'])

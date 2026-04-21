@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Send Enquiry — MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--teal:#0D6E6E;--teal-lt:#14A097;--teal-bg:#E6F4F4;--amber:#E8833A;--dark:#0F2027;--mid:#1E3A3A;--text:#2C2C2C;--muted:#6B7B7B;--white:#FFFFFF;--cream:#F9F5F0;--border:#D4E8E8;--sw:260px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;min-height:100vh}
+    .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200}
+    .sb-logo{padding:18px 20px 16px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-logo-icon{display:block;width:auto;height:2.8rem;object-fit:contain;flex-shrink:0}
+    .sb-logo-text{display:inline-flex;align-items:baseline;line-height:1;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;letter-spacing:-.035em}
+    .sb-logo-main{color:var(--white)}
+    .sb-logo-accent{color:var(--amber);margin-left:-.04em}
+    .sb-section{padding:18px 16px 6px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+    .sb-item{display:flex;align-items:center;gap:11px;padding:10px 14px;margin:2px 8px;border-radius:9px;font-size:.86rem;font-weight:500;color:rgba(255,255,255,.6);text-decoration:none;transition:background .18s,color .18s}
+    .sb-item:hover{background:rgba(255,255,255,.07);color:var(--white)}
+    .sb-item.active{background:rgba(20,160,151,.22);color:var(--teal-lt);font-weight:600}
+    .sb-icon{font-size:.95rem;width:18px;text-align:center}
+    .sb-footer{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.07)}
+    .sb-user{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.05);margin-bottom:8px}
+    .sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--white)}
+    .sb-uname{font-size:.8rem;font-weight:600;color:var(--white)}
+    .sb-urole{font-size:.68rem;color:rgba(255,255,255,.4)}
+    .sb-logout{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.8rem;text-decoration:none;display:block;text-align:center}
+    .sb-logout:hover{background:rgba(255,255,255,.09);color:var(--white)}
+    .main{margin-left:var(--sw);flex:1}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(249,245,240,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .topbar h1{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark)}
+    .topbar p{font-size:.76rem;color:var(--muted)}
+    .content{padding:28px 32px;max-width:760px}
+    .card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .agent-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--teal-bg);color:var(--teal);font-size:.8rem;font-weight:700;margin-bottom:18px}
+    .form-grid{display:grid;gap:16px}
+    .fg label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
+    .fg input,.fg select,.fg textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;background:var(--white)}
+    .fg textarea{resize:vertical;min-height:140px}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--teal)}
+    .warn-box{margin:18px 0;padding:14px 16px;border-radius:12px;background:#fff8e6;border:1px solid #f5d06a;font-size:.82rem;color:#7a5a00;line-height:1.6}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;border:none;text-decoration:none;cursor:pointer;transition:all .18s}
+    .btn-primary{background:var(--teal);color:var(--white)}
+    .btn-primary:hover{background:var(--mid)}
+    .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+    .btn-outline:hover{background:var(--teal-bg)}
+    .flash{border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:.88rem}
+    .flash.success{background:#e6faf0;border:1px solid #b6eace;color:#1a9a55}
+    .flash.danger{background:#fdecea;border:1px solid #f5b9b4;color:#c0392b}
+    .flash.warning{background:#fff8e6;border:1px solid #f5d06a;color:#8a5c00}
+    @media(max-width:860px){.sidebar{display:none}.main{margin-left:0}}
+  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
+  <div class="sb-section">Main</div>
+  <a href="{{ url_for('dashboard_worker') }}" class="sb-item"><span class="sb-icon">🏠</span> Home</a>
+  <a href="{{ url_for('agents') }}" class="sb-item"><span class="sb-icon">🔍</span> Find Agents</a>
+  <a href="{{ url_for('my_enquiries') }}" class="sb-item active"><span class="sb-icon">✉️</span> My Enquiries</a>
+  <a href="{{ url_for('my_reports') }}" class="sb-item"><span class="sb-icon">📋</span> My Reports</a>
+  <div class="sb-section">Account</div>
+  <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> Back to Homepage</a>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">{{ current_user.name[0].upper() if current_user.name else 'W' }}</div>
+      <div><div class="sb-uname">{{ current_user.name or 'Worker' }}</div><div class="sb-urole">Migrant Worker</div></div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="sb-logout">← Log Out</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Toggle sidebar">&#9776;</button>
+    <div><h1>Send Enquiry</h1><p>Contact this agent safely inside MigrantSafe</p></div>
+    <a href="{{ url_for('agent_detail', agent_id=agent['id']) }}" class="btn btn-outline">Back to Agent</a>
+  </div>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="card">
+      <div class="agent-badge">🏢 {{ agent['agency_name'] }}</div>
+      <div class="warn-box">
+        Keep communication inside MigrantSafe. Do not share passport copies, work permits, bank details, or other sensitive personal documents in these messages.
+      </div>
+
+      <form method="POST" action="{{ url_for('submit_enquiry', agent_id=agent['id']) }}" class="form-grid">
+        <input type="hidden" name="agent_id" value="{{ agent['id'] }}"/>
+        <div class="fg">
+          <label for="subject">Subject</label>
+          <input id="subject" type="text" name="subject" maxlength="150" placeholder="Short title for your question" value="{{ form_data.subject if form_data else '' }}" required/>
+        </div>
+        <div class="fg">
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="">Select a category</option>
+            {% for category in enquiry_categories %}
+            <option value="{{ category }}" {{ 'selected' if form_data and form_data.category == category else '' }}>{{ category }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="fg">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Write your question here. Keep it clear and simple." required>{{ form_data.message if form_data else '' }}</textarea>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">Send Enquiry</button>
+          <a href="{{ url_for('agent_detail', agent_id=agent['id']) }}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+</body>
+</html>

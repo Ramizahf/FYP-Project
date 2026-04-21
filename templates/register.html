@@ -21,8 +21,10 @@
 
     /* NAVBAR */
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-    .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
+    .nav-home-link{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-home-link:hover{color:var(--teal)}
     .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:transform .15s,box-shadow .15s}
     .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
     .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
@@ -94,11 +96,6 @@
     .alert-error{background:var(--error-bg);color:var(--error);border:1px solid rgba(192,57,43,.2)}
     .alert-success{background:var(--success-bg);color:var(--success);border:1px solid rgba(26,154,85,.2)}
 
-    /* DIVIDER */
-    .divider{display:flex;align-items:center;gap:12px;margin:20px 0}
-    .divider span{font-size:.78rem;color:var(--muted);white-space:nowrap}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
     /* SUBMIT */
     .btn-submit{width:100%;padding:14px;border-radius:10px;background:var(--teal);color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;border:none;cursor:pointer;transition:background .2s,transform .15s,box-shadow .15s;margin-top:4px}
     .btn-submit:hover{background:var(--mid);transform:translateY(-1px);box-shadow:0 8px 24px rgba(13,110,110,.25)}
@@ -128,15 +125,19 @@
       .form-row{grid-template-columns:1fr}
     }
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav>
-  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
-  <div style="display:flex;align-items:center;gap:24px">
-    <a href="{{ url_for('agents') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Find Agents</a>
-    <a href="{{ url_for('chatbot') }}" style="font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none">Chatbot</a>
+<nav data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}" class="nav-home-link">Back to homepage</a>
+  </div>
+  <div class="nav-cta">
     <a href="{{ url_for('login') }}" class="btn btn-outline" id="r-login-btn">Log In</a>
   </div>
 </nav>
@@ -322,8 +323,6 @@
 
           <button type="submit" class="btn-submit" id="submitBtn">Create Free Account →</button>
 
-          <div class="divider"><span>or</span></div>
-          <p style="text-align:center;font-size:.82rem;color:var(--muted)">By registering, you confirm you are 18 years or older.</p>
         </form>
       </div>
 

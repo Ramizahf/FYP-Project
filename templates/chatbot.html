@@ -82,7 +82,19 @@
     /* Chat header */
     .chat-header{flex-shrink:0;background:var(--white);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px}
     .chat-header-left{display:flex;align-items:center;gap:14px}
-    .bot-avatar{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(13,110,110,.25)}
+    .bot-avatar{
+      width:92px;height:72px;border-radius:16px;
+      background:transparent;border:none;
+      display:flex;align-items:center;justify-content:center;
+      padding:0;flex-shrink:0;box-shadow:none;overflow:hidden
+    }
+    .chatbot-icon-img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:12px;
+    }
     .bot-info-name{font-size:.95rem;font-weight:700;color:var(--dark)}
     .bot-info-status{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--muted);margin-top:2px}
     .status-dot{width:7px;height:7px;border-radius:50%;background:#1a9a55;animation:pulse-dot 2s infinite}
@@ -112,7 +124,11 @@
     @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .msg-row.user{flex-direction:row-reverse}
     .msg-avatar{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
-    .bot-msg-avatar{background:linear-gradient(135deg,var(--teal),var(--teal-lt));box-shadow:0 2px 8px rgba(13,110,110,.2)}
+    .bot-msg-avatar{
+      width:72px;height:50px;border-radius:12px;
+      background:transparent;border:none;
+      box-shadow:none;padding:0;overflow:hidden
+    }
     .user-msg-avatar{background:var(--amber);box-shadow:0 2px 8px rgba(232,131,58,.25)}
     .msg-bubble{max-width:72%;padding:13px 16px;border-radius:16px;font-size:.88rem;line-height:1.65;position:relative}
     .bot-bubble{background:var(--white);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.04)}
@@ -157,12 +173,15 @@
       .chat-header{padding:12px 16px}
     }
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav>
-  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
+<nav data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
   <div class="nav-links">
     <a href="{{ url_for('index') }}">Home</a>
     <a href="{{ url_for('agents') }}">Find Agents</a>
@@ -250,7 +269,7 @@
     <!-- Chat Header -->
     <div class="chat-header">
       <div class="chat-header-left">
-        <div class="bot-avatar">🤖</div>
+        <div class="bot-avatar"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"/></div>
         <div>
           <div class="bot-info-name">MigrantSafe Assistant</div>
           <div class="bot-info-status"><span class="status-dot"></span> <span id="statusText">Online — ready to help</span></div>
@@ -300,7 +319,10 @@
   // ═══════════════════════════════════════════
   //  STATE
   // ═══════════════════════════════════════════
-  let currentLang = 'en';
+  const isLoggedIn = {{ is_logged_in|tojson }};
+  const initialChatHistory = {{ chat_history|tojson }};
+  const initialChatLanguage = {{ chat_language|tojson }};
+  let currentLang = initialChatLanguage || 'en';
   let isTyping    = false;
   let messageHistory = []; // full conversation history for the API
 
@@ -411,13 +433,81 @@ Peraturan:
     }
   };
 
+  function setActiveLanguageButton(lang) {
+    const langBtnMap = { en: 0, ms: 1, bn: 2 };
+    const btns = document.querySelectorAll('.lang-btn');
+    btns.forEach(b => b.classList.remove('active'));
+    if (btns[langBtnMap[lang]]) btns[langBtnMap[lang]].classList.add('active');
+  }
+
+  function toConversationTurn(sender, text) {
+    return { role: sender === 'bot' ? 'assistant' : 'user', content: text };
+  }
+
+  function formatTimestamp(timestamp) {
+    if (!timestamp) {
+      return new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    }
+    if (timestamp.length >= 16) {
+      return timestamp.slice(11, 16);
+    }
+    return timestamp;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function renderWelcomeCard() {
+    const msgs = document.getElementById('messages');
+    const card = document.createElement('div');
+    card.className = 'welcome-card';
+    card.id = 'welcomeCard';
+    const subs = {
+      en: "I can help you understand your rights, verify agents, learn about visas and documents, and navigate the recruitment process safely in Malaysia. Ask me anything!",
+      ms: "Saya boleh membantu anda memahami hak anda, mengesahkan ejen, mengetahui tentang visa dan dokumen, serta mengemudi proses pengambilan dengan selamat di Malaysia.",
+      bn: "আমি আপনাকে আপনার অধিকার বুঝতে, এজেন্ট যাচাই করতে, ভিসা ও ডকুমেন্ট সম্পর্কে জানতে এবং মালয়েশিয়ায় নিরাপদে কাজ খোঁজার প্রক্রিয়া বুঝতে সাহায্য করতে পারি।"
+    };
+    card.innerHTML = `
+      <div class="wc-icon">👋</div>
+      <div class="wc-title">Hello! I'm your MigrantSafe Assistant.</div>
+      <div class="wc-sub">${subs[currentLang]}</div>
+      <div class="wc-topics">
+        <span class="wc-topic">🛡️ Agent Verification</span>
+        <span class="wc-topic">💰 Recruitment Fees</span>
+        <span class="wc-topic">📄 Documents & Visas</span>
+        <span class="wc-topic">⚖️ Worker Rights</span>
+        <span class="wc-topic">🚨 Reporting Fraud</span>
+        <span class="wc-topic">🌏 Multilingual</span>
+      </div>`;
+    msgs.appendChild(card);
+  }
+
+  function loadSavedMessages() {
+    if (!initialChatHistory.length) return;
+
+    const wc = document.getElementById('welcomeCard');
+    if (wc) wc.remove();
+
+    initialChatHistory.forEach(item => {
+      appendMessage(item.sender, item.message, item.created_at);
+      messageHistory.push(toConversationTurn(item.sender, item.message));
+    });
+  }
+
+  function initializeChatPage() {
+    setLang(currentLang);
+    loadSavedMessages();
+  }
+
   // ═══════════════════════════════════════════
   //  LANGUAGE SWITCH
   // ═══════════════════════════════════════════
   function setLang(lang, btnEl) {
     currentLang = lang;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    if (btnEl) btnEl.classList.add('active');
+    setActiveLanguageButton(lang);
 
     const cfg = LANGS[lang];
     document.getElementById('langBadge').textContent    = cfg.badge;
@@ -470,12 +560,7 @@ Peraturan:
     // Auto-detect language from what the user typed and switch if needed
     const detected = detectLang(text);
     if (detected && detected !== currentLang) {
-      // Silently switch to the detected language so the response matches
-      currentLang = detected;
-      const langBtnMap = { en: 0, ms: 1, bn: 2 };
-      const btns = document.querySelectorAll('.lang-btn');
-      btns.forEach(b => b.classList.remove('active'));
-      if (btns[langBtnMap[detected]]) btns[langBtnMap[detected]].classList.add('active');
+      setLang(detected);
     }
 
     // Hide welcome card
@@ -500,7 +585,7 @@ Peraturan:
         body: JSON.stringify({
           message: text,
           language: currentLang,
-          history: messageHistory.slice(-6)   // send last 6 turns for context
+          history: messageHistory.slice(0, -1).slice(-12)   // send only earlier recent turns for context
         })
       });
 
@@ -528,22 +613,26 @@ Peraturan:
   // ═══════════════════════════════════════════
   //  DOM HELPERS
   // ═══════════════════════════════════════════
-  function appendMessage(role, text) {
+  function appendMessage(role, text, timestamp = null) {
     const msgs = document.getElementById('messages');
-    const now  = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const now  = formatTimestamp(timestamp);
 
     const row = document.createElement('div');
     row.className = `msg-row ${role}`;
 
     const avatar = document.createElement('div');
     avatar.className = `msg-avatar ${role === 'bot' ? 'bot-msg-avatar' : 'user-msg-avatar'}`;
-    avatar.textContent = role === 'bot' ? '🤖' : '🙋';
+    if (role === 'bot') {
+      avatar.innerHTML = `<img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async">`;
+    } else {
+      avatar.textContent = '🙋';
+    }
 
     const bubble = document.createElement('div');
     bubble.className = `msg-bubble ${role === 'bot' ? 'bot-bubble' : 'user-bubble'}`;
 
     // Convert markdown-style line breaks and basic bold
-    const formatted = text
+    const formatted = escapeHtml(text)
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n\n/g, '<br><br>')
       .replace(/\n/g, '<br>');
@@ -567,7 +656,7 @@ Peraturan:
     row.className = 'typing-row';
     row.id = 'typingIndicator';
     row.innerHTML = `
-      <div class="msg-avatar bot-msg-avatar">🤖</div>
+      <div class="msg-avatar bot-msg-avatar"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"></div>
       <div class="typing-bubble">
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
@@ -587,34 +676,22 @@ Peraturan:
     return fb[currentLang] || fb.en;
   }
 
-  function clearChat() {
+  async function clearChat() {
+    if (isLoggedIn) {
+      try {
+        const response = await fetch('/api/chat/history', { method: 'POST' });
+        if (!response.ok) throw new Error('clear_failed');
+      } catch (err) {
+        showToast('Could not clear saved chat yet.');
+        return;
+      }
+    }
+
     messageHistory = [];
     const msgs = document.getElementById('messages');
     msgs.innerHTML = '';
-
-    // Re-add welcome card
-    const card = document.createElement('div');
-    card.className = 'welcome-card';
-    card.id = 'welcomeCard';
-    const subs = {
-      en: "I can help you understand your rights, verify agents, learn about visas and documents, and navigate the recruitment process safely in Malaysia. Ask me anything!",
-      ms: "Saya boleh membantu anda memahami hak anda, mengesahkan ejen, mengetahui tentang visa dan dokumen, serta mengemudi proses pengambilan dengan selamat di Malaysia.",
-      bn: "আমি আপনাকে আপনার অধিকার বুঝতে, এজেন্ট যাচাই করতে, ভিসা ও ডকুমেন্ট সম্পর্কে জানতে এবং মালয়েশিয়ায় নিরাপদে কাজ খোঁজার প্রক্রিয়া বুঝতে সাহায্য করতে পারি।"
-    };
-    card.innerHTML = `
-      <div class="wc-icon">👋</div>
-      <div class="wc-title">Hello! I'm your MigrantSafe Assistant.</div>
-      <div class="wc-sub">${subs[currentLang]}</div>
-      <div class="wc-topics">
-        <span class="wc-topic">🛡️ Agent Verification</span>
-        <span class="wc-topic">💰 Recruitment Fees</span>
-        <span class="wc-topic">📄 Documents & Visas</span>
-        <span class="wc-topic">⚖️ Worker Rights</span>
-        <span class="wc-topic">🚨 Reporting Fraud</span>
-        <span class="wc-topic">🌏 Multilingual</span>
-      </div>`;
-    msgs.appendChild(card);
-    showToast('Chat cleared.');
+    renderWelcomeCard();
+    showToast(isLoggedIn ? 'Chat history cleared.' : 'Chat cleared.');
   }
 
   function showToast(msg) {
@@ -644,6 +721,7 @@ Peraturan:
     }
   }
 
+  initializeChatPage();
   checkChatHealth();
 </script>
 </body>

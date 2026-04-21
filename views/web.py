@@ -1,8 +1,69 @@
-from flask import flash, redirect, render_template, request, session, url_for
+import sqlite3
+
+from flask import current_app, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from auth_utils import login_required, role_required
+from auth_utils import (
+    create_unusable_password_hash,
+    is_verified_gmail_address,
+    log_in_user,
+    login_required,
+    normalize_email,
+    role_required,
+)
 from db import execute_db, query_db, row_to_dict, rows_to_dicts
+
+
+ROLE_LABELS = {
+    'worker': 'Migrant Worker',
+    'agent': 'Recruitment Agent',
+    'admin': 'Administrator',
+}
+
+ENQUIRY_CATEGORIES = (
+    'Job Details',
+    'Salary and Benefits',
+    'Fees and Costs',
+    'Documents and Process',
+    'Accommodation and Travel',
+    'Other',
+)
+
+GOOGLE_OAUTH_SESSION_KEYS = (
+    'google_oauth_token',
+    'google_oauth_state',
+    'google_oauth_code_verifier',
+)
+
+
+def build_google_name(profile, email):
+    """Prefer Google's profile name and fall back to the Gmail username."""
+    full_name = (profile.get('name') or '').strip()
+    if full_name:
+        return full_name
+
+    local_part = email.split('@', 1)[0].replace('.', ' ').replace('_', ' ').strip()
+    fallback_name = ' '.join(word.capitalize() for word in local_part.split())
+    return fallback_name or 'Google User'
+
+
+def clear_google_oauth_session():
+    """Remove any Google OAuth state/token values from the Flask session."""
+    for key in GOOGLE_OAUTH_SESSION_KEYS:
+        session.pop(key, None)
+
+
+def pick_dashboard_page(page_name, allowed_pages, default='home'):
+    """Return a safe dashboard page name for client-side navigation."""
+    return page_name if page_name in allowed_pages else default
+
+
+def get_agent_profile_for_user(user_id):
+    """Fetch the logged-in agent's profile row."""
+    return row_to_dict(query_db(
+        "SELECT * FROM agents WHERE user_id = ?",
+        (user_id,), one=True
+    ))
 
 
 def index():
@@ -61,7 +122,7 @@ def login():
     error = None
 
     if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
+        email = normalize_email(request.form.get('email', ''))
         password = request.form.get('password', '').strip()
 
         if not email:
@@ -75,21 +136,10 @@ def login():
             )
 
             if user and check_password_hash(user['password_hash'], password):
-                session.clear()
-                session.permanent = True
-                session['user_id'] = user['id']
-                session['name'] = user['full_name']
-                session['email'] = user['email']
-                session['role'] = user['role']
-
-                role_labels = {
-                    'worker': 'Migrant Worker',
-                    'agent': 'Recruitment Agent',
-                    'admin': 'Administrator'
-                }
+                log_in_user(user)
                 flash(
                     f"Welcome back, {user['full_name']}! "
-                    f"Logged in as {role_labels.get(user['role'], user['role'])}.",
+                    f"Logged in as {ROLE_LABELS.get(user['role'], user['role'])}.",
                     'success'
                 )
                 return redirect(url_for('dashboard'))
@@ -97,6 +147,156 @@ def login():
             error = 'Incorrect email or password. Please try again.'
 
     return render_template('login.html', error=error)
+
+
+def google_login():
+    """Start the Google OAuth flow."""
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+
+    clear_google_oauth_session()
+
+    if not current_app.config.get('GOOGLE_OAUTH_READY'):
+        reason = current_app.config.get('GOOGLE_OAUTH_DISABLED_REASON')
+        if reason == 'missing_dependency':
+            flash(
+                'Google sign-in is unavailable in this Python environment. '
+                'Install Flask-Dance and restart the app.',
+                'danger'
+            )
+        elif reason == 'missing_config':
+            flash(
+                'Google sign-in is not configured yet. '
+                'Add GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET to your .env file, then restart the app.',
+                'danger'
+            )
+        else:
+            flash(
+                'Google sign-in is not available right now. Restart the app and try again.',
+                'danger'
+            )
+        return redirect(url_for('login'))
+
+    canonical_base_url = current_app.config.get('GOOGLE_OAUTH_BASE_URL', '')
+    current_base_url = request.host_url.rstrip('/')
+    if canonical_base_url and canonical_base_url.lower() != current_base_url.lower():
+        return redirect(f"{canonical_base_url}{url_for('google_login')}")
+
+    return redirect(url_for('google.login'))
+
+
+def google_oauth_callback():
+    """Finish Google OAuth, then log the user into the existing session system."""
+    def fail_google_login(message, category='danger'):
+        clear_google_oauth_session()
+        flash(message, category)
+        return redirect(url_for('login'))
+
+    if not current_app.config.get('GOOGLE_OAUTH_READY'):
+        return fail_google_login('Google sign-in is not available right now.')
+
+    try:
+        from flask_dance.contrib.google import google
+    except ImportError:
+        return fail_google_login(
+            'Google sign-in dependency is missing. Install Flask-Dance and try again.'
+        )
+
+    if not google.authorized:
+        return fail_google_login(
+            'Google sign-in was cancelled or could not be completed. Please try again.',
+            'warning'
+        )
+
+    response = google.get('/oauth2/v2/userinfo')
+    if not response or not response.ok:
+        return fail_google_login('We could not verify your Google account. Please try again.')
+
+    profile = response.json() or {}
+    email = normalize_email(profile.get('email'))
+    google_sub = str(profile.get('id') or profile.get('sub') or '').strip()
+    verified_email = bool(profile.get('verified_email'))
+
+    if not google_sub:
+        return fail_google_login('We could not verify your Google account ID. Please try again.')
+
+    if not email or not verified_email:
+        return fail_google_login('Only verified Google email addresses can be used to sign in.')
+
+    if not is_verified_gmail_address(email):
+        return fail_google_login('Please use a verified Gmail account to continue.', 'warning')
+
+    user = query_db(
+        "SELECT * FROM users WHERE google_sub = ?",
+        (google_sub,),
+        one=True
+    )
+    is_new_user = False
+
+    if not user:
+        user = query_db(
+            "SELECT * FROM users WHERE email = ?",
+            (email,),
+            one=True
+        )
+
+    if user and user['google_sub'] and user['google_sub'] != google_sub:
+        return fail_google_login(
+            'That email is already linked to a different Google account. Please contact support.',
+            'warning'
+        )
+
+    if user and not user['google_sub']:
+        execute_db(
+            "UPDATE users SET google_sub = ? WHERE id = ?",
+            (google_sub, user['id'])
+        )
+        user = query_db(
+            "SELECT * FROM users WHERE id = ?",
+            (user['id'],),
+            one=True
+        )
+
+    if not user:
+        full_name = build_google_name(profile, email)
+        try:
+            new_user_id = execute_db(
+                "INSERT INTO users (full_name, email, password_hash, role, google_sub) VALUES (?, ?, ?, ?, ?)",
+                (full_name, email, create_unusable_password_hash(), 'worker', google_sub)
+            )
+        except sqlite3.IntegrityError:
+            user = query_db(
+                "SELECT * FROM users WHERE google_sub = ? OR email = ?",
+                (google_sub, email),
+                one=True
+            )
+        else:
+            user = query_db(
+                "SELECT * FROM users WHERE id = ?",
+                (new_user_id,),
+                one=True
+            )
+            is_new_user = True
+
+    if not user:
+        return fail_google_login('We could not complete your sign-in. Please try again.')
+
+    log_in_user(user)
+
+    if is_new_user:
+        flash(
+            f"Welcome, {user['full_name']}! "
+            "Your worker account has been created from your verified Gmail.",
+            'success'
+        )
+    else:
+        flash(
+            f"Welcome back, {user['full_name']}! "
+            f"Signed in with Google as {ROLE_LABELS.get(user['role'], user['role'])}.",
+            'success'
+        )
+
+    return redirect(url_for('dashboard'))
 
 
 def register():
@@ -112,7 +312,7 @@ def register():
 
     if request.method == 'POST':
         role = request.form.get('role', 'worker').strip()
-        email = request.form.get('email', '').strip().lower()
+        email = normalize_email(request.form.get('email', ''))
         password = request.form.get('password', '').strip()
         confirm = request.form.get('confirm_password', '').strip()
 
@@ -195,10 +395,18 @@ def register():
 
 def logout():
     """Clear the session and go home."""
-    name = session.get('name', '')
+    clear_google_oauth_session()
     session.clear()
-    flash(f'You have been logged out{", " + name if name else ""}. See you next time!', 'info')
-    return redirect(url_for('index'))
+    response = redirect(url_for('index'))
+    response.delete_cookie(
+        current_app.config.get('SESSION_COOKIE_NAME', 'session'),
+        path=current_app.config.get('SESSION_COOKIE_PATH', '/'),
+        domain=current_app.config.get('SESSION_COOKIE_DOMAIN'),
+        secure=current_app.config.get('SESSION_COOKIE_SECURE', False),
+        httponly=current_app.config.get('SESSION_COOKIE_HTTPONLY', True),
+        samesite=current_app.config.get('SESSION_COOKIE_SAMESITE'),
+    )
+    return response
 
 
 def agent_detail(agent_id):
@@ -233,6 +441,22 @@ def my_reports():
     return render_template('my_reports.html', reports=reports)
 
 
+@role_required('worker')
+def my_enquiries():
+    """Worker can see enquiries sent to agents and any replies."""
+    enquiries = rows_to_dicts(query_db(
+        """
+        SELECT e.*, a.agency_name, a.state
+        FROM enquiries e
+        JOIN agents a ON a.id = e.agent_id
+        WHERE e.worker_id = ?
+        ORDER BY e.created_at DESC
+        """,
+        (session['user_id'],)
+    ))
+    return render_template('my_enquiries.html', enquiries=enquiries)
+
+
 def migration_guide():
     """Step-by-step migration process guide."""
     return render_template('guide.html')
@@ -258,12 +482,21 @@ def dashboard():
 def dashboard_worker():
     """Worker's personal dashboard."""
     user_id = session['user_id']
+    initial_page = pick_dashboard_page(
+        request.args.get('page', '').strip(),
+        {'home', 'profile', 'jobs'},
+    )
 
     my_reports_count = query_db(
         "SELECT COUNT(*) as cnt FROM reports WHERE worker_id = ?",
         (user_id,), one=True
     )
     report_count = my_reports_count['cnt'] if my_reports_count else 0
+    my_enquiries_count = query_db(
+        "SELECT COUNT(*) as cnt FROM enquiries WHERE worker_id = ?",
+        (user_id,), one=True
+    )
+    enquiry_count = my_enquiries_count['cnt'] if my_enquiries_count else 0
 
     stats = {
         'verified': query_db(
@@ -284,13 +517,33 @@ def dashboard_worker():
         "SELECT country, phone FROM users WHERE id = ?",
         (user_id,), one=True
     ))
+    job_preferences = row_to_dict(query_db(
+        """
+        SELECT desired_job, preferred_location, job_description
+        FROM worker_job_preferences
+        WHERE worker_id = ?
+        """,
+        (user_id,), one=True
+    ))
+    job_listings = rows_to_dicts(query_db(
+        """
+        SELECT jl.*, a.agency_name
+        FROM job_listings jl
+        JOIN agents a ON a.id = jl.agent_id
+        ORDER BY jl.created_at DESC, jl.id DESC
+        """
+    ))
 
     return render_template(
         'dashboard-worker.html',
         report_count=report_count,
+        enquiry_count=enquiry_count,
         stats=stats,
         recent_agents=recent_agents,
         worker_profile=worker_profile,
+        job_preferences=job_preferences,
+        job_listings=job_listings,
+        initial_page=initial_page,
     )
 
 
@@ -298,20 +551,63 @@ def dashboard_worker():
 def dashboard_agent():
     """Recruitment agent's dashboard."""
     user_id = session['user_id']
-
-    agent = row_to_dict(query_db(
-        "SELECT * FROM agents WHERE user_id = ?",
-        (user_id,), one=True
-    ))
+    initial_page = pick_dashboard_page(
+        request.args.get('page', '').strip(),
+        {'home', 'profile-agency', 'job-listings', 'worker-preferences', 'reviews', 'settings'},
+    )
+    agent = get_agent_profile_for_user(user_id)
 
     reports = []
+    enquiries = []
+    agent_job_listings = []
+    worker_preferences = []
     if agent:
         reports = rows_to_dicts(query_db(
             "SELECT * FROM reports WHERE agent_id = ? ORDER BY created_at DESC",
             (agent['id'],)
         ))
+        enquiries = rows_to_dicts(query_db(
+            """
+            SELECT e.*, u.full_name AS worker_name, u.email AS worker_email
+            FROM enquiries e
+            JOIN users u ON u.id = e.worker_id
+            WHERE e.agent_id = ?
+            ORDER BY
+                CASE e.status
+                    WHEN 'open' THEN 0
+                    WHEN 'replied' THEN 1
+                    ELSE 2
+                END,
+                e.created_at DESC
+            """,
+            (agent['id'],)
+        ))
+        agent_job_listings = rows_to_dicts(query_db(
+            """
+            SELECT *
+            FROM job_listings
+            WHERE agent_id = ?
+            ORDER BY created_at DESC, id DESC
+            """,
+            (agent['id'],)
+        ))
+
+    worker_preferences = rows_to_dicts(query_db(
+        """
+        SELECT
+            u.full_name AS worker_name,
+            wjp.desired_job,
+            wjp.preferred_location,
+            wjp.job_description
+        FROM worker_job_preferences wjp
+        JOIN users u ON u.id = wjp.worker_id
+        WHERE u.role = 'worker'
+        ORDER BY u.full_name ASC
+        """
+    ))
 
     open_report_count = sum(1 for r in reports if r['status'] == 'open')
+    open_enquiry_count = sum(1 for e in enquiries if e['status'] == 'open')
     profile_views = 0
     average_rating = None
 
@@ -319,10 +615,139 @@ def dashboard_agent():
         'dashboard-agent.html',
         agent=agent,
         reports=reports,
+        enquiries=enquiries,
         open_report_count=open_report_count,
+        open_enquiry_count=open_enquiry_count,
         profile_views=profile_views,
         average_rating=average_rating,
+        agent_job_listings=agent_job_listings,
+        worker_preferences=worker_preferences,
+        initial_page=initial_page,
     )
+
+
+def submit_enquiry():
+    """Worker-only enquiry form for contacting an agent inside the platform."""
+    if 'user_id' not in session:
+        flash('Please log in to send an enquiry.', 'warning')
+        return redirect(url_for('login'))
+    if session.get('role') != 'worker':
+        flash('Only workers can send enquiries to agents.', 'warning')
+        return redirect(url_for('dashboard'))
+
+    agent_id_param = request.args.get('agent_id') or request.form.get('agent_id')
+    if not agent_id_param:
+        flash('Please choose an agent first, then send your enquiry from the agent page.', 'warning')
+        return redirect(url_for('agents'))
+
+    agent = row_to_dict(query_db(
+        "SELECT * FROM agents WHERE id = ?",
+        (agent_id_param,), one=True
+    ))
+    if not agent:
+        flash('Agent not found.', 'danger')
+        return redirect(url_for('agents'))
+
+    form_data = {
+        'subject': request.form.get('subject', '').strip(),
+        'category': request.form.get('category', '').strip(),
+        'message': request.form.get('message', '').strip(),
+    }
+
+    if request.method == 'POST':
+        errors = []
+        if not form_data['subject']:
+            errors.append('Please enter a subject for your enquiry.')
+        elif len(form_data['subject']) < 3:
+            errors.append('Subject must be at least 3 characters.')
+        elif len(form_data['subject']) > 150:
+            errors.append('Subject is too long (max 150 characters).')
+
+        if form_data['category'] not in ENQUIRY_CATEGORIES:
+            errors.append('Please choose a valid enquiry category.')
+
+        if not form_data['message']:
+            errors.append('Please write your message.')
+        elif len(form_data['message']) < 10:
+            errors.append('Message must be at least 10 characters.')
+        elif len(form_data['message']) > 2000:
+            errors.append('Message is too long (max 2000 characters).')
+
+        if errors:
+            for error in errors:
+                flash(error, 'danger')
+        else:
+            execute_db(
+                """
+                INSERT INTO enquiries
+                    (worker_id, agent_id, subject, category, message)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    session['user_id'],
+                    agent['id'],
+                    form_data['subject'],
+                    form_data['category'],
+                    form_data['message'],
+                )
+            )
+            flash('Your enquiry has been sent through MigrantSafe. Please wait for the agent reply here.', 'success')
+            return redirect(url_for('my_enquiries'))
+
+    return render_template(
+        'enquiry_form.html',
+        agent=agent,
+        enquiry_categories=ENQUIRY_CATEGORIES,
+        form_data=form_data,
+    )
+
+
+@role_required('agent')
+def reply_enquiry(enquiry_id):
+    """Agent replies to a worker enquiry and sets its ticket status."""
+    agent = row_to_dict(query_db(
+        "SELECT * FROM agents WHERE user_id = ?",
+        (session['user_id'],), one=True
+    ))
+    if not agent:
+        flash('Please complete your agency profile before managing enquiries.', 'warning')
+        return redirect(url_for('dashboard_agent'))
+
+    enquiry = row_to_dict(query_db(
+        "SELECT * FROM enquiries WHERE id = ? AND agent_id = ?",
+        (enquiry_id, agent['id']), one=True
+    ))
+    if not enquiry:
+        flash('Enquiry not found.', 'danger')
+        return redirect(url_for('dashboard_agent'))
+
+    reply_message = request.form.get('reply_message', '').strip()
+    new_status = request.form.get('status', 'replied').strip().lower()
+
+    if new_status not in ('replied', 'closed'):
+        flash('Please choose a valid status.', 'danger')
+        return redirect(url_for('dashboard_agent'))
+
+    if not reply_message:
+        flash('Please write a reply before updating the enquiry.', 'danger')
+        return redirect(url_for('dashboard_agent'))
+    if len(reply_message) < 5:
+        flash('Reply must be at least 5 characters.', 'danger')
+        return redirect(url_for('dashboard_agent'))
+    if len(reply_message) > 2000:
+        flash('Reply is too long (max 2000 characters).', 'danger')
+        return redirect(url_for('dashboard_agent'))
+
+    execute_db(
+        """
+        UPDATE enquiries
+        SET reply_message = ?, status = ?, replied_at = datetime('now')
+        WHERE id = ?
+        """,
+        (reply_message, new_status, enquiry_id)
+    )
+    flash('Enquiry reply saved.', 'success')
+    return redirect(url_for('dashboard_agent', page='reviews'))
 
 
 def submit_report():
@@ -407,7 +832,66 @@ def update_worker_profile():
     )
 
     flash('Profile updated successfully.', 'success')
-    return redirect(url_for('dashboard_worker'))
+    return redirect(url_for('dashboard_worker', page='profile'))
+
+
+@role_required('worker')
+def update_worker_job_preferences():
+    """Save a worker's job preference details."""
+    user_id = session['user_id']
+    desired_job = request.form.get('desired_job', '').strip()
+    preferred_location = request.form.get('preferred_location', '').strip()
+    job_description = request.form.get('job_description', '').strip()
+
+    if not desired_job:
+        flash('Please enter the type of job you are looking for.', 'danger')
+        return redirect(url_for('dashboard_worker', page='profile'))
+    if len(desired_job) > 150:
+        flash('Desired job is too long (max 150 characters).', 'danger')
+        return redirect(url_for('dashboard_worker', page='profile'))
+    if len(preferred_location) > 150:
+        flash('Preferred location is too long (max 150 characters).', 'danger')
+        return redirect(url_for('dashboard_worker', page='profile'))
+    if len(job_description) > 1000:
+        flash('Job description is too long (max 1000 characters).', 'danger')
+        return redirect(url_for('dashboard_worker', page='profile'))
+
+    existing_preferences = query_db(
+        "SELECT id FROM worker_job_preferences WHERE worker_id = ?",
+        (user_id,), one=True
+    )
+
+    if existing_preferences:
+        execute_db(
+            """
+            UPDATE worker_job_preferences
+            SET desired_job = ?, preferred_location = ?, job_description = ?
+            WHERE worker_id = ?
+            """,
+            (
+                desired_job,
+                preferred_location or None,
+                job_description or None,
+                user_id,
+            )
+        )
+    else:
+        execute_db(
+            """
+            INSERT INTO worker_job_preferences
+                (worker_id, desired_job, preferred_location, job_description)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                user_id,
+                desired_job,
+                preferred_location or None,
+                job_description or None,
+            )
+        )
+
+    flash('Job preferences saved.', 'success')
+    return redirect(url_for('dashboard_worker', page='profile'))
 
 
 @role_required('agent')
@@ -471,7 +955,50 @@ def update_agent_profile():
 
     session['name'] = agency_name
     flash('Profile saved! Admins will be notified to review your details.', 'success')
-    return redirect(url_for('dashboard_agent'))
+    return redirect(url_for('dashboard_agent', page='profile-agency'))
+
+
+@role_required('agent')
+def create_job_listing():
+    """Allow an agent to create a basic job listing."""
+    agent = get_agent_profile_for_user(session['user_id'])
+    if not agent:
+        flash('Please complete your agency profile before posting a job listing.', 'warning')
+        return redirect(url_for('dashboard_agent', page='profile-agency'))
+
+    job_title = request.form.get('job_title', '').strip()
+    location = request.form.get('location', '').strip()
+    description = request.form.get('description', '').strip()
+
+    if not job_title:
+        flash('Please enter a job title.', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+    if not location:
+        flash('Please enter a job location.', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+    if not description:
+        flash('Please enter a short job description.', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+    if len(job_title) > 150:
+        flash('Job title is too long (max 150 characters).', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+    if len(location) > 150:
+        flash('Location is too long (max 150 characters).', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+    if len(description) > 1000:
+        flash('Description is too long (max 1000 characters).', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+
+    execute_db(
+        """
+        INSERT INTO job_listings (agent_id, job_title, location, description)
+        VALUES (?, ?, ?, ?)
+        """,
+        (agent['id'], job_title, location, description)
+    )
+
+    flash('Job listing published.', 'success')
+    return redirect(url_for('dashboard_agent', page='job-listings'))
 
 
 def register_web_routes(app):
@@ -479,14 +1006,21 @@ def register_web_routes(app):
     app.add_url_rule('/', endpoint='index', view_func=index)
     app.add_url_rule('/agents', endpoint='agents', view_func=agents)
     app.add_url_rule('/login', endpoint='login', view_func=login, methods=['GET', 'POST'])
+    app.add_url_rule('/login/google', endpoint='google_login', view_func=google_login)
+    app.add_url_rule('/login/google/callback', endpoint='google_oauth_callback', view_func=google_oauth_callback)
     app.add_url_rule('/register', endpoint='register', view_func=register, methods=['GET', 'POST'])
     app.add_url_rule('/logout', endpoint='logout', view_func=logout)
     app.add_url_rule('/agents/<int:agent_id>', endpoint='agent_detail', view_func=agent_detail)
     app.add_url_rule('/my-reports', endpoint='my_reports', view_func=my_reports)
+    app.add_url_rule('/my-enquiries', endpoint='my_enquiries', view_func=my_enquiries)
     app.add_url_rule('/guide', endpoint='migration_guide', view_func=migration_guide)
     app.add_url_rule('/dashboard', endpoint='dashboard', view_func=dashboard)
     app.add_url_rule('/dashboard/worker', endpoint='dashboard_worker', view_func=dashboard_worker)
     app.add_url_rule('/dashboard/agent', endpoint='dashboard_agent', view_func=dashboard_agent)
+    app.add_url_rule('/enquiry', endpoint='submit_enquiry', view_func=submit_enquiry, methods=['GET', 'POST'])
+    app.add_url_rule('/agent/enquiry/<int:enquiry_id>/reply', endpoint='reply_enquiry', view_func=reply_enquiry, methods=['POST'])
     app.add_url_rule('/report', endpoint='submit_report', view_func=submit_report, methods=['GET', 'POST'])
     app.add_url_rule('/worker/profile', endpoint='update_worker_profile', view_func=update_worker_profile, methods=['POST'])
+    app.add_url_rule('/worker/job-preferences', endpoint='update_worker_job_preferences', view_func=update_worker_job_preferences, methods=['POST'])
     app.add_url_rule('/agent/profile', endpoint='update_agent_profile', view_func=update_agent_profile, methods=['POST'])
+    app.add_url_rule('/agent/job-listings', endpoint='create_job_listing', view_func=create_job_listing, methods=['POST'])

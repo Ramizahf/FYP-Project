@@ -61,40 +61,91 @@
     .btn-amber{background:var(--amber);color:var(--white)}
     .btn-amber:hover{background:#d06e28}
     .btn-lg{padding:14px 32px;font-size:1rem;border-radius:10px}
-    .chatbot-blob{
-      position:fixed;right:22px;bottom:22px;z-index:120;
-      width:84px;height:84px;border-radius:28px 28px 22px 28px;
-      display:flex;align-items:center;justify-content:center;
-      background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,.92) 0 12%, transparent 13%),
-        linear-gradient(145deg, var(--teal-lt) 0%, var(--teal) 55%, var(--amber) 100%);
-      color:var(--white);text-decoration:none;
-      box-shadow:0 18px 42px rgba(13,110,110,.28), 0 0 0 1px rgba(255,255,255,.18) inset;
-      transition:transform .18s ease, box-shadow .18s ease;
-      overflow:hidden
+    .chatbot-float{
+      position:fixed;right:6px;bottom:12px;z-index:120;
+      display:inline-flex;align-items:center;justify-content:center;
+      text-decoration:none;transition:transform .18s ease
     }
-    .chatbot-blob::before{
-      content:'';position:absolute;inset:10px;border-radius:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.02));
-      pointer-events:none
+    .chatbot-float:hover{transform:translateY(-2px)}
+    .chatbot-float-label{
+      position:fixed;right:112px;bottom:46px;z-index:119;
+      display:inline-flex;align-items:center;
+      padding:9px 15px;border-radius:999px;
+      background:rgba(255,255,255,.97);
+      border:1px solid rgba(212,232,232,.95);
+      color:var(--teal);font-size:.84rem;font-weight:700;
+      text-decoration:none;white-space:nowrap;
+      box-shadow:0 10px 24px rgba(6,52,55,.14);
+      overflow:visible
     }
-    .chatbot-blob::after{
-      content:'';position:absolute;right:-10px;bottom:-10px;width:34px;height:34px;border-radius:50%;
-      background:rgba(255,255,255,.12);filter:blur(2px);pointer-events:none
+    .chatbot-float-label::before{
+      content:none
     }
-    .chatbot-blob:hover{
-      transform:translateY(-2px) scale(1.02);
-      box-shadow:0 24px 50px rgba(13,110,110,.34), 0 0 0 1px rgba(255,255,255,.18) inset
+    .chatbot-float-label::after{
+      content:none
     }
-    .chatbot-blob-icon{
-      position:relative;z-index:1;font-size:1.65rem;font-weight:700;line-height:1
+    .chatbot-float img{
+      display:block;width:138px;height:auto;
+      border-radius:28px;
+      filter:drop-shadow(0 12px 24px rgba(6,52,55,.22));
     }
-    .chatbot-blob-label{
-      position:fixed;right:118px;bottom:40px;z-index:119;
-      padding:11px 15px;border-radius:999px;background:rgba(255,255,255,.96);
-      border:1px solid var(--border);color:var(--teal);font-size:.84rem;font-weight:700;
-      box-shadow:0 10px 28px rgba(13,110,110,.12)
+    .guide-replay{
+      position:fixed;left:22px;bottom:24px;z-index:119;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:11px 16px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(255,255,255,.96);color:var(--teal);font-family:'DM Sans',sans-serif;
+      font-size:.84rem;font-weight:700;cursor:pointer;box-shadow:0 10px 28px rgba(13,110,110,.12);
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease
     }
+    .guide-replay:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(13,110,110,.18);border-color:var(--teal)}
+    .guide-replay:focus-visible{outline:3px solid rgba(20,160,151,.35);outline-offset:2px}
+    .guide-overlay{
+      position:fixed;inset:0;z-index:240;background:transparent;
+      opacity:0;pointer-events:none;transition:opacity .22s ease
+    }
+    .guide-overlay.active{opacity:1;pointer-events:auto}
+    .guide-spotlight{
+      position:fixed;z-index:242;
+      left:0;top:0;width:0;height:0;
+      border:3px solid rgba(255,179,71,.98);
+      border-radius:14px;
+      box-shadow:0 0 0 9999px rgba(15,32,39,.74);
+      opacity:0;pointer-events:none;
+      transition:opacity .22s ease,transform .22s ease;
+      transform:translateY(6px)
+    }
+    .guide-spotlight.active{opacity:1;transform:translateY(0)}
+    .guide-card{
+      position:fixed;z-index:243;width:min(340px,calc(100vw - 28px));max-width:calc(100vw - 28px);
+      left:14px;top:14px;
+      background:var(--white);color:var(--text);border:1px solid var(--border);
+      border-radius:18px;padding:16px 16px 14px;box-shadow:0 18px 46px rgba(0,0,0,.26);
+      opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .22s ease,transform .22s ease
+    }
+    .guide-card.active{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .guide-kicker{font-size:.69rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+    .guide-title{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:6px}
+    .guide-text{font-size:.9rem;line-height:1.55;color:var(--muted)}
+    .guide-count{font-size:.76rem;font-weight:700;color:var(--amber);margin-top:10px}
+    .guide-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .guide-btn{
+      display:inline-flex;align-items:center;justify-content:center;min-width:74px;
+      padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--white);
+      color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer
+    }
+    .guide-btn[hidden]{display:none}
+    .guide-btn:hover{border-color:var(--teal)}
+    .guide-btn:focus-visible{outline:3px solid rgba(20,160,151,.35);outline-offset:2px}
+    .guide-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--white)}
+    .guide-btn.primary:hover{background:var(--mid);border-color:var(--mid)}
+    .guide-arrow{
+      position:fixed;z-index:242;font-size:2rem;line-height:1;color:var(--amber-lt);
+      text-shadow:0 12px 24px rgba(0,0,0,.28);opacity:0;pointer-events:none;
+      transform:translateY(8px);transition:opacity .22s ease,transform .22s ease
+    }
+    .guide-arrow.active{opacity:1;transform:translateY(0)}
+    .guide-arrow.up{transform:translateY(-8px)}
+    .guide-arrow.up.active{transform:translateY(0)}
 
     /* HERO */
     .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 5% 60px;background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);position:relative;overflow:hidden}
@@ -250,7 +301,7 @@
     .chatbot-section{background:linear-gradient(135deg,var(--teal-bg) 0%,var(--white) 100%);display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
     .chat-window{background:var(--white);border-radius:20px;box-shadow:0 20px 60px rgba(13,110,110,.12);border:1px solid var(--border);overflow:hidden}
     .chat-header{background:var(--teal);padding:16px 20px;display:flex;align-items:center;gap:12px}
-    .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .chat-avatar{width:36px;height:36px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;padding:0}
     .chat-info .cname{font-size:.9rem;font-weight:600;color:var(--white)}
     .chat-info .cstatus{font-size:.72rem;color:rgba(255,255,255,.7)}
     .online-dot{width:8px;height:8px;border-radius:50%;background:#4ddb8a;display:inline-block;margin-right:4px}
@@ -282,7 +333,7 @@
     .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
     .footer-brand .flogo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--white);margin-bottom:12px}
     .footer-brand .flogo .dot{color:var(--amber)}
-    .footer-brand p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.65;max-width:260px}
+    .footer-brand p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.75;max-width:360px}
     .footer-col h4{font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:16px}
     .footer-col a{display:block;font-size:.84rem;color:rgba(255,255,255,.55);text-decoration:none;margin-bottom:10px;transition:color .2s}
     .footer-col a:hover{color:var(--teal-lt)}
@@ -322,29 +373,37 @@
       .hero-visual{display:none}
       .nav-logo-mark{width:30px;height:30px;border-radius:10px}
       .nav-logo-wordmark{font-size:1.22rem}
-      .chatbot-blob{width:72px;height:72px;right:14px;bottom:14px;border-radius:24px 24px 18px 24px}
-      .chatbot-blob-label{display:none}
+      .chatbot-float-label{right:82px;bottom:34px;padding:8px 12px;font-size:.76rem}
+      .chatbot-float{right:8px;bottom:12px}
+      .chatbot-float img{width:88px;border-radius:24px}
+      .guide-replay{left:14px;bottom:14px;padding:10px 14px}
+      .guide-card{width:calc(100vw - 20px);max-width:calc(100vw - 20px);padding:14px}
+      .guide-actions{justify-content:space-between}
+      .guide-btn{flex:1}
     }
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav id="navbar">
+<nav id="navbar" data-mobile-nav>
   <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home">
-    <span class="nav-logo-mark" aria-hidden="true"></span>
-    <span class="nav-logo-wordmark">
+    <img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/>
+    <span class="nav-logo-wordmark" aria-hidden="true">
       <span class="nav-logo-main">Migrant</span><span class="nav-logo-accent">Safe</span>
     </span>
   </a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
   <div class="nav-links">
     <a href="#how"      data-t="nav_how">How It Works</a>
     <a href="#features" data-t="nav_feat">Features</a>
     <a href="#who"      data-t="nav_who">For You</a>
   </div>
   <div class="nav-cta">
-    <a href="{{ url_for('login') }}"    class="btn btn-outline"  data-t="nav_login">Log In</a>
-    <a href="{{ url_for('register') }}" class="btn btn-primary"  data-t="nav_reg">Register Free</a>
+    <a href="{{ url_for('login') }}"    class="btn btn-outline"  data-t="nav_login" data-guide="login-btn">Log In</a>
+    <a href="{{ url_for('register') }}" class="btn btn-primary"  data-t="nav_reg" data-guide="register-btn">Register Free</a>
   </div>
 </nav>
 
@@ -429,7 +488,7 @@
     <div class="step-card reveal" data-num="01"><div class="step-icon" style="background:#e6f4f4">🧑‍💼</div><h3 data-t="s1h">Create Your Account</h3><p data-t="s1p">Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.</p></div>
     <div class="step-card reveal" data-num="02"><div class="step-icon" style="background:#fff3e6">🔍</div><h3 data-t="s2h">Search for Agents</h3><p data-t="s2p">Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.</p></div>
     <div class="step-card reveal" data-num="03"><div class="step-icon" style="background:#e6f4f4">🚨</div><h3 data-t="s3h">Report Bad Actors</h3><p data-t="s3p">If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.</p></div>
-    <div class="step-card reveal" data-num="04"><div class="step-icon" style="background:#fff3e6">💬</div><h3 data-t="s4h">Ask the Chatbot</h3><p data-t="s4p">Have a question about visas, contracts, or fees? Ask our AI chatbot in English, Malay, or Bangla — anytime.</p></div>
+    <div class="step-card reveal" data-num="04"><div class="step-icon" style="background:#fff3e6;padding:10px"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"/></div><h3 data-t="s4h">Ask the Chatbot</h3><p data-t="s4p">Have a question about visas, contracts, or fees? Ask our AI chatbot in English, Malay, or Bangla — anytime.</p></div>
   </div>
 </section>
 
@@ -446,7 +505,7 @@
         <h3 data-t="f1h">Agent Verification System</h3>
         <p data-t="f1p">Every recruitment agent on MigrantSafe has a clear status badge. Before you trust an agent with your money and future, check if they are officially verified, still under review, or have been reported by other workers.</p>
         <br/><p style="font-size:.84rem;color:var(--muted)" data-t="f1s">Admins can update statuses based on reports and investigations — keeping the database trustworthy.</p>
-        <br/><a href="{{ url_for('agents') }}" class="btn btn-primary" style="margin-top:8px" data-t="f1btn">Browse Agents →</a>
+        <br/><a href="{{ url_for('agents') }}" class="btn btn-primary" style="margin-top:8px" data-t="f1btn" data-guide="agents-btn">Browse Agents →</a>
       </div>
       <div class="feat-demo">
         <div class="agent-row"><div><div class="agent-name">Suria Recruitment Sdn Bhd</div><div class="agent-loc">📍 Kuala Lumpur</div></div><span class="pill pill-v" data-t="pv">✓ Verified</span></div>
@@ -455,7 +514,7 @@
         <div class="agent-row"><div><div class="agent-name">Harapan Recruitment</div><div class="agent-loc">📍 Penang</div></div><span class="pill pill-v" data-t="pv2">✓ Verified</span></div>
       </div>
     </div>
-    <div class="feat-card reveal" style="background:var(--cream)">
+    <div class="feat-card reveal" style="background:var(--cream)" data-guide="report-feature">
       <div class="feat-icon">📝</div><h3 data-t="f2h">Report Suspicious Agents</h3>
       <p data-t="f2p">Been cheated, overcharged, or misled? Submit a report. We collect the details and alert the admin. Other workers can see flagged agents before it's too late.</p>
       <br/><p style="font-size:.82rem;color:var(--muted)" data-t="f2s">Your identity stays protected — reports are reviewed confidentially.</p>
@@ -520,7 +579,7 @@
   <div class="reveal">
     <div class="chat-window">
       <div class="chat-header">
-        <div class="chat-avatar">🤖</div>
+        <div class="chat-avatar"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"/></div>
         <div class="chat-info">
           <div class="cname">MigrantSafe Assistant</div>
           <div class="cstatus"><span class="online-dot"></span><span data-t="ch_online">Online — Ready to Help</span></div>
@@ -570,13 +629,6 @@
       <a href="{{ url_for('chatbot') }}"  data-t="ft_chatbot">Chatbot</a>
     </div>
     <div class="footer-col">
-      <h4 data-t="ft_h2">For Workers</h4>
-      <a href="{{ url_for('agents') }}" data-t="ft_w1">How to Verify Agents</a>
-      <a href="{{ url_for('chatbot') }}" data-t="ft_w2">Recruitment Guide</a>
-      <a href="{{ url_for('agents') }}" data-t="ft_w3">Report an Agent</a>
-      <a href="{{ url_for('chatbot') }}" data-t="ft_w4">Know Your Rights</a>
-    </div>
-    <div class="footer-col">
       <h4 data-t="ft_h3">Languages</h4>
       <a href="#" onclick="setLang('en');return false">🇬🇧 English</a>
       <a href="#" onclick="setLang('ms');return false">🇲🇾 Bahasa Melayu</a>
@@ -592,9 +644,25 @@
 <!-- ═══════════════════════════════════════
      TRANSLATION ENGINE
 ═══════════════════════════════════════ -->
-<a href="{{ url_for('chatbot') }}" class="chatbot-blob-label">Need help now?</a>
-<a href="{{ url_for('chatbot') }}" class="chatbot-blob" aria-label="Open chatbot">
-  <span class="chatbot-blob-icon">AI</span>
+<button type="button" class="guide-replay" id="guideReplayBtn" aria-label="Show guide">🧭 Show Guide</button>
+<div class="guide-overlay" id="guideOverlay" hidden></div>
+<div class="guide-spotlight" id="guideSpotlight" hidden aria-hidden="true"></div>
+<div class="guide-arrow" id="guideArrow" aria-hidden="true">↓</div>
+<div class="guide-card" id="guideCard" role="dialog" aria-modal="true" aria-labelledby="guideTitle" aria-describedby="guideText" hidden tabindex="-1">
+  <div class="guide-kicker">Quick Guide</div>
+  <div class="guide-title" id="guideTitle">Start Here</div>
+  <div class="guide-text" id="guideText">Start here to create your account.</div>
+  <div class="guide-count" id="guideCount">Step 1 of 4</div>
+  <div class="guide-actions">
+    <button type="button" class="guide-btn" id="guideBack">Back</button>
+    <button type="button" class="guide-btn" id="guideSkip">Skip</button>
+    <button type="button" class="guide-btn" id="guideDone">Done</button>
+    <button type="button" class="guide-btn primary" id="guideNext">Next</button>
+  </div>
+</div>
+<a href="{{ url_for('chatbot') }}" class="chatbot-float-label">Chat with us!</a>
+<a href="{{ url_for('chatbot') }}" class="chatbot-float" aria-label="Open chatbot" data-guide="chatbot-btn">
+  <img src="{{ url_for('static', filename='img/chatbot-floating-icon.png') }}" alt="" width="581" height="430" decoding="async"/>
 </a>
 <script>
 // ──────────────────────────────────────────────────────────
@@ -659,9 +727,8 @@ const T = {
     cta_p:"It's free, it's simple, and it could protect you from exploitation. Register in under 2 minutes.",
     cta_b1:"Create Free Account", cta_b2:"Browse Agents",
     ft_desc:"A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.",
-    ft_h1:"Platform", ft_h2:"For Workers", ft_h3:"Languages",
+    ft_h1:"Platform", ft_h3:"Languages",
     ft_reg:"Register", ft_login:"Login", ft_agents:"Agent Directory", ft_chatbot:"Chatbot",
-    ft_w1:"How to Verify Agents", ft_w2:"Recruitment Guide", ft_w3:"Report an Agent", ft_w4:"Know Your Rights",
     ft_copy:"© 2025 MigrantSafe · Final Year Project · APU Malaysia",
     ft_sdg:"SDG 8 — Decent Work & Economic Growth",
     r_default:"Thank you for your question! For a full answer, please use the chatbot page. 😊",
@@ -728,9 +795,8 @@ const T = {
     cta_p:"Ia percuma, mudah, dan boleh melindungi anda daripada eksploitasi. Daftar dalam masa kurang dari 2 minit.",
     cta_b1:"Buat Akaun Percuma", cta_b2:"Semak Ejen",
     ft_desc:"Platform berbilang bahasa yang membantu pekerja asing di Malaysia mencari ejen yang disahkan dan memahami hak mereka.",
-    ft_h1:"Platform", ft_h2:"Untuk Pekerja", ft_h3:"Bahasa",
+    ft_h1:"Platform", ft_h3:"Bahasa",
     ft_reg:"Daftar", ft_login:"Log Masuk", ft_agents:"Direktori Ejen", ft_chatbot:"Chatbot",
-    ft_w1:"Cara Sahkan Ejen", ft_w2:"Panduan Pengambilan", ft_w3:"Laporkan Ejen", ft_w4:"Ketahui Hak Anda",
     ft_copy:"© 2025 MigrantSafe · Projek Tahun Akhir · APU Malaysia",
     ft_sdg:"SDG 8 — Kerja Layak & Pertumbuhan Ekonomi",
     r_default:"Terima kasih atas soalan anda! Untuk jawapan penuh, sila gunakan halaman chatbot. 😊",
@@ -797,9 +863,8 @@ const T = {
     cta_p:"এটি বিনামূল্যে, সহজ এবং এটি আপনাকে শোষণ থেকে রক্ষা করতে পারে। ২ মিনিটেরও কম সময়ে নিবন্ধন করুন।",
     cta_b1:"বিনামূল্যে অ্যাকাউন্ট তৈরি করুন", cta_b2:"এজেন্ট দেখুন",
     ft_desc:"একটি বহুভাষিক প্ল্যাটফর্ম যা মালয়েশিয়ায় অভিবাসী শ্রমিকদের যাচাইকৃত এজেন্ট খুঁজে পেতে এবং তাদের অধিকার বুঝতে সহায়তা করে।",
-    ft_h1:"প্ল্যাটফর্ম", ft_h2:"শ্রমিকদের জন্য", ft_h3:"ভাষা",
+    ft_h1:"প্ল্যাটফর্ম", ft_h3:"ভাষা",
     ft_reg:"নিবন্ধন", ft_login:"লগ ইন", ft_agents:"এজেন্ট ডিরেক্টরি", ft_chatbot:"চ্যাটবট",
-    ft_w1:"এজেন্ট যাচাই করার উপায়", ft_w2:"নিয়োগ গাইড", ft_w3:"এজেন্ট রিপোর্ট করুন", ft_w4:"আপনার অধিকার জানুন",
     ft_copy:"© ২০২৫ MigrantSafe · চূড়ান্ত বর্ষ প্রকল্প · APU মালয়েশিয়া",
     ft_sdg:"SDG ৮ — সম্মানজনক কাজ ও অর্থনৈতিক প্রবৃদ্ধি",
     r_default:"আপনার প্রশ্নের জন্য ধন্যবাদ! সম্পূর্ণ উত্তরের জন্য চ্যাটবট পাতায় যান। 😊",
@@ -892,7 +957,361 @@ function sendDemo() {
 // ──────────────────────────────────────────────────────────
 // INIT & SCROLL
 // ──────────────────────────────────────────────────────────
+// ----------------------------------------------------------
+// HOMEPAGE GUIDE
+// ----------------------------------------------------------
+const GUIDE_KEY = 'ms-index-guide-done';
+const GUIDE_STEPS = [
+  { target: 'register-btn', title: 'Register', text: 'Start here to create your account' },
+  { target: 'login-btn', title: 'Login', text: 'Log in here if you already have an account' },
+  { target: 'chatbot-btn', title: 'Chatbot', text: 'Ask for help here anytime' },
+  { target: 'agents-btn', title: 'Browse Agents', text: 'Check agents here before trusting them' }
+];
+
+const guideReplayBtn = document.getElementById('guideReplayBtn');
+const guideOverlay = document.getElementById('guideOverlay');
+const guideArrow = document.getElementById('guideArrow');
+const guideCard = document.getElementById('guideCard');
+const guideTitle = document.getElementById('guideTitle');
+const guideText = document.getElementById('guideText');
+const guideCount = document.getElementById('guideCount');
+const guideBack = document.getElementById('guideBack');
+const guideSkip = document.getElementById('guideSkip');
+const guideDone = document.getElementById('guideDone');
+const guideNext = document.getElementById('guideNext');
+
+let guideIndex = 0;
+let guideOpen = false;
+let activeGuideTarget = null;
+let guidePreviousFocus = null;
+let guideScrollTimer = null;
+let guidePositionFrame = null;
+let guideOpenedMenu = false;
+
+guideArrow.hidden = true;
+const guideSpotlight = document.getElementById('guideSpotlight');
+
+function getGuideSeen() {
+  try {
+    return window.localStorage.getItem(GUIDE_KEY) === 'done';
+  } catch (err) {
+    return false;
+  }
+}
+
+function setGuideSeen() {
+  try {
+    window.localStorage.setItem(GUIDE_KEY, 'done');
+  } catch (err) {
+    // Ignore storage errors and keep the guide usable.
+  }
+}
+
+function getGuideTarget(step) {
+  return document.querySelector(`[data-guide="${step.target}"]`);
+}
+
+function setGuideMenuState(open) {
+  const nav = document.querySelector('nav[data-mobile-nav]');
+  const toggle = document.querySelector('[data-menu-toggle]');
+  if (!nav || !toggle) return;
+
+  nav.classList.toggle('nav-open', open);
+  toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  document.body.classList.toggle('mobile-menu-open', open);
+}
+
+function ensureGuideTargetVisible(target) {
+  if (!target) return target;
+
+  const nav = document.querySelector('nav[data-mobile-nav]');
+  const targetInNav = nav && nav.contains(target);
+  if (!targetInNav) {
+    if (guideOpenedMenu) {
+      setGuideMenuState(false);
+      guideOpenedMenu = false;
+    }
+    return target;
+  }
+
+  if (window.innerWidth >= 1024) return target;
+
+  const hiddenByMenu = !target.offsetParent || window.getComputedStyle(target).display === 'none';
+  if (hiddenByMenu) {
+    setGuideMenuState(true);
+    guideOpenedMenu = true;
+  }
+
+  return target;
+}
+
+function clearGuideTarget() {
+  if (activeGuideTarget) activeGuideTarget.classList.remove('guide-target');
+  activeGuideTarget = null;
+}
+
+function getGuideFocusable() {
+  return [guideBack, guideSkip, guideDone, guideNext].filter(btn => !btn.hidden && !btn.disabled);
+}
+
+function updateGuideButtons() {
+  const isFirst = guideIndex === 0;
+  const isLast = guideIndex === GUIDE_STEPS.length - 1;
+
+  guideBack.hidden = isFirst;
+  guideSkip.hidden = isLast;
+  guideNext.hidden = isLast;
+  guideDone.hidden = !isLast;
+  guideDone.classList.toggle('primary', isLast);
+  guideCount.textContent = `Step ${guideIndex + 1} of ${GUIDE_STEPS.length}`;
+}
+
+function clampGuideValue(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function positionGuide(target) {
+  if (!target || guideCard.hidden) return;
+
+  const rect = target.getBoundingClientRect();
+  const spotlightPad = 6;
+  const cardRect = guideCard.getBoundingClientRect();
+  const cardWidth = cardRect.width || 320;
+  const cardHeight = cardRect.height || 184;
+  const arrowWidth = guideArrow.offsetWidth || 24;
+  const arrowHeight = guideArrow.offsetHeight || 24;
+  const padding = 12;
+  const gap = 18;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const targetCenterX = rect.left + (rect.width / 2);
+  const targetCenterY = rect.top + (rect.height / 2);
+  const roomAbove = rect.top - padding;
+  const roomBelow = viewportHeight - rect.bottom - padding;
+  const roomLeft = rect.left - padding;
+  const roomRight = viewportWidth - rect.right - padding;
+
+  const spotlightLeft = clampGuideValue(rect.left - spotlightPad, 8, viewportWidth - 8);
+  const spotlightTop = clampGuideValue(rect.top - spotlightPad, 8, viewportHeight - 8);
+  const spotlightWidth = Math.min(rect.width + (spotlightPad * 2), viewportWidth - spotlightLeft - 8);
+  const spotlightHeight = Math.min(rect.height + (spotlightPad * 2), viewportHeight - spotlightTop - 8);
+  const targetRadius = window.getComputedStyle(target).borderRadius || '14px';
+
+  guideSpotlight.style.left = `${spotlightLeft}px`;
+  guideSpotlight.style.top = `${spotlightTop}px`;
+  guideSpotlight.style.width = `${spotlightWidth}px`;
+  guideSpotlight.style.height = `${spotlightHeight}px`;
+  guideSpotlight.style.borderRadius = targetRadius;
+
+  let placement = 'bottom';
+  if (roomBelow >= cardHeight + gap || roomBelow >= roomAbove) {
+    placement = 'bottom';
+  } else if (roomAbove >= cardHeight + gap) {
+    placement = 'top';
+  } else if (roomRight >= roomLeft) {
+    placement = 'right';
+  } else {
+    placement = 'left';
+  }
+
+  if ((placement === 'bottom' || placement === 'top') && Math.min(roomAbove, roomBelow) < (cardHeight * 0.45)) {
+    placement = roomRight >= roomLeft ? 'right' : 'left';
+  }
+
+  let cardLeft = padding;
+  let cardTop = padding;
+  let arrowLeft = padding;
+  let arrowTop = padding;
+
+  if (placement === 'bottom' || placement === 'top') {
+    cardLeft = clampGuideValue(targetCenterX - (cardWidth / 2), padding, viewportWidth - cardWidth - padding);
+    cardTop = placement === 'bottom'
+      ? rect.bottom + gap
+      : rect.top - cardHeight - gap;
+    cardTop = clampGuideValue(cardTop, padding, viewportHeight - cardHeight - padding);
+
+    arrowLeft = clampGuideValue(targetCenterX - (arrowWidth / 2), padding, viewportWidth - arrowWidth - padding);
+    if (placement === 'bottom') {
+      guideArrow.textContent = '\u2191';
+      guideArrow.classList.add('up');
+      arrowTop = clampGuideValue(rect.bottom + 1, padding, viewportHeight - arrowHeight - padding);
+    } else {
+      guideArrow.textContent = '\u2193';
+      guideArrow.classList.remove('up');
+      arrowTop = clampGuideValue(rect.top - arrowHeight - 1, padding, viewportHeight - arrowHeight - padding);
+    }
+  } else {
+    cardTop = clampGuideValue(targetCenterY - (cardHeight / 2), padding, viewportHeight - cardHeight - padding);
+    cardLeft = placement === 'right'
+      ? rect.right + gap
+      : rect.left - cardWidth - gap;
+    cardLeft = clampGuideValue(cardLeft, padding, viewportWidth - cardWidth - padding);
+
+    arrowTop = clampGuideValue(targetCenterY - (arrowHeight / 2), padding, viewportHeight - arrowHeight - padding);
+    guideArrow.classList.remove('up');
+    if (placement === 'right') {
+      guideArrow.textContent = '\u2190';
+      arrowLeft = clampGuideValue(rect.right, padding, viewportWidth - arrowWidth - padding);
+    } else {
+      guideArrow.textContent = '\u2192';
+      arrowLeft = clampGuideValue(rect.left - arrowWidth, padding, viewportWidth - arrowWidth - padding);
+    }
+  }
+
+  guideCard.style.left = `${cardLeft}px`;
+  guideCard.style.top = `${cardTop}px`;
+  guideArrow.style.left = `${arrowLeft}px`;
+  guideArrow.style.top = `${arrowTop}px`;
+}
+
+function scheduleGuidePosition() {
+  if (!guideOpen || !activeGuideTarget) return;
+  if (guidePositionFrame) window.cancelAnimationFrame(guidePositionFrame);
+  guidePositionFrame = window.requestAnimationFrame(() => {
+    guidePositionFrame = null;
+    positionGuide(activeGuideTarget);
+  });
+}
+
+function positionActiveGuide() {
+  if (!guideOpen || !activeGuideTarget) return;
+  scheduleGuidePosition();
+}
+
+function showGuideStep(index) {
+  const step = GUIDE_STEPS[index];
+  const target = step ? ensureGuideTargetVisible(getGuideTarget(step)) : null;
+  if (!step || !target) return;
+
+  guideIndex = index;
+  clearGuideTarget();
+  activeGuideTarget = target;
+  activeGuideTarget.classList.add('guide-target');
+
+  guideTitle.textContent = step.title;
+  guideText.textContent = step.text;
+  updateGuideButtons();
+
+  if (window.getComputedStyle(target).position !== 'fixed') {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+  }
+  window.clearTimeout(guideScrollTimer);
+  scheduleGuidePosition();
+  guideScrollTimer = window.setTimeout(() => scheduleGuidePosition(), 260);
+}
+
+function startGuide(forceStart) {
+  if (guideOpen) return;
+  if (!forceStart && getGuideSeen()) return;
+
+  guideOpen = true;
+  guidePreviousFocus = document.activeElement;
+  guideOverlay.hidden = false;
+  guideSpotlight.hidden = false;
+  guideArrow.hidden = false;
+  guideCard.hidden = false;
+  guideOverlay.classList.add('active');
+  guideSpotlight.classList.add('active');
+  guideArrow.classList.add('active');
+  guideCard.classList.add('active');
+  guideReplayBtn.hidden = true;
+
+  showGuideStep(0);
+
+  window.setTimeout(() => {
+    const firstFocus = guideNext.hidden ? guideDone : guideNext;
+    firstFocus.focus();
+  }, 280);
+}
+
+function closeGuide(markSeen) {
+  guideOpen = false;
+  window.clearTimeout(guideScrollTimer);
+  if (guidePositionFrame) {
+    window.cancelAnimationFrame(guidePositionFrame);
+    guidePositionFrame = null;
+  }
+  clearGuideTarget();
+  if (guideOpenedMenu) {
+    setGuideMenuState(false);
+    guideOpenedMenu = false;
+  }
+
+  if (markSeen) setGuideSeen();
+
+  guideOverlay.classList.remove('active');
+  guideSpotlight.classList.remove('active');
+  guideArrow.classList.remove('active', 'up');
+  guideCard.classList.remove('active');
+
+  window.setTimeout(() => {
+    if (guideOpen) return;
+    guideOverlay.hidden = true;
+    guideSpotlight.hidden = true;
+    guideArrow.hidden = true;
+    guideCard.hidden = true;
+  }, 180);
+
+  guideReplayBtn.hidden = false;
+  if (guidePreviousFocus && typeof guidePreviousFocus.focus === 'function') {
+    window.setTimeout(() => guidePreviousFocus.focus(), 50);
+  }
+}
+
+function moveGuide(stepChange) {
+  const nextIndex = guideIndex + stepChange;
+  if (nextIndex < 0 || nextIndex >= GUIDE_STEPS.length) return;
+  showGuideStep(nextIndex);
+}
+
+function trapGuideFocus(event) {
+  if (!guideOpen || event.key !== 'Tab') return;
+
+  const focusable = getGuideFocusable();
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const current = document.activeElement;
+
+  if (event.shiftKey && current === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && current === last) {
+    event.preventDefault();
+    first.focus();
+  } else if (!guideCard.contains(current)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+guideReplayBtn.addEventListener('click', () => startGuide(true));
+guideBack.addEventListener('click', () => moveGuide(-1));
+guideNext.addEventListener('click', () => moveGuide(1));
+guideSkip.addEventListener('click', () => closeGuide(true));
+guideDone.addEventListener('click', () => closeGuide(true));
+
+document.addEventListener('keydown', event => {
+  if (!guideOpen) return;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeGuide(true);
+    return;
+  }
+  trapGuideFocus(event);
+});
+
+window.addEventListener('resize', positionActiveGuide);
+window.addEventListener('scroll', positionActiveGuide, { passive: true });
+
 buildDemoChat('en');
+
+window.addEventListener('load', () => {
+  if (!getGuideSeen()) {
+    window.setTimeout(() => startGuide(false), 700);
+  }
+});
 
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);

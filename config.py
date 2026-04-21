@@ -18,3 +18,13 @@ class Config:
     # Session expires after 2 hours of inactivity
     PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
     SESSION_PERMANENT = True
+
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID', '').strip()
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '').strip()
+    GOOGLE_OAUTH_BASE_URL = os.environ.get('GOOGLE_OAUTH_BASE_URL', '').strip().rstrip('/')
+    GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
+    GOOGLE_OAUTH_SCOPES = [
+        'openid',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile',
+    ]

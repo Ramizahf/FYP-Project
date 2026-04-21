@@ -17,7 +17,7 @@
     body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream)}
 
     nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06)}
-    .nav-logo{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--teal);text-decoration:none}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s}
     .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
@@ -77,17 +77,24 @@
     .rw-icon{font-size:1.6rem;flex-shrink:0}
     .rw-title{font-size:.92rem;font-weight:700;color:#ffb4b4;margin-bottom:4px}
     .rw-sub{font-size:.8rem;color:rgba(255,180,180,.7);line-height:1.55}
+    .enquiry-note{background:var(--teal-bg);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:24px}
+    .enquiry-note strong{display:block;font-size:.9rem;color:var(--dark);margin-bottom:4px}
+    .enquiry-note p{font-size:.82rem;color:var(--muted);line-height:1.6}
 
     @media(max-width:600px){.info-grid{grid-template-columns:1fr}.info-card.full{grid-column:span 1}}
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
 
-<nav>
-  <a href="{{ url_for('index') }}" class="nav-logo">Migrant<span class="dot">Safe</span></a>
-  <div style="display:flex;gap:10px;align-items:center">
+<nav data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
+  <div class="nav-cta">
     <a href="{{ url_for('agents') }}" class="btn btn-outline">← All Agents</a>
     {% if current_user.is_auth and current_user.role == 'worker' %}
+    <a href="{{ url_for('submit_enquiry') }}?agent_id={{ agent['id'] }}" class="btn btn-primary">Send Enquiry</a>
     <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red">🚨 Report</a>
     {% endif %}
   </div>
@@ -149,6 +156,11 @@
   </div>
   {% endif %}
 
+  <div class="enquiry-note">
+    <strong>Safe contact inside MigrantSafe</strong>
+    <p>Use the enquiry form to contact this agent through the platform. Do not share passport copies, bank details, or other sensitive personal documents in your message.</p>
+  </div>
+
   {# ── DETAILS ── #}
   <div class="info-grid">
     <div class="info-card">
@@ -197,8 +209,10 @@
   <div class="actions">
     <a href="{{ url_for('agents') }}" class="btn btn-outline">← Back to Directory</a>
     {% if current_user.is_auth and current_user.role == 'worker' %}
+    <a href="{{ url_for('submit_enquiry') }}?agent_id={{ agent['id'] }}" class="btn btn-primary">Send Enquiry</a>
     <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red">🚨 Report this Agent</a>
     {% elif not current_user.is_auth %}
+    <a href="{{ url_for('login') }}" class="btn btn-outline">Log in to Send Enquiry →</a>
     <a href="{{ url_for('login') }}" class="btn btn-primary">Log in to Report →</a>
     {% endif %}
   </div>
@@ -206,3 +220,4 @@
 </div>
 </body>
 </html>
+
