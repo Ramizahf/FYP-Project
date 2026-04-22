@@ -70,12 +70,6 @@
     .prompt-icon{font-size:.95rem;flex-shrink:0;margin-top:1px}
     .prompt-text{font-size:.78rem;color:rgba(255,255,255,.72);line-height:1.45}
 
-    /* Info pills */
-    .lp-info{margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
-    .info-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.04);margin-bottom:6px}
-    .info-pill-icon{font-size:.8rem}
-    .info-pill-text{font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.4}
-
     /* ── RIGHT PANEL (CHAT) ── */
     .chat-panel{display:flex;flex-direction:column;background:var(--cream);overflow:hidden;min-height:0}
 
@@ -117,7 +111,29 @@
     .wc-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:8px}
     .wc-sub{font-size:.84rem;color:var(--muted);line-height:1.65;margin-bottom:18px}
     .wc-topics{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
-    .wc-topic{background:var(--teal-bg);color:var(--teal);font-size:.73rem;font-weight:600;padding:4px 11px;border-radius:100px;border:1px solid var(--border)}
+    .wc-topic{background:var(--teal-bg);color:var(--teal);font-size:.73rem;font-weight:600;padding:4px 11px;border-radius:100px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+    .wc-topic:hover{background:#d9eeee;border-color:rgba(13,110,110,.22);transform:translateY(-1px)}
+    .msg-copy{margin:0}
+    .msg-copy + .msg-copy,
+    .msg-copy + .doc-table-wrap,
+    .doc-table-wrap + .msg-copy,
+    .doc-table-wrap + .doc-table-wrap{margin-top:12px}
+    .doc-table-wrap{margin-top:0}
+    .doc-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem;line-height:1.55;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fcffff}
+    .doc-table thead th{padding:11px 12px;background:linear-gradient(135deg,rgba(13,110,110,.08),rgba(230,244,244,.9));border-bottom:1px solid var(--border);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left}
+    .doc-table tbody td{padding:12px;border-bottom:1px solid rgba(13,110,110,.08);vertical-align:top;color:var(--text)}
+    .doc-table tbody tr:last-child td{border-bottom:none}
+    .doc-table tbody td:first-child strong{color:var(--dark);font-weight:700}
+    .doc-table tbody td:not(:last-child){border-right:1px solid rgba(13,110,110,.08)}
+    @media(max-width:640px){
+      .doc-table,.doc-table thead,.doc-table tbody,.doc-table tr,.doc-table th,.doc-table td{display:block;width:100%}
+      .doc-table thead{display:none}
+      .doc-table{border:none;background:transparent}
+      .doc-table tbody{display:grid;gap:10px}
+      .doc-table tbody tr{border:1px solid var(--border);border-radius:14px;background:#fcffff;padding:2px 0;overflow:hidden}
+      .doc-table tbody td{border:none!important;padding:9px 12px}
+      .doc-table tbody td::before{content:attr(data-label);display:block;margin-bottom:4px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    }
 
     /* Message bubbles */
     .msg-row{display:flex;align-items:flex-end;gap:10px;animation:msgIn .3s ease both}
@@ -132,6 +148,7 @@
     .user-msg-avatar{background:var(--amber);box-shadow:0 2px 8px rgba(232,131,58,.25)}
     .msg-bubble{max-width:72%;padding:13px 16px;border-radius:16px;font-size:.88rem;line-height:1.65;position:relative}
     .bot-bubble{background:var(--white);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+    .bot-bubble.has-table{max-width:min(820px,86vw);padding:14px}
     .user-bubble{background:var(--teal);border-bottom-right-radius:4px;color:var(--white)}
     .msg-time{font-size:.65rem;color:var(--muted);margin-top:5px;display:block}
     .user-bubble .msg-time{color:rgba(255,255,255,.55);text-align:right}
@@ -253,13 +270,6 @@
         </button>
       </div>
 
-      <!-- Info Pills -->
-      <div class="lp-info">
-        <div class="info-pill"><span class="info-pill-icon">🔒</span><span class="info-pill-text">Your conversations are private and not shared.</span></div>
-        <div class="info-pill"><span class="info-pill-icon">⚡</span><span class="info-pill-text">Powered by Claude AI — responds within seconds.</span></div>
-        <div class="info-pill"><span class="info-pill-icon">🆓</span><span class="info-pill-text">Completely free to use, always.</span></div>
-      </div>
-
     </div>
   </div>
 
@@ -289,12 +299,12 @@
         <div class="wc-title">Hello! I'm your MigrantSafe Assistant.</div>
         <div class="wc-sub">I can help you understand your rights, verify agents, learn about visas and documents, and navigate the recruitment process safely in Malaysia. Ask me anything!</div>
         <div class="wc-topics">
-          <span class="wc-topic">🛡️ Agent Verification</span>
-          <span class="wc-topic">💰 Recruitment Fees</span>
-          <span class="wc-topic">📄 Documents & Visas</span>
-          <span class="wc-topic">⚖️ Worker Rights</span>
-          <span class="wc-topic">🚨 Reporting Fraud</span>
-          <span class="wc-topic">🌏 Multilingual</span>
+          <button type="button" class="wc-topic" onclick="sendTopicReply('agent_verification')">🛡️ Agent Verification</button>
+          <button type="button" class="wc-topic" onclick="sendTopicReply('recruitment_fees')">💰 Recruitment Fees</button>
+          <button type="button" class="wc-topic" onclick="sendTopicReply('documents_visas')">📄 Documents &amp; Visas</button>
+          <button type="button" class="wc-topic" onclick="sendTopicReply('worker_rights')">⚖️ Worker Rights</button>
+          <button type="button" class="wc-topic" onclick="sendTopicReply('reporting_fraud')">🚨 Reporting Fraud</button>
+          <button type="button" class="wc-topic" onclick="sendTopicReply('multilingual')">🌏 Multilingual</button>
         </div>
       </div>
     </div>
@@ -433,6 +443,147 @@ Peraturan:
     }
   };
 
+  const TOPIC_REPLIES = {
+    en: {
+      agent_verification: {
+        label: '🛡️ Agent Verification',
+        reply: 'Check the agent status on MigrantSafe first. Verified means reviewed by admins, pending means still under review, and reported means complaints were filed.'
+      },
+      recruitment_fees: {
+        label: '💰 Recruitment Fees',
+        reply: 'Workers should be very cautious about paying recruitment fees. If an agent asks for large upfront payments, ask for a full written breakdown and report suspicious charges.'
+      },
+      documents_visas: {
+        label: '📄 Documents & Visas',
+        reply: 'Common documents include your passport, work permit and visa-related papers. Always make sure documents are processed through legal channels and keep copies for yourself.'
+      },
+      worker_rights: {
+        label: '⚖️ Worker Rights',
+        reply: 'Migrant workers have rights to fair pay, safe working conditions, and respectful treatment. If something feels abusive or unsafe, get help early and document what happened.'
+      },
+      reporting_fraud: {
+        label: '🚨 Reporting Fraud',
+        reply: 'If you suspect fraud, save any receipts, messages, or promises you received, then use the report flow on MigrantSafe so the admin team can review the case.'
+      },
+      multilingual: {
+        label: '🌏 Multilingual',
+        reply: 'You can ask questions in English, Bahasa Melayu, or Bangla here. If you type in one of those languages, the chatbot will respond in that language.'
+      }
+    },
+    ms: {
+      agent_verification: {
+        label: '🛡️ Semakan Ejen',
+        reply: 'Semak status ejen di MigrantSafe dahulu. Disahkan bermaksud telah disemak admin, pending masih dalam semakan, dan reported bermaksud aduan telah difailkan.'
+      },
+      recruitment_fees: {
+        label: '💰 Yuran Pengambilan',
+        reply: 'Pekerja perlu sangat berhati-hati dengan yuran pengambilan. Jika ejen meminta bayaran pendahuluan yang besar, minta pecahan bertulis penuh dan laporkan caj yang mencurigakan.'
+      },
+      documents_visas: {
+        label: '📄 Dokumen & Visa',
+        reply: 'Dokumen biasa termasuk pasport anda, permit kerja, dan dokumen berkaitan visa. Pastikan semuanya diproses melalui saluran yang sah dan simpan salinan sendiri.'
+      },
+      worker_rights: {
+        label: '⚖️ Hak Pekerja',
+        reply: 'Pekerja migran mempunyai hak untuk gaji yang adil, keadaan kerja yang selamat, dan layanan yang bermaruah. Jika keadaan terasa menindas atau tidak selamat, dapatkan bantuan awal.'
+      },
+      reporting_fraud: {
+        label: '🚨 Lapor Penipuan',
+        reply: 'Jika anda mengesyaki penipuan, simpan resit, mesej, atau janji yang diberi, kemudian gunakan aliran laporan di MigrantSafe supaya pasukan admin boleh menyemak kes itu.'
+      },
+      multilingual: {
+        label: '🌏 Pelbagai Bahasa',
+        reply: 'Anda boleh bertanya dalam English, Bahasa Melayu, atau Bangla di sini. Jika anda menaip dalam salah satu bahasa itu, chatbot akan membalas dalam bahasa tersebut.'
+      }
+    },
+    bn: {
+      agent_verification: {
+        label: '🛡️ এজেন্ট যাচাই',
+        reply: 'আগে MigrantSafe-এ এজেন্টের স্ট্যাটাস দেখুন। Verified মানে অ্যাডমিন যাচাই করেছে, pending মানে এখনো রিভিউ চলছে, আর reported মানে অভিযোগ জমা হয়েছে।'
+      },
+      recruitment_fees: {
+        label: '💰 নিয়োগ ফি',
+        reply: 'নিয়োগ ফি দেওয়ার বিষয়ে শ্রমিকদের খুব সতর্ক থাকতে হবে। কোনো এজেন্ট বড় অগ্রিম টাকা চাইলে লিখিত খরচের তালিকা চান এবং সন্দেহজনক চার্জ রিপোর্ট করুন।'
+      },
+      documents_visas: {
+        label: '📄 কাগজপত্র ও ভিসা',
+        reply: 'সাধারণত আপনার পাসপোর্ট, ওয়ার্ক পারমিট, এবং ভিসা-সংক্রান্ত কাগজপত্র দরকার হয়। সব কিছু বৈধ প্রক্রিয়ায় হচ্ছে কি না দেখুন এবং নিজের কাছে কপি রাখুন।'
+      },
+      worker_rights: {
+        label: '⚖️ শ্রমিকের অধিকার',
+        reply: 'অভিবাসী শ্রমিকদের ন্যায্য বেতন, নিরাপদ কাজের পরিবেশ, এবং সম্মানজনক আচরণের অধিকার আছে। কিছু অন্যায় বা অনিরাপদ মনে হলে দ্রুত সাহায্য চান।'
+      },
+      reporting_fraud: {
+        label: '🚨 প্রতারণা রিপোর্ট',
+        reply: 'প্রতারণার সন্দেহ হলে রসিদ, মেসেজ, বা দেওয়া প্রতিশ্রুতির প্রমাণ রেখে দিন, তারপর MigrantSafe-এর রিপোর্ট ফ্লো ব্যবহার করুন যাতে অ্যাডমিন দল বিষয়টি দেখতে পারে।'
+      },
+      multilingual: {
+        label: '🌏 বহু ভাষা',
+        reply: 'এখানে আপনি English, Bahasa Melayu, বা বাংলা ভাষায় প্রশ্ন করতে পারেন। এই ভাষাগুলোর একটিতে লিখলে চ্যাটবট সেই ভাষায় উত্তর দেবে।'
+      }
+    }
+  };
+
+  const DOCUMENT_TABLES = {
+    en: {
+      headers: ['Document', "Why it's needed", 'How to obtain'],
+      entries: [
+        {
+          match: 'Common documents include your passport, work permit and visa-related papers. Always make sure documents are processed through legal channels and keep copies for yourself.',
+          rows: [
+            ['Passport', 'Common document', 'Processed through legal channels; keep copies for yourself'],
+            ['Work permit', 'Common document', 'Processed through legal channels; keep copies for yourself'],
+            ['Visa-related papers', 'Common document', 'Processed through legal channels; keep copies for yourself']
+          ]
+        },
+        {
+          match: 'To work legally in Malaysia, you usually need a valid passport, VP(TE) work permit processing, FOMEMA medical clearance, and a written employment contract you understand.',
+          rows: [
+            ['Valid passport', 'Needed to work legally in Malaysia', '—'],
+            ['VP(TE) work permit processing', 'Needed to work legally in Malaysia', '—'],
+            ['FOMEMA medical clearance', 'Needed to work legally in Malaysia', '—'],
+            ['Written employment contract you understand', 'Needed to work legally in Malaysia', '—']
+          ]
+        }
+      ]
+    },
+    ms: {
+      headers: ['Dokumen', 'Mengapa diperlukan', 'Cara mendapatkannya'],
+      entries: [
+        {
+          match: 'Dokumen biasa termasuk pasport anda, permit kerja, dan dokumen berkaitan visa. Pastikan semuanya diproses melalui saluran yang sah dan simpan salinan sendiri.',
+          rows: [
+            ['Pasport', 'Dokumen biasa', 'Diproses melalui saluran yang sah; simpan salinan sendiri'],
+            ['Permit kerja', 'Dokumen biasa', 'Diproses melalui saluran yang sah; simpan salinan sendiri'],
+            ['Dokumen berkaitan visa', 'Dokumen biasa', 'Diproses melalui saluran yang sah; simpan salinan sendiri']
+          ]
+        },
+        {
+          match: 'Untuk bekerja secara sah di Malaysia, anda biasanya memerlukan pasport sah, proses permit kerja VP(TE), kelulusan perubatan FOMEMA, dan kontrak kerja bertulis yang anda faham.',
+          rows: [
+            ['Pasport sah', 'Diperlukan untuk bekerja secara sah di Malaysia', '—'],
+            ['Proses permit kerja VP(TE)', 'Diperlukan untuk bekerja secara sah di Malaysia', '—'],
+            ['Kelulusan perubatan FOMEMA', 'Diperlukan untuk bekerja secara sah di Malaysia', '—'],
+            ['Kontrak kerja bertulis yang anda faham', 'Diperlukan untuk bekerja secara sah di Malaysia', '—']
+          ]
+        }
+      ]
+    },
+    bn: {
+      headers: ['ডকুমেন্ট', 'কেন দরকার', 'কীভাবে পাবেন'],
+      variants: [
+        'সাধারণত আপনার পাসপোর্ট, ওয়ার্ক পারমিট, এবং ভিসা-সংক্রান্ত কাগজপত্র দরকার হয়। সব কিছু বৈধ প্রক্রিয়ায় হচ্ছে কি না দেখুন এবং নিজের কাছে কপি রাখুন।',
+        'Malaysia te boidho vabe kaj korte hole shadharonoto valid passport, VP(TE) permit process, FOMEMA medical clearance, ebong bujhte paren emon likhito contract dorkar.'
+      ],
+      rows: [
+        ['Valid passport', 'Malaysia te boidho vabe kaj korte hole dorkar', 'Valid passport rakhun'],
+        ['VP(TE) permit process', 'Malaysia te boidho vabe kaj korte hole dorkar', 'VP(TE) permit process shesh korun'],
+        ['FOMEMA medical clearance', 'Malaysia te boidho vabe kaj korte hole dorkar', 'FOMEMA medical clearance nin'],
+        ['Bujhte paren emon likhito contract', 'Malaysia te boidho vabe kaj korte hole dorkar', 'Bujhte paren emon likhito contract chan']
+      ]
+    }
+  };
+
   function setActiveLanguageButton(lang) {
     const langBtnMap = { en: 0, ms: 1, bn: 2 };
     const btns = document.querySelectorAll('.lang-btn');
@@ -460,6 +611,131 @@ Peraturan:
     return div.innerHTML;
   }
 
+  function formatInlineRichText(text) {
+    return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function formatRichTextBlock(text) {
+    return (text || '')
+      .split('\n')
+      .map((line) => {
+        const headingMatch = line.match(/^\s{0,3}#{1,6}\s+(.+?)\s*$/);
+        if (headingMatch) {
+          return `<strong>${formatInlineRichText(headingMatch[1])}</strong>`;
+        }
+        return formatInlineRichText(line);
+      })
+      .join('<br>');
+  }
+
+  function isMarkdownTableDivider(line) {
+    return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test((line || '').trim());
+  }
+
+  function splitMarkdownTableRow(line) {
+    const trimmed = (line || '').trim().replace(/^\|/, '').replace(/\|$/, '');
+    return trimmed.split('|').map(cell => cell.trim());
+  }
+
+  function buildMarkdownTableHtml(block) {
+    const lines = (block || '')
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    if (lines.length < 3) return null;
+    if (!lines[0].startsWith('|') || !isMarkdownTableDivider(lines[1])) return null;
+
+    const headers = splitMarkdownTableRow(lines[0]);
+    const rows = lines.slice(2)
+      .filter(line => line.startsWith('|'))
+      .map(splitMarkdownTableRow)
+      .filter(cells => cells.some(cell => cell));
+
+    if (!headers.length || !rows.length) return null;
+
+    const rowsHtml = rows.map((cells) => {
+      const normalizedCells = headers.map((_, index) => cells[index] || '');
+      return `
+        <tr>
+          ${normalizedCells.map((cell, index) => `
+            <td data-label="${escapeHtml(headers[index])}">${index === 0 ? `<strong>${formatInlineRichText(cell)}</strong>` : formatInlineRichText(cell)}</td>
+          `).join('')}
+        </tr>
+      `;
+    }).join('');
+
+    return `
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead>
+            <tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('')}</tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function formatBotMessageHtml(text) {
+    const normalized = (text || '').replace(/\r\n/g, '\n').trim();
+    if (!normalized) return '';
+
+    const blocks = normalized.split(/\n{2,}/).map(block => block.trim()).filter(Boolean);
+    return blocks.map((block) => {
+      const markdownTable = buildMarkdownTableHtml(block);
+      if (markdownTable) return markdownTable;
+      return `<div class="msg-copy">${formatRichTextBlock(block)}</div>`;
+    }).join('');
+  }
+
+  function getTopicConfig(topicKey) {
+    return (TOPIC_REPLIES[currentLang] && TOPIC_REPLIES[currentLang][topicKey])
+      || (TOPIC_REPLIES.en && TOPIC_REPLIES.en[topicKey])
+      || null;
+  }
+
+  function getDocumentTableConfig(text) {
+    const normalized = (text || '').trim();
+    for (const config of Object.values(DOCUMENT_TABLES)) {
+      const entry = (config.entries || []).find((item) => item.match === normalized);
+      if (entry) return { headers: config.headers, rows: entry.rows };
+      if ((config.variants || []).includes(normalized)) {
+        return { headers: config.headers, rows: config.rows };
+      }
+    }
+    return null;
+  }
+
+  function buildDocumentTableHtml(text) {
+    const config = getDocumentTableConfig(text);
+    if (!config) return null;
+
+    const [docHeader, whyHeader, howHeader] = config.headers;
+    const rowsHtml = config.rows.map(([document, why, how]) => `
+      <tr>
+        <td data-label="${escapeHtml(docHeader)}"><strong>${escapeHtml(document)}</strong></td>
+        <td data-label="${escapeHtml(whyHeader)}">${escapeHtml(why)}</td>
+        <td data-label="${escapeHtml(howHeader)}">${escapeHtml(how)}</td>
+      </tr>
+    `).join('');
+
+    return `
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>${escapeHtml(docHeader)}</th>
+              <th>${escapeHtml(whyHeader)}</th>
+              <th>${escapeHtml(howHeader)}</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
   function renderWelcomeCard() {
     const msgs = document.getElementById('messages');
     const card = document.createElement('div');
@@ -470,18 +746,24 @@ Peraturan:
       ms: "Saya boleh membantu anda memahami hak anda, mengesahkan ejen, mengetahui tentang visa dan dokumen, serta mengemudi proses pengambilan dengan selamat di Malaysia.",
       bn: "আমি আপনাকে আপনার অধিকার বুঝতে, এজেন্ট যাচাই করতে, ভিসা ও ডকুমেন্ট সম্পর্কে জানতে এবং মালয়েশিয়ায় নিরাপদে কাজ খোঁজার প্রক্রিয়া বুঝতে সাহায্য করতে পারি।"
     };
+    const topicOrder = [
+      'agent_verification',
+      'recruitment_fees',
+      'documents_visas',
+      'worker_rights',
+      'reporting_fraud',
+      'multilingual'
+    ];
+    const topicsHtml = topicOrder.map((topicKey) => {
+      const topic = getTopicConfig(topicKey);
+      if (!topic) return '';
+      return `<button type="button" class="wc-topic" onclick="sendTopicReply('${topicKey}')">${escapeHtml(topic.label)}</button>`;
+    }).join('');
     card.innerHTML = `
       <div class="wc-icon">👋</div>
       <div class="wc-title">Hello! I'm your MigrantSafe Assistant.</div>
       <div class="wc-sub">${subs[currentLang]}</div>
-      <div class="wc-topics">
-        <span class="wc-topic">🛡️ Agent Verification</span>
-        <span class="wc-topic">💰 Recruitment Fees</span>
-        <span class="wc-topic">📄 Documents & Visas</span>
-        <span class="wc-topic">⚖️ Worker Rights</span>
-        <span class="wc-topic">🚨 Reporting Fraud</span>
-        <span class="wc-topic">🌏 Multilingual</span>
-      </div>`;
+      <div class="wc-topics">${topicsHtml}</div>`;
     msgs.appendChild(card);
   }
 
@@ -541,6 +823,20 @@ Peraturan:
   function sendQuick(text) {
     document.getElementById('chatInput').value = text;
     sendMessage();
+  }
+
+  function sendTopicReply(topicKey) {
+    if (isTyping) return;
+
+    const topic = getTopicConfig(topicKey);
+    if (!topic) return;
+
+    const wc = document.getElementById('welcomeCard');
+    if (wc) wc.remove();
+
+    appendMessage('bot', topic.reply);
+    const input = document.getElementById('chatInput');
+    if (input) input.focus();
   }
 
   function handleKey(e) {
@@ -631,11 +927,11 @@ Peraturan:
     const bubble = document.createElement('div');
     bubble.className = `msg-bubble ${role === 'bot' ? 'bot-bubble' : 'user-bubble'}`;
 
-    // Convert markdown-style line breaks and basic bold
-    const formatted = escapeHtml(text)
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>');
+    const formatted = role === 'bot'
+      ? (buildDocumentTableHtml(text) || formatBotMessageHtml(text))
+      : formatRichTextBlock(text)
+          .replace(/(<br>){2,}/g, '<br><br>');
+    if (role === 'bot' && formatted.includes('class="doc-table"')) bubble.classList.add('has-table');
     bubble.innerHTML = formatted + `<span class="msg-time">${now}</span>`;
 
     if (role === 'bot') {

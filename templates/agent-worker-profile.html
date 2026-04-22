@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Worker Profile - MigrantSafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--teal:#0D6E6E;--dark:#0F2027;--text:#2C2C2C;--muted:#6B7B7B;--white:#FFFFFF;--cream:#F9F5F0;--border:#D4E8E8}
+    *,*::before,*::after{box-sizing:border-box}
+    body{margin:0;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text)}
+    .wrap{max-width:860px;margin:0 auto;padding:32px 20px 48px}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+    .title h1{margin:0 0 6px;font-family:'Playfair Display',serif;font-size:2rem;color:var(--dark)}
+    .title p{margin:0;color:var(--muted);line-height:1.6}
+    .back-link{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--white);border:1px solid var(--border);color:var(--dark);text-decoration:none;font-weight:600}
+    .card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .row{padding:12px 0;border-bottom:1px solid var(--border)}
+    .row:last-child{border-bottom:none}
+    .label{display:block;font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+    .value{font-size:.96rem;color:var(--dark);line-height:1.7;white-space:pre-line}
+    @media(max-width:700px){.top{flex-direction:column}.title h1{font-size:1.7rem}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="title">
+        <h1>{{ worker['worker_name'] }}</h1>
+        <p>Simple worker profile for agents.</p>
+      </div>
+      <a class="back-link" href="{{ back_url }}">Back</a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="label">Name</span>
+        <div class="value">{{ worker['worker_name'] }}</div>
+      </div>
+      <div class="row">
+        <span class="label">Desired Job</span>
+        <div class="value">{{ worker['desired_job'] or 'Not provided' }}</div>
+      </div>
+      <div class="row">
+        <span class="label">Preferred Location</span>
+        <div class="value">{{ worker['preferred_location'] or 'Not provided' }}</div>
+      </div>
+      <div class="row">
+        <span class="label">Job Description</span>
+        <div class="value">{{ worker['job_description'] or 'No extra details provided.' }}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

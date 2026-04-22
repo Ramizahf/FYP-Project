@@ -39,7 +39,9 @@
     .page-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);padding:56px 5% 52px;position:relative;overflow:hidden}
     .page-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.2) 0%,transparent 70%)}
     .page-hero::after{content:'';position:absolute;bottom:-60px;left:20%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.1) 0%,transparent 70%)}
-    .ph-inner{position:relative;z-index:2;max-width:700px}
+    .ph-inner{position:relative;z-index:2}
+    .ph-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,380px);gap:32px;align-items:start}
+    .ph-content{max-width:700px}
     .ph-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(232,131,58,.18);border:1px solid rgba(232,131,58,.35);color:var(--amber-lt);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:5px 13px;border-radius:100px;text-transform:uppercase;margin-bottom:18px}
     .ph-dot{width:6px;height:6px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -50,36 +52,42 @@
     .ph-stat{border-left:2px solid rgba(20,160,151,.45);padding-left:14px}
     .ph-stat-num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--white)}
     .ph-stat-lbl{font-size:.72rem;color:rgba(255,255,255,.5);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+    .ph-control-card{background:linear-gradient(135deg,rgba(22,114,108,.88),rgba(37,121,111,.82));border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:28px 30px;box-shadow:0 18px 46px rgba(7,24,31,.18);backdrop-filter:blur(10px)}
+    .ph-control-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,1.2fr);gap:24px;align-items:center}
+    .ph-control-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8);margin:0}
+    .ph-control-select{width:100%;padding:18px 20px;border-radius:22px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.14);color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;outline:none;cursor:pointer}
+    .ph-control-select:focus{border-color:rgba(255,255,255,.38);background:rgba(255,255,255,.18)}
+    .ph-control-select option{color:var(--dark);background:var(--white)}
 
     /* ── STATUS LEGEND STRIP ── */
-    .legend-strip{background:var(--white);border-bottom:1px solid var(--border);padding:14px 5%;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+    .legend-strip{background:linear-gradient(135deg,rgba(232,131,58,.16),rgba(255,179,71,.24));border-bottom:1px solid rgba(232,131,58,.24);padding:14px 5%;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
     .legend-title{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
     .legend-item{display:flex;align-items:center;gap:7px;font-size:.82rem;color:var(--text)}
-    .pill{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:100px;white-space:nowrap}
-    .pv{background:#e6faf0;color:#1a9a55;border:1px solid #b6eace}
-    .pp{background:#fff8e6;color:#b87d00;border:1px solid #fce8a0}
-    .pr{background:#fdecea;color:#c0392b;border:1px solid #f5b9b4}
+    .pill{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:4px 11px;border-radius:100px;white-space:nowrap}
+    .pv{background:#d6f7e5;color:#0d8a49;border:1px solid #78d8a8;box-shadow:inset 0 0 0 1px rgba(13,138,73,.08)}
+    .pp{background:#fff1bf;color:#9a6700;border:1px solid #f2c34b;box-shadow:inset 0 0 0 1px rgba(154,103,0,.08)}
+    .pr{background:#ffd9d4;color:#b42318;border:1px solid #f08a7f;box-shadow:inset 0 0 0 1px rgba(180,35,24,.08)}
 
     /* ── MAIN LAYOUT ── */
     .page-body{display:grid;grid-template-columns:280px 1fr;gap:24px;padding:28px 5% 60px;max-width:1300px;margin:0 auto;align-items:start}
 
     /* ── SIDEBAR FILTERS ── */
-    .filters{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px;position:sticky;top:92px}
-    .filters h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dark);margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
-    .filters h3 button{font-size:.72rem;font-weight:600;color:var(--teal);background:none;border:none;cursor:pointer}
+    .filters{background:var(--teal);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px;position:sticky;top:92px;box-shadow:0 12px 30px rgba(13,110,110,.18)}
+    .filters h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+    .filters h3 button{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.82);background:none;border:none;cursor:pointer}
     .filters h3 button:hover{text-decoration:underline}
     .filter-group{margin-bottom:20px}
-    .filter-group label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
-    .filter-search{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s;background:var(--cream)}
+    .filter-group label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:9px}
+    .filter-search{width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s;background:rgba(255,255,255,.96)}
     .filter-search:focus{border-color:var(--teal);background:var(--white)}
-    .check-item{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-size:.86rem;color:var(--text)}
-    .check-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0}
+    .check-item{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-size:.86rem;color:rgba(255,255,255,.92)}
+    .check-item input[type=checkbox]{width:15px;height:15px;accent-color:#9fe3de;cursor:pointer;flex-shrink:0}
     .check-item span{user-select:none}
-    .check-count{margin-left:auto;font-size:.7rem;background:var(--teal-bg);color:var(--teal);padding:1px 7px;border-radius:100px;font-weight:600}
-    .filter-select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;background:var(--cream);cursor:pointer;transition:border-color .2s}
+    .check-count{margin-left:auto;font-size:.7rem;background:rgba(255,255,255,.16);color:var(--white);padding:1px 7px;border-radius:100px;font-weight:600}
+    .filter-select{width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;background:rgba(255,255,255,.96);cursor:pointer;transition:border-color .2s}
     .filter-select:focus{border-color:var(--teal);background:var(--white)}
-    .apply-btn{width:100%;padding:11px;background:var(--teal);color:var(--white);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .18s,transform .15s;margin-top:4px}
-    .apply-btn:hover{background:var(--mid);transform:translateY(-1px)}
+    .apply-btn{width:100%;padding:11px;background:var(--white);color:var(--teal);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .18s,transform .15s;margin-top:4px}
+    .apply-btn:hover{background:#eefafa;transform:translateY(-1px)}
 
     /* ── RESULTS AREA ── */
     .results-area{min-width:0}
@@ -103,12 +111,18 @@
     .agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
     .agent-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:22px;transition:transform .22s,box-shadow .22s,border-color .22s;cursor:pointer;position:relative;overflow:hidden}
     .agent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);transition:background .2s}
-    .agent-card.card-verified::before{background:linear-gradient(90deg,#1a9a55,#4ddb8a)}
-    .agent-card.card-pending::before{background:linear-gradient(90deg,#b87d00,#ffcc55)}
-    .agent-card.card-reported::before{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+    .agent-card.card-verified::before{background:linear-gradient(90deg,#0d8a49,#46c77d)}
+    .agent-card.card-pending::before{background:linear-gradient(90deg,#b7791f,#f2bf3c)}
+    .agent-card.card-reported::before{background:linear-gradient(90deg,#c2412d,#ef6b5a)}
+    .agent-card.card-verified{box-shadow:0 8px 24px rgba(13,138,73,.08)}
+    .agent-card.card-pending{box-shadow:0 8px 24px rgba(183,121,31,.08)}
+    .agent-card.card-reported{box-shadow:0 8px 24px rgba(194,65,45,.08)}
     .agent-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(13,110,110,.12);border-color:var(--teal)}
     .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
-    .agent-avatar{width:46px;height:46px;border-radius:12px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+    .agent-avatar{width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 4px rgba(13,110,110,.08)}
+    .agent-avatar.status-verified,.arc-avatar.status-verified{background:#17a85d}
+    .agent-avatar.status-pending,.arc-avatar.status-pending{background:#e2a723}
+    .agent-avatar.status-reported,.arc-avatar.status-reported{background:#e45445}
     .card-body{margin-bottom:14px}
     .card-name{font-size:.97rem;font-weight:700;color:var(--dark);margin-bottom:4px;line-height:1.3}
     .card-loc{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:4px;margin-bottom:3px}
@@ -126,7 +140,10 @@
     .agents-list{display:flex;flex-direction:column;gap:10px}
     .agent-row-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:border-color .18s,box-shadow .18s;cursor:pointer}
     .agent-row-card:hover{border-color:var(--teal);box-shadow:0 4px 18px rgba(13,110,110,.09)}
-    .arc-avatar{width:40px;height:40px;border-radius:10px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .agent-row-card.status-verified{border-left:4px solid #17a85d}
+    .agent-row-card.status-pending{border-left:4px solid #e2a723}
+    .agent-row-card.status-reported{border-left:4px solid #e45445}
+    .arc-avatar{width:12px;height:12px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 4px rgba(13,110,110,.08)}
     .arc-info{flex:1;min-width:0}
     .arc-name{font-size:.9rem;font-weight:700;color:var(--dark);margin-bottom:2px}
     .arc-sub{font-size:.75rem;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
@@ -198,10 +215,14 @@
     #toast.error{background:#c0392b}
 
     /* ── LANG TOGGLE ── */
-    .lang-bar{background:var(--teal);padding:11px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px}
-    .lang-pill{padding:5px 15px;border-radius:100px;background:rgba(255,255,255,.15);color:var(--white);font-size:.78rem;font-weight:600;border:1px solid rgba(255,255,255,.2);cursor:pointer;transition:background .2s}
-    .lang-pill:hover{background:rgba(255,255,255,.25)}
-    .lang-pill.active{background:var(--amber);border-color:var(--amber)}
+    .lang-bar{background:var(--teal);padding:11px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+    .lang-label{font-size:.78rem;font-weight:600;color:rgba(255,255,255,.88)}
+    .lang-bar > span{display:none}
+    .lang-pill{display:none}
+    .lang-select-wrap{display:flex;align-items:center;gap:8px}
+    .lang-select{min-width:180px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;outline:none}
+    .lang-select:focus{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.18)}
+    .lang-select option{color:var(--dark);background:var(--white)}
 
     /* ── FOOTER NOTE ── */
     .safety-note{background:linear-gradient(135deg,var(--dark),var(--mid));padding:36px 5%;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:0}
@@ -212,6 +233,9 @@
 
     /* ── RESPONSIVE ── */
     @media(max-width:900px){
+      .ph-layout{grid-template-columns:1fr}
+      .ph-control-card{max-width:460px}
+      .ph-control-row{grid-template-columns:1fr;gap:14px}
       .page-body{grid-template-columns:1fr}
       .filters{position:static;display:none}
       .filters.mob-open{display:block}
@@ -237,35 +261,41 @@
   <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
   <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
   <div class="nav-links">
-    <a href="index.html#how">How It Works</a>
-    <a href="{{ url_for('agents') }}" class="active">Find Agents</a>
-    <a href="{{ url_for('chatbot') }}">Chatbot</a>
+    <a href="index.html#how" id="t-navHow">How It Works</a>
+    <a href="{{ url_for('agents') }}" class="active" id="t-navAgents">Find Agents</a>
+    <a href="{{ url_for('chatbot') }}" id="t-navChatbot">Chatbot</a>
   </div>
   <div class="nav-cta">
-    <a href="{{ url_for('login') }}" class="btn btn-outline">Log In</a>
-    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Free</a>
+    <a href="{{ url_for('login') }}" class="btn btn-outline" id="t-navLogin">Log In</a>
+    <a href="{{ url_for('register') }}" class="btn btn-primary" id="t-navRegister">Register Free</a>
   </div>
 </nav>
-
-<!-- LANG BAR -->
-<div class="lang-bar">
-  <span style="font-size:.75rem;color:rgba(255,255,255,.6);margin-right:4px">🌐</span>
-  <span class="lang-pill active" onclick="setLang('en')">🇬🇧 English</span>
-  <span class="lang-pill" onclick="setLang('ms')">🇲🇾 Melayu</span>
-  <span class="lang-pill" onclick="setLang('bn')">🇧🇩 বাংলা</span>
-</div>
 
 <!-- PAGE HERO -->
 <div class="page-hero">
   <div class="ph-inner">
-    <div class="ph-tag"><span class="ph-dot"></span> <span id="t-tag">Agent Directory</span></div>
-    <h1 class="ph-title"><span id="t-h1a">Find </span><span class="accent" id="t-h1b">Trusted</span><span id="t-h1c"> Recruitment Agents</span></h1>
-    <p class="ph-sub" id="t-sub">Search our database of registered recruitment agencies in Malaysia. Always check an agent's verification status before trusting them with your future.</p>
-    <div class="ph-stats">
-      <div class="ph-stat"><div class="ph-stat-num">{{ stats.total }}</div><div class="ph-stat-lbl">Agents Listed</div></div>
-      <div class="ph-stat"><div class="ph-stat-num">{{ stats.verified }}</div><div class="ph-stat-lbl">Verified</div></div>
-      <div class="ph-stat"><div class="ph-stat-num">{{ stats.pending }}</div><div class="ph-stat-lbl">Pending Review</div></div>
-      <div class="ph-stat"><div class="ph-stat-num">{{ stats.reported }}</div><div class="ph-stat-lbl">Reported</div></div>
+    <div class="ph-layout">
+      <div class="ph-content">
+        <div class="ph-tag"><span class="ph-dot"></span> <span id="t-tag">Agent Directory</span></div>
+        <h1 class="ph-title"><span id="t-h1a">Find </span><span class="accent" id="t-h1b">Trusted</span><span id="t-h1c"> Recruitment Agents</span></h1>
+        <p class="ph-sub" id="t-sub">Search our database of registered recruitment agencies in Malaysia. Always check an agent's verification status before trusting them with your future.</p>
+        <div class="ph-stats">
+          <div class="ph-stat"><div class="ph-stat-num">{{ stats.total }}</div><div class="ph-stat-lbl" id="t-statTotal">Agents Listed</div></div>
+          <div class="ph-stat"><div class="ph-stat-num">{{ stats.verified }}</div><div class="ph-stat-lbl" id="t-statVerified">Verified</div></div>
+          <div class="ph-stat"><div class="ph-stat-num">{{ stats.pending }}</div><div class="ph-stat-lbl" id="t-statPending">Pending Review</div></div>
+          <div class="ph-stat"><div class="ph-stat-num">{{ stats.reported }}</div><div class="ph-stat-lbl" id="t-statReported">Reported</div></div>
+        </div>
+      </div>
+      <div class="ph-control-card">
+        <div class="ph-control-row">
+          <label class="ph-control-label" id="t-langLabel" for="languageSelect">Language</label>
+          <select id="languageSelect" class="ph-control-select" onchange="setLang(this.value)">
+            <option value="en">English</option>
+            <option value="ms">Bahasa Melayu</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -362,18 +392,18 @@
         <div class="agent-card {{ card_class.get(a['verification_status'], '') }} fade-in"
              onclick="openDetail({{ a['id'] }})">
           <div class="card-top">
-            <div class="agent-avatar">{{ status_icon.get(a['verification_status'], '🏢') }}</div>
+            <div class="agent-avatar status-{{ a['verification_status'] or 'pending' }}"></div>
             <span class="pill {{ status_class.get(a['verification_status'], '') }}">
               {{ status_label.get(a['verification_status'], a['verification_status']) }}
             </span>
           </div>
           <div class="card-body">
             <div class="card-name">{{ a['agency_name'] }}</div>
-            <div class="card-loc">📍 {{ a['state'] or 'Malaysia' }}</div>
+            <div class="card-loc">{{ a['state'] or 'Malaysia' }}</div>
             <div class="card-ind">{{ a['industry'] or 'General' }}</div>
           </div>
           <div class="card-meta">
-            <div class="card-phone">📞 {{ a['phone'] or '—' }}</div>
+            <div class="card-phone">{{ a['phone'] or '—' }}</div>
             <div class="card-actions">
               <button class="ca-btn ca-view"
                       onclick="event.stopPropagation();window.location.href='{{ url_for('agent_detail', agent_id=0) }}'.replace('/0','/' + {{ a['id'] }})">View Details</button>
@@ -401,14 +431,14 @@
       {% if agents %}
       <div class="agents-list">
         {% for a in agents %}
-        <div class="agent-row-card fade-in" onclick="openDetail({{ a['id'] }})">
-          <div class="arc-avatar">{{ status_icon.get(a['verification_status'], '🏢') }}</div>
+        <div class="agent-row-card status-{{ a['verification_status'] or 'pending' }} fade-in" onclick="openDetail({{ a['id'] }})">
+          <div class="arc-avatar status-{{ a['verification_status'] or 'pending' }}"></div>
           <div class="arc-info">
             <div class="arc-name">{{ a['agency_name'] }}</div>
             <div class="arc-sub">
-              <span>📍 {{ a['state'] or 'Malaysia' }}</span>
-              <span>🏭 {{ a['industry'] or 'General' }}</span>
-              <span>📞 {{ a['phone'] or '—' }}</span>
+              <span>{{ a['state'] or 'Malaysia' }}</span>
+              <span>{{ a['industry'] or 'General' }}</span>
+              <span>{{ a['phone'] or '—' }}</span>
             </div>
           </div>
           <div class="arc-actions">
@@ -589,19 +619,19 @@
             `<a href="/report?agent_id=${a.id}" class="ca-btn ca-report" onclick="event.stopPropagation()">Report</a>`
           {% else %} '' {% endif %};
           return `
-          <div class="agent-card ${cardClass[s] || ''} fade-in" onclick="openDetail(${a.id})">
-            <div class="card-top">
-              <div class="agent-avatar">${statusIcon[s] || '🏢'}</div>
-              <span class="pill ${statusClass[s] || 'pp'}">${statusLabel[s] || s}</span>
-            </div>
-            <div class="card-body">
-              <div class="card-name">${a.agency_name || '—'}</div>
-              <div class="card-loc">📍 ${a.state || 'Malaysia'}</div>
-              <div class="card-ind">${a.industry || 'General'}</div>
-            </div>
-            <div class="card-meta">
-              <div class="card-phone">📞 ${a.phone || '—'}</div>
-              <div class="card-actions">
+            <div class="agent-card ${cardClass[s] || ''} fade-in" onclick="openDetail(${a.id})">
+              <div class="card-top">
+                <div class="agent-avatar status-${s}"></div>
+                <span class="pill ${statusClass[s] || 'pp'}">${statusLabel[s] || s}</span>
+              </div>
+              <div class="card-body">
+                <div class="card-name">${a.agency_name || '—'}</div>
+                <div class="card-loc">${a.state || 'Malaysia'}</div>
+                <div class="card-ind">${a.industry || 'General'}</div>
+              </div>
+              <div class="card-meta">
+                <div class="card-phone">${a.phone || '—'}</div>
+                <div class="card-actions">
                 <button class="ca-btn ca-view" onclick="event.stopPropagation();openDetail(${a.id})">View Details</button>
                 ${reportBtn}
               </div>
@@ -623,14 +653,14 @@
             `<a href="/report?agent_id=${a.id}" class="ca-btn ca-report" onclick="event.stopPropagation()">Report</a>`
           {% else %} '' {% endif %};
           return `
-          <div class="agent-row-card fade-in" onclick="openDetail(${a.id})">
-            <div class="arc-avatar">${statusIcon[s] || '🏢'}</div>
+          <div class="agent-row-card status-${s} fade-in" onclick="openDetail(${a.id})">
+            <div class="arc-avatar status-${s}"></div>
             <div class="arc-info">
               <div class="arc-name">${a.agency_name || '—'}</div>
               <div class="arc-sub">
-                <span>📍 ${a.state || 'Malaysia'}</span>
-                <span>🏭 ${a.industry || 'General'}</span>
-                <span>📞 ${a.phone || '—'}</span>
+                <span>${a.state || 'Malaysia'}</span>
+                <span>${a.industry || 'General'}</span>
+                <span>${a.phone || '—'}</span>
               </div>
             </div>
             <div class="arc-actions">
@@ -792,6 +822,683 @@
   window.addEventListener('DOMContentLoaded', () => {
     // Stats are now rendered by Jinja2 — nothing to update here
   });
+</script>
+<script>
+  (() => {
+    const AGENTS_URL = '{{ url_for("agents") }}';
+    const LOGIN_URL = '{{ url_for("login") }}';
+    const REPORT_URL = '{{ url_for("submit_report") }}';
+    const ENQUIRY_URL = '{{ url_for("submit_enquiry") }}';
+    const STATUS_CLASS = { verified: 'pv', pending: 'pp', reported: 'pr' };
+    const STATUS_ICON = { verified: '🏢', pending: '⭐', reported: '⚙️' };
+    const CARD_CLASS = { verified: 'card-verified', pending: 'card-pending', reported: 'card-reported' };
+    const MODAL_STATUS_CLASS = { verified: 'msb-v', pending: 'msb-p', reported: 'msb-r' };
+    let currentLang = 'en';
+    let currentView = 'grid';
+    let currentAgentId = null;
+
+    const TRANSLATIONS = {
+      en: {
+        htmlLang: 'en',
+        pageTitle: 'Find Verified Agents - MigrantSafe',
+        langLabel: 'Language',
+        navHow: 'How It Works',
+        navAgents: 'Find Agents',
+        navChatbot: 'Chatbot',
+        navLogin: 'Log In',
+        navRegister: 'Register Free',
+        tag: 'Agent Directory',
+        heroA: 'Find ',
+        heroB: 'Trusted',
+        heroC: ' Recruitment Agents',
+        sub: "Search our database of registered recruitment agencies in Malaysia. Always check an agent's verification status before trusting them with your future.",
+        statTotal: 'Agents Listed',
+        statVerified: 'Verified',
+        statPending: 'Pending Review',
+        statReported: 'Reported',
+        legendTitle: 'Status Guide:',
+        legendPills: ['Verified', 'Pending', 'Reported'],
+        legendDescriptions: [
+          'Admin-approved, safe to trust',
+          'Under admin review, not yet confirmed',
+          'Worker complaints filed - proceed with caution'
+        ],
+        filters: 'Filters',
+        clearAll: 'Clear all',
+        location: 'Location',
+        industry: 'Industry',
+        verificationStatus: 'Verification Status',
+        locations: { 'Kuala Lumpur': 'Kuala Lumpur', 'Selangor': 'Selangor', 'Penang': 'Penang', 'Johor': 'Johor Bahru', 'Sabah': 'Sabah' },
+        industries: { 'Construction': 'Construction', 'Agriculture': 'Agriculture', 'Hospitality': 'Hospitality', 'Manufacturing': 'Manufacturing', 'General': 'General', 'Technology': 'Technology' },
+        statusPills: { verified: 'Verified', pending: 'Pending', reported: 'Reported' },
+        searchPlaceholder: 'Search agents by name, location or industry...',
+        statusOptions: ['All Statuses', 'Verified Only', 'Pending Only', 'Reported Only'],
+        resultsFound: 'agents found',
+        resultsFor: 'for',
+        filterLabel: 'filter',
+        clear: 'Clear',
+        viewTitles: { grid: 'Grid view', list: 'List view' },
+        noResultsTitle: 'No agents found',
+        noResultsFilterText: 'Try adjusting your filters or clearing them.',
+        noResultsSearchHtml: `Try adjusting your search terms or <a href="${AGENTS_URL}">clear all filters</a>.`,
+        viewDetails: 'View Details',
+        report: 'Report',
+        fallbackLocation: 'Malaysia',
+        fallbackIndustry: 'General',
+        noValue: '-',
+        safetyTitle: 'Protect Yourself - Know Before You Trust',
+        safetyText: 'Recruitment fees must always be paid by the employer, NOT by you. If any agent asks you to pay a large upfront fee, they may be acting illegally. Always verify before paying.',
+        safetyBtn: 'Report an Agent ->',
+        modalLabels: ['Agency Details', 'Location', 'Industry', 'Contact', 'Email', 'Registration No.', 'Listed Since', 'About this Agency'],
+        modalSendEnquiry: 'Send Enquiry',
+        modalLoginToSend: 'Log in to Send Enquiry',
+        modalReport: 'Report this Agent',
+        modalClose: 'Close',
+        modalNoDesc: 'No description available.',
+        statusTitles: {
+          verified: 'Verified Agent',
+          pending: 'Pending Verification',
+          reported: 'Reported - Proceed with Caution'
+        },
+        statusDescriptions: {
+          verified: 'This agency has been reviewed and approved by MigrantSafe admins. Always verify all agreements in writing.',
+          pending: 'This agency is currently under admin review. We recommend waiting until verification is complete before making any payments.',
+          reported: 'Worker complaints have been filed against this agency. An admin investigation is active. Do not engage with this agency or make any payments.'
+        },
+        reportModalTitle: 'Report an Agent',
+        reportModalSub: 'Your report is reviewed confidentially by our admin team within 48 hours.',
+        reportLabels: ['Agent / Agency Name *', 'Type of Issue *', 'Describe what happened *', 'Date of Incident'],
+        reportPlaceholder: 'Describe the incident in as much detail as you can...',
+        reportOptions: ['- Select issue type -', 'Charged excessive fees', 'Provided false job information', 'Withheld passport or documents', 'Threatened or harassed worker', 'Did not deliver on promises', 'Arranged fraudulent documents', 'Other'],
+        reportSubmit: 'Submit Report ->',
+        reportCancel: 'Cancel',
+        reportSuccessTitle: 'Report Submitted!',
+        reportSuccessText: "Our admin team will review your report within 48 hours and update the agent's status if needed.",
+        reportSuccessClose: 'Close',
+        onlyWorkers: 'Only registered migrant workers can submit reports.'
+      },
+      ms: {
+        htmlLang: 'ms',
+        pageTitle: 'Cari Ejen Disahkan - MigrantSafe',
+        langLabel: 'Bahasa',
+        navHow: 'Cara Ia Berfungsi',
+        navAgents: 'Cari Ejen',
+        navChatbot: 'Chatbot',
+        navLogin: 'Log Masuk',
+        navRegister: 'Daftar Percuma',
+        tag: 'Direktori Ejen',
+        heroA: 'Cari ',
+        heroB: 'Dipercayai',
+        heroC: ' Ejen Pengambilan',
+        sub: 'Cari dalam pangkalan data kami untuk agensi pengambilan pekerja berdaftar di Malaysia. Sentiasa semak status pengesahan ejen sebelum mempercayai mereka.',
+        statTotal: 'Ejen Tersenarai',
+        statVerified: 'Disahkan',
+        statPending: 'Semakan Tertunda',
+        statReported: 'Dilaporkan',
+        legendTitle: 'Panduan Status:',
+        legendPills: ['Disahkan', 'Tertunda', 'Dilaporkan'],
+        legendDescriptions: [
+          'Diluluskan admin, lebih selamat untuk dipercayai',
+          'Masih dalam semakan admin, belum disahkan',
+          'Aduan pekerja telah difailkan - sila berhati-hati'
+        ],
+        filters: 'Penapis',
+        clearAll: 'Kosongkan semua',
+        location: 'Lokasi',
+        industry: 'Industri',
+        verificationStatus: 'Status Pengesahan',
+        locations: { 'Kuala Lumpur': 'Kuala Lumpur', 'Selangor': 'Selangor', 'Penang': 'Pulau Pinang', 'Johor': 'Johor Bahru', 'Sabah': 'Sabah' },
+        industries: { 'Construction': 'Pembinaan', 'Agriculture': 'Pertanian', 'Hospitality': 'Hospitaliti', 'Manufacturing': 'Pembuatan', 'General': 'Umum', 'Technology': 'Teknologi' },
+        statusPills: { verified: 'Disahkan', pending: 'Tertunda', reported: 'Dilaporkan' },
+        searchPlaceholder: 'Cari ejen mengikut nama, lokasi atau industri...',
+        statusOptions: ['Semua Status', 'Disahkan Sahaja', 'Tertunda Sahaja', 'Dilaporkan Sahaja'],
+        resultsFound: 'ejen ditemui',
+        resultsFor: 'untuk',
+        filterLabel: 'penapis',
+        clear: 'Kosongkan',
+        viewTitles: { grid: 'Paparan grid', list: 'Paparan senarai' },
+        noResultsTitle: 'Tiada ejen ditemui',
+        noResultsFilterText: 'Cuba ubah penapis anda atau kosongkannya.',
+        noResultsSearchHtml: `Cuba ubah carian anda atau <a href="${AGENTS_URL}">kosongkan semua penapis</a>.`,
+        viewDetails: 'Lihat Butiran',
+        report: 'Lapor',
+        fallbackLocation: 'Malaysia',
+        fallbackIndustry: 'Umum',
+        noValue: '-',
+        safetyTitle: 'Lindungi Diri Anda - Tahu Sebelum Percaya',
+        safetyText: 'Yuran pengambilan mesti sentiasa dibayar oleh majikan, BUKAN oleh anda. Jika ada ejen meminta bayaran pendahuluan yang besar, mereka mungkin bertindak secara haram. Sentiasa semak sebelum membayar.',
+        safetyBtn: 'Lapor Ejen ->',
+        modalLabels: ['Butiran Agensi', 'Lokasi', 'Industri', 'Hubungan', 'E-mel', 'No. Pendaftaran', 'Tersenarai Sejak', 'Tentang Agensi Ini'],
+        modalSendEnquiry: 'Hantar Pertanyaan',
+        modalLoginToSend: 'Log masuk untuk hantar pertanyaan',
+        modalReport: 'Lapor ejen ini',
+        modalClose: 'Tutup',
+        modalNoDesc: 'Tiada keterangan tersedia.',
+        statusTitles: {
+          verified: 'Ejen Disahkan',
+          pending: 'Pengesahan Tertunda',
+          reported: 'Dilaporkan - Berhati-hati'
+        },
+        statusDescriptions: {
+          verified: 'Agensi ini telah disemak dan diluluskan oleh admin MigrantSafe. Sentiasa sahkan semua perjanjian secara bertulis.',
+          pending: 'Agensi ini masih dalam semakan admin. Kami syorkan anda tunggu sehingga pengesahan selesai sebelum membuat bayaran.',
+          reported: 'Aduan pekerja telah difailkan terhadap agensi ini. Siasatan admin sedang berjalan. Jangan berurusan atau membuat bayaran kepada agensi ini.'
+        },
+        reportModalTitle: 'Lapor Ejen',
+        reportModalSub: 'Laporan anda akan disemak secara sulit oleh pasukan admin kami dalam masa 48 jam.',
+        reportLabels: ['Nama Ejen / Agensi *', 'Jenis Isu *', 'Terangkan apa yang berlaku *', 'Tarikh Kejadian'],
+        reportPlaceholder: 'Terangkan kejadian dengan seberapa terperinci yang anda boleh...',
+        reportOptions: ['- Pilih jenis isu -', 'Mengenakan yuran berlebihan', 'Memberi maklumat kerja palsu', 'Menahan pasport atau dokumen', 'Mengugut atau mengganggu pekerja', 'Tidak menunaikan janji', 'Mengurus dokumen palsu', 'Lain-lain'],
+        reportSubmit: 'Hantar Laporan ->',
+        reportCancel: 'Batal',
+        reportSuccessTitle: 'Laporan Dihantar!',
+        reportSuccessText: 'Pasukan admin kami akan menyemak laporan anda dalam masa 48 jam dan mengemas kini status ejen jika perlu.',
+        reportSuccessClose: 'Tutup',
+        onlyWorkers: 'Hanya pekerja migran berdaftar boleh menghantar laporan.'
+      },
+      bn: {
+        htmlLang: 'bn',
+        pageTitle: 'বিশ্বস্ত এজেন্ট খুঁজুন - MigrantSafe',
+        langLabel: 'ভাষা',
+        navHow: 'কীভাবে কাজ করে',
+        navAgents: 'এজেন্ট খুঁজুন',
+        navChatbot: 'চ্যাটবট',
+        navLogin: 'লগ ইন',
+        navRegister: 'ফ্রি রেজিস্টার',
+        tag: 'এজেন্ট ডিরেক্টরি',
+        heroA: 'খুঁজুন ',
+        heroB: 'বিশ্বস্ত',
+        heroC: ' রিক্রুটমেন্ট এজেন্ট',
+        sub: 'মালয়েশিয়ার নিবন্ধিত রিক্রুটমেন্ট এজেন্সির ডাটাবেস থেকে খুঁজুন। কোনো এজেন্টকে বিশ্বাস করার আগে তার ভেরিফিকেশন স্ট্যাটাস যাচাই করুন।',
+        statTotal: 'তালিকাভুক্ত এজেন্ট',
+        statVerified: 'ভেরিফায়েড',
+        statPending: 'পর্যালোচনাধীন',
+        statReported: 'রিপোর্টেড',
+        legendTitle: 'স্ট্যাটাস গাইড:',
+        legendPills: ['ভেরিফায়েড', 'পেন্ডিং', 'রিপোর্টেড'],
+        legendDescriptions: [
+          'অ্যাডমিন অনুমোদন করেছে, তাই তুলনামূলকভাবে নিরাপদ',
+          'অ্যাডমিন পর্যালোচনা চলছে, এখনো নিশ্চিত নয়',
+          'কর্মীদের অভিযোগ জমা হয়েছে - সতর্ক থাকুন'
+        ],
+        filters: 'ফিল্টার',
+        clearAll: 'সব মুছুন',
+        location: 'অবস্থান',
+        industry: 'শিল্পখাত',
+        verificationStatus: 'ভেরিফিকেশন স্ট্যাটাস',
+        locations: { 'Kuala Lumpur': 'কুয়ালালামপুর', 'Selangor': 'সেলাঙ্গর', 'Penang': 'পেনাং', 'Johor': 'জোহর বাহরু', 'Sabah': 'সাবাহ' },
+        industries: { 'Construction': 'নির্মাণ', 'Agriculture': 'কৃষি', 'Hospitality': 'হসপিটালিটি', 'Manufacturing': 'উৎপাদন', 'General': 'সাধারণ', 'Technology': 'প্রযুক্তি' },
+        statusPills: { verified: 'ভেরিফায়েড', pending: 'পেন্ডিং', reported: 'রিপোর্টেড' },
+        searchPlaceholder: 'নাম, অবস্থান বা শিল্পখাত দিয়ে এজেন্ট খুঁজুন...',
+        statusOptions: ['সব স্ট্যাটাস', 'শুধু ভেরিফায়েড', 'শুধু পেন্ডিং', 'শুধু রিপোর্টেড'],
+        resultsFound: 'এজেন্ট পাওয়া গেছে',
+        resultsFor: 'জন্য',
+        filterLabel: 'ফিল্টার',
+        clear: 'মুছুন',
+        viewTitles: { grid: 'গ্রিড ভিউ', list: 'লিস্ট ভিউ' },
+        noResultsTitle: 'কোনো এজেন্ট পাওয়া যায়নি',
+        noResultsFilterText: 'ফিল্টার পরিবর্তন করুন বা সব মুছে দিন।',
+        noResultsSearchHtml: `সার্চ পরিবর্তন করুন অথবা <a href="${AGENTS_URL}">সব ফিল্টার মুছে দিন</a>।`,
+        viewDetails: 'বিস্তারিত দেখুন',
+        report: 'রিপোর্ট',
+        fallbackLocation: 'মালয়েশিয়া',
+        fallbackIndustry: 'সাধারণ',
+        noValue: '-',
+        safetyTitle: 'নিজেকে সুরক্ষিত রাখুন - বিশ্বাসের আগে জানুন',
+        safetyText: 'রিক্রুটমেন্ট ফি সব সময় নিয়োগকর্তার দেওয়ার কথা, আপনার নয়। যদি কোনো এজেন্ট বড় অঙ্কের অগ্রিম টাকা চায়, তাহলে তা অবৈধ হতে পারে। টাকা দেওয়ার আগে অবশ্যই যাচাই করুন।',
+        safetyBtn: 'এজেন্ট রিপোর্ট করুন ->',
+        modalLabels: ['এজেন্সির তথ্য', 'অবস্থান', 'শিল্পখাত', 'যোগাযোগ', 'ইমেইল', 'রেজিস্ট্রেশন নম্বর', 'তালিকাভুক্তির তারিখ', 'এই এজেন্সি সম্পর্কে'],
+        modalSendEnquiry: 'জিজ্ঞাসা পাঠান',
+        modalLoginToSend: 'জিজ্ঞাসা পাঠাতে লগ ইন করুন',
+        modalReport: 'এই এজেন্টকে রিপোর্ট করুন',
+        modalClose: 'বন্ধ করুন',
+        modalNoDesc: 'কোনো বর্ণনা নেই।',
+        statusTitles: {
+          verified: 'ভেরিফায়েড এজেন্ট',
+          pending: 'ভেরিফিকেশন পেন্ডিং',
+          reported: 'রিপোর্টেড - সতর্ক থাকুন'
+        },
+        statusDescriptions: {
+          verified: 'এই এজেন্সিকে MigrantSafe অ্যাডমিন পর্যালোচনা করে অনুমোদন করেছে। সব চুক্তি লিখিতভাবে নিশ্চিত করুন।',
+          pending: 'এই এজেন্সিটি এখন অ্যাডমিন পর্যালোচনার মধ্যে আছে। ভেরিফিকেশন শেষ না হওয়া পর্যন্ত টাকা না দেওয়াই ভালো।',
+          reported: 'এই এজেন্সির বিরুদ্ধে কর্মীদের অভিযোগ জমা হয়েছে। অ্যাডমিন তদন্ত চলছে। এই এজেন্সির সঙ্গে লেনদেন বা টাকা দেবেন না।'
+        },
+        reportModalTitle: 'এজেন্ট রিপোর্ট করুন',
+        reportModalSub: 'আপনার রিপোর্ট আমাদের অ্যাডমিন টিম ৪৮ ঘণ্টার মধ্যে গোপনীয়ভাবে পর্যালোচনা করবে।',
+        reportLabels: ['এজেন্ট / এজেন্সির নাম *', 'সমস্যার ধরন *', 'কি ঘটেছে লিখুন *', 'ঘটনার তারিখ'],
+        reportPlaceholder: 'ঘটনাটি যতটা সম্ভব বিস্তারিত লিখুন...',
+        reportOptions: ['- সমস্যার ধরন নির্বাচন করুন -', 'অতিরিক্ত ফি নিয়েছে', 'ভুল চাকরির তথ্য দিয়েছে', 'পাসপোর্ট বা কাগজপত্র আটকে রেখেছে', 'হুমকি দিয়েছে বা হয়রানি করেছে', 'প্রতিশ্রুতি অনুযায়ী কাজ করেনি', 'জাল কাগজপত্রের ব্যবস্থা করেছে', 'অন্যান্য'],
+        reportSubmit: 'রিপোর্ট জমা দিন ->',
+        reportCancel: 'বাতিল',
+        reportSuccessTitle: 'রিপোর্ট জমা হয়েছে!',
+        reportSuccessText: 'আমাদের অ্যাডমিন টিম ৪৮ ঘণ্টার মধ্যে আপনার রিপোর্ট পর্যালোচনা করে প্রয়োজন হলে এজেন্টের স্ট্যাটাস আপডেট করবে।',
+        reportSuccessClose: 'বন্ধ করুন',
+        onlyWorkers: 'শুধু নিবন্ধিত অভিবাসী কর্মীরাই রিপোর্ট জমা দিতে পারেন।'
+      }
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getText() {
+      return TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+    }
+
+    function getStatusLabel(status) {
+      return getText().statusPills[status] || status;
+    }
+
+    function setLabelTextWithCount(container, label) {
+      if (!container) return;
+      const count = container.querySelector('.check-count');
+      if (!count) {
+        container.textContent = label;
+        return;
+      }
+      Array.from(container.childNodes).forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE) container.removeChild(node);
+      });
+      container.insertBefore(document.createTextNode(label), container.firstChild);
+    }
+
+    function updateFilterOptions() {
+      const cfg = getText();
+      const groups = document.querySelectorAll('.filter-group');
+
+      if (groups[0]) {
+        groups[0].querySelectorAll('.check-item').forEach((item) => {
+          const input = item.querySelector('input');
+          const label = item.querySelector('span');
+          if (input && label) setLabelTextWithCount(label, cfg.locations[input.value] || input.value);
+        });
+      }
+
+      if (groups[1]) {
+        groups[1].querySelectorAll('.check-item').forEach((item) => {
+          const input = item.querySelector('input');
+          const label = item.querySelector('span');
+          if (input && label) setLabelTextWithCount(label, cfg.industries[input.value] || input.value);
+        });
+      }
+
+      if (groups[2]) {
+        groups[2].querySelectorAll('.check-item').forEach((item) => {
+          const input = item.querySelector('input');
+          const label = item.querySelector('span');
+          if (input && label) label.textContent = getStatusLabel(input.value);
+        });
+      }
+    }
+
+    function updateResultsCount(count) {
+      const cfg = getText();
+      const q = (document.getElementById('searchInput')?.value || '').trim();
+      const status = document.querySelector('.sort-select')?.value || '';
+      const resultsEl = document.querySelector('.results-count');
+      if (!resultsEl) return;
+
+      let html = `<strong>${count}</strong> ${escapeHtml(cfg.resultsFound)}`;
+      if (q) html += ` ${escapeHtml(cfg.resultsFor)} "<em>${escapeHtml(q)}</em>"`;
+      if (status) html += ` · ${escapeHtml(cfg.filterLabel)}: <em>${escapeHtml(getStatusLabel(status))}</em>`;
+      if (q || status) html += ` <a href="${AGENTS_URL}" style="margin-left:8px;color:var(--teal);font-size:.78rem;">${escapeHtml(cfg.clear)}</a>`;
+      resultsEl.innerHTML = html;
+    }
+
+    function populateReportSelect() {
+      const cfg = getText();
+      const select = document.getElementById('rType');
+      if (!select) return;
+      select.innerHTML = cfg.reportOptions.map((option, index) => {
+        const value = index === 0 ? '' : option;
+        return `<option value="${escapeHtml(value)}">${escapeHtml(option)}</option>`;
+      }).join('');
+    }
+
+    function applyStaticTranslations() {
+      const cfg = getText();
+      document.documentElement.lang = cfg.htmlLang;
+      document.title = cfg.pageTitle;
+      const select = document.getElementById('languageSelect');
+      if (select) select.value = currentLang;
+
+      const navLinks = document.querySelectorAll('.nav-cta a');
+      if (navLinks[0]) navLinks[0].textContent = cfg.navLogin;
+      if (navLinks[1]) navLinks[1].textContent = cfg.navRegister;
+      const navHow = document.getElementById('t-navHow');
+      const navAgents = document.getElementById('t-navAgents');
+      const navChatbot = document.getElementById('t-navChatbot');
+      if (navHow) navHow.textContent = cfg.navHow;
+      if (navAgents) navAgents.textContent = cfg.navAgents;
+      if (navChatbot) navChatbot.textContent = cfg.navChatbot;
+
+      const textMap = {
+        't-langLabel': cfg.langLabel,
+        't-tag': cfg.tag,
+        't-h1a': cfg.heroA,
+        't-h1b': cfg.heroB,
+        't-h1c': cfg.heroC,
+        't-sub': cfg.sub,
+        't-statTotal': cfg.statTotal,
+        't-statVerified': cfg.statVerified,
+        't-statPending': cfg.statPending,
+        't-statReported': cfg.statReported,
+        't-legend': cfg.legendTitle,
+        't-lv': cfg.legendDescriptions[0],
+        't-lp': cfg.legendDescriptions[1],
+        't-lr': cfg.legendDescriptions[2],
+        't-fil': cfg.filters,
+        't-clear': cfg.clearAll,
+        't-floc': cfg.location,
+        't-find': cfg.industry,
+        't-fstat': cfg.verificationStatus,
+        't-snt': cfg.safetyTitle,
+        't-sns': cfg.safetyText,
+        't-snbtn': cfg.safetyBtn,
+        't-minfo': cfg.modalLabels[0],
+        't-mclose': cfg.modalClose,
+        't-mdesc': cfg.modalLabels[7],
+        't-rmod': cfg.reportModalTitle,
+        't-rmodsub': cfg.reportModalSub,
+        't-rl1': cfg.reportLabels[0],
+        't-rl2': cfg.reportLabels[1],
+        't-rl3': cfg.reportLabels[2],
+        't-rl4': cfg.reportLabels[3],
+        't-rsub': cfg.reportSubmit,
+        't-rcan': cfg.reportCancel,
+        't-rsuc': cfg.reportSuccessTitle,
+        't-rsucp': cfg.reportSuccessText
+      };
+
+      Object.entries(textMap).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      });
+
+      const legendPills = document.querySelectorAll('.legend-strip .pill');
+      legendPills.forEach((pill, index) => {
+        if (cfg.legendPills[index]) pill.textContent = cfg.legendPills[index];
+      });
+
+      const sortOptions = document.querySelectorAll('.sort-select option');
+      sortOptions.forEach((option, index) => {
+        if (cfg.statusOptions[index]) option.textContent = cfg.statusOptions[index];
+      });
+
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.placeholder = cfg.searchPlaceholder;
+
+      const infoLabels = document.querySelectorAll('.info-row .ir-lbl');
+      for (let i = 0; i < infoLabels.length; i += 1) {
+        if (cfg.modalLabels[i + 1]) infoLabels[i].textContent = cfg.modalLabels[i + 1];
+      }
+
+      const descBox = document.getElementById('mDesc');
+      if (descBox && !descBox.textContent.trim()) descBox.textContent = cfg.modalNoDesc;
+
+      const detailReportBtn = document.querySelector('#detailModal .btn-full-red');
+      if (detailReportBtn) detailReportBtn.textContent = cfg.modalReport;
+      const detailEnquiryBtn = document.getElementById('mEnquiryBtn');
+      if (detailEnquiryBtn && detailEnquiryBtn.style.display !== 'none') detailEnquiryBtn.textContent = cfg.modalSendEnquiry;
+
+      const reportDesc = document.getElementById('rDesc');
+      if (reportDesc) reportDesc.placeholder = cfg.reportPlaceholder;
+
+      const successCloseBtn = document.querySelector('#rSuccess .btn-full-teal');
+      if (successCloseBtn) successCloseBtn.textContent = cfg.reportSuccessClose;
+
+      document.getElementById('btnGrid')?.setAttribute('title', cfg.viewTitles.grid);
+      document.getElementById('btnList')?.setAttribute('title', cfg.viewTitles.list);
+
+      updateFilterOptions();
+      populateReportSelect();
+      updateResultsCount(document.querySelectorAll('#viewGrid .agent-card').length || AGENTS_DATA.length);
+
+      document.querySelectorAll('.ca-view').forEach((btn) => { btn.textContent = cfg.viewDetails; });
+      document.querySelectorAll('.ca-report').forEach((btn) => { btn.textContent = cfg.report; });
+      document.querySelectorAll('.agent-card .pill, .agent-row-card .pill').forEach((pill) => {
+        if (pill.classList.contains('pv')) pill.textContent = cfg.statusPills.verified;
+        if (pill.classList.contains('pp')) pill.textContent = cfg.statusPills.pending;
+        if (pill.classList.contains('pr')) pill.textContent = cfg.statusPills.reported;
+      });
+      document.querySelectorAll('.no-results').forEach((block) => {
+        const title = block.querySelector('h3');
+        const body = block.querySelector('p');
+        if (title) title.textContent = cfg.noResultsTitle;
+        if (body) {
+          body.innerHTML = body.innerHTML.includes('href=') ? cfg.noResultsSearchHtml : escapeHtml(cfg.noResultsFilterText);
+        }
+      });
+
+      if (currentAgentId !== null && document.getElementById('detailModal')?.classList.contains('open')) {
+        window.openDetail(currentAgentId);
+      }
+    }
+
+    function renderFilteredCards(list) {
+      const cfg = getText();
+      const grid = document.getElementById('viewGrid');
+      const listView = document.getElementById('viewList');
+
+      if (grid) {
+        grid.innerHTML = list.length ? `<div class="agents-grid">${list.map((agent) => {
+          const status = agent.verification_status || 'pending';
+          const reportBtn = {% if current_user.is_auth and current_user.role == 'worker' %}
+            `<a href="${REPORT_URL}?agent_id=${agent.id}" class="ca-btn ca-report" onclick="event.stopPropagation()">${escapeHtml(cfg.report)}</a>`
+          {% else %} '' {% endif %};
+          return `
+            <div class="agent-card ${CARD_CLASS[status] || ''} fade-in" onclick="openDetail(${agent.id})">
+              <div class="card-top">
+                <div class="agent-avatar status-${status}"></div>
+                <span class="pill ${STATUS_CLASS[status] || 'pp'}">${escapeHtml(getStatusLabel(status))}</span>
+              </div>
+              <div class="card-body">
+                <div class="card-name">${escapeHtml(agent.agency_name || cfg.noValue)}</div>
+                <div class="card-loc">${escapeHtml(agent.state || cfg.fallbackLocation)}</div>
+                <div class="card-ind">${escapeHtml(agent.industry || cfg.fallbackIndustry)}</div>
+              </div>
+              <div class="card-meta">
+                <div class="card-phone">${escapeHtml(agent.phone || cfg.noValue)}</div>
+                <div class="card-actions">
+                  <button class="ca-btn ca-view" onclick="event.stopPropagation();openDetail(${agent.id})">${escapeHtml(cfg.viewDetails)}</button>
+                  ${reportBtn}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}</div>` : `<div class="no-results"><div class="nr-icon">🔍</div><h3>${escapeHtml(cfg.noResultsTitle)}</h3><p>${escapeHtml(cfg.noResultsFilterText)}</p></div>`;
+      }
+
+      if (listView) {
+        listView.innerHTML = list.length ? `<div class="agents-list">${list.map((agent) => {
+          const status = agent.verification_status || 'pending';
+          const reportBtn = {% if current_user.is_auth and current_user.role == 'worker' %}
+            `<a href="${REPORT_URL}?agent_id=${agent.id}" class="ca-btn ca-report" onclick="event.stopPropagation()">${escapeHtml(cfg.report)}</a>`
+          {% else %} '' {% endif %};
+          return `
+            <div class="agent-row-card status-${status} fade-in" onclick="openDetail(${agent.id})">
+              <div class="arc-avatar status-${status}"></div>
+              <div class="arc-info">
+                <div class="arc-name">${escapeHtml(agent.agency_name || cfg.noValue)}</div>
+                <div class="arc-sub">
+                  <span>${escapeHtml(agent.state || cfg.fallbackLocation)}</span>
+                  <span>${escapeHtml(agent.industry || cfg.fallbackIndustry)}</span>
+                  <span>${escapeHtml(agent.phone || cfg.noValue)}</span>
+                </div>
+              </div>
+              <div class="arc-actions">
+                <span class="pill ${STATUS_CLASS[status] || 'pp'}">${escapeHtml(getStatusLabel(status))}</span>
+                <button class="ca-btn ca-view" onclick="event.stopPropagation();openDetail(${agent.id})">${escapeHtml(cfg.viewDetails)}</button>
+                ${reportBtn}
+              </div>
+            </div>`;
+        }).join('')}</div>` : `<div class="no-results"><div class="nr-icon">🔍</div><h3>${escapeHtml(cfg.noResultsTitle)}</h3><p>${escapeHtml(cfg.noResultsFilterText)}</p></div>`;
+      }
+
+      setView(currentView);
+      updateResultsCount(list.length);
+    }
+
+    window.applyFilters = function applyFilters() {
+      const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const checked = [...document.querySelectorAll('.filter-group input[type=checkbox]:checked')];
+      const locs = checked.filter((item) => ['Kuala Lumpur', 'Selangor', 'Penang', 'Johor', 'Sabah'].includes(item.value)).map((item) => item.value);
+      const inds = checked.filter((item) => ['Construction', 'Agriculture', 'Hospitality', 'Manufacturing', 'General', 'Technology'].includes(item.value)).map((item) => item.value);
+      const stats = checked.filter((item) => ['verified', 'pending', 'reported'].includes(item.value)).map((item) => item.value);
+
+      const filtered = AGENTS_DATA.filter((agent) => {
+        const name = (agent.agency_name || '').toLowerCase();
+        const state = (agent.state || '').toLowerCase();
+        const industry = (agent.industry || '').toLowerCase();
+        const status = agent.verification_status || '';
+        if (q && !name.includes(q) && !state.includes(q) && !industry.includes(q)) return false;
+        if (locs.length && !locs.includes(agent.state)) return false;
+        if (inds.length && !inds.includes(agent.industry)) return false;
+        if (stats.length && !stats.includes(status)) return false;
+        return true;
+      });
+
+      renderFilteredCards(filtered);
+    };
+
+    window.clearFilters = function clearFilters() {
+      document.querySelectorAll('.filter-group input[type=checkbox]').forEach((checkbox) => { checkbox.checked = false; });
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.value = '';
+      renderFilteredCards(AGENTS_DATA);
+    };
+
+    window.setView = function setView(view) {
+      currentView = view;
+      document.getElementById('viewGrid').style.display = view === 'grid' ? '' : 'none';
+      document.getElementById('viewList').style.display = view === 'list' ? '' : 'none';
+      document.getElementById('btnGrid').classList.toggle('active', view === 'grid');
+      document.getElementById('btnList').classList.toggle('active', view === 'list');
+    };
+
+    window.openDetail = function openDetail(id) {
+      const cfg = getText();
+      const agent = AGENTS_DATA.find((item) => item.id === id || item.id === Number(id));
+      if (!agent) return;
+      currentAgentId = agent.id;
+
+      const status = agent.verification_status || 'pending';
+      document.getElementById('mAvatar').textContent = STATUS_ICON[status] || STATUS_ICON.pending;
+      document.getElementById('mName').textContent = agent.agency_name || cfg.noValue;
+      const pill = document.getElementById('mPill');
+      pill.className = `pill ${STATUS_CLASS[status] || 'pp'}`;
+      pill.textContent = getStatusLabel(status);
+
+      const statusBlock = document.getElementById('mStatusBlock');
+      statusBlock.className = `modal-status-block ${MODAL_STATUS_CLASS[status] || 'msb-p'}`;
+      document.getElementById('mStatusTitle').textContent = cfg.statusTitles[status] || status;
+      document.getElementById('mStatusSub').textContent = cfg.statusDescriptions[status] || '';
+
+      document.getElementById('mLoc').textContent = `📍 ${agent.state || cfg.fallbackLocation}`;
+      document.getElementById('mInd').textContent = agent.industry || cfg.fallbackIndustry;
+      document.getElementById('mPhone').textContent = agent.phone || cfg.noValue;
+      document.getElementById('mEmail').textContent = agent.email || cfg.noValue;
+      document.getElementById('mReg').textContent = agent.license_number || cfg.noValue;
+      document.getElementById('mSince').textContent = agent.created_at ? agent.created_at.slice(0, 10) : cfg.noValue;
+      document.getElementById('mDesc').textContent = agent.description || cfg.modalNoDesc;
+
+      const enquiryBtn = document.getElementById('mEnquiryBtn');
+      {% if current_user.is_auth and current_user.role == 'worker' %}
+      enquiryBtn.style.display = '';
+      enquiryBtn.textContent = cfg.modalSendEnquiry;
+      enquiryBtn.onclick = () => {
+        closeDetailModal();
+        window.location.href = `${ENQUIRY_URL}?agent_id=${agent.id}`;
+      };
+      {% elif current_user.is_auth %}
+      enquiryBtn.style.display = 'none';
+      {% else %}
+      enquiryBtn.style.display = '';
+      enquiryBtn.textContent = cfg.modalLoginToSend;
+      enquiryBtn.onclick = () => {
+        closeDetailModal();
+        window.location.href = LOGIN_URL;
+      };
+      {% endif %}
+
+      const reportBtn = document.querySelector('#detailModal .btn-full-red');
+      {% if current_user.is_auth and current_user.role == 'worker' %}
+      reportBtn.style.display = '';
+      reportBtn.textContent = cfg.modalReport;
+      reportBtn.onclick = () => {
+        closeDetailModal();
+        window.location.href = `${REPORT_URL}?agent_id=${agent.id}`;
+      };
+      {% else %}
+      reportBtn.style.display = 'none';
+      {% endif %}
+
+      document.getElementById('detailModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeDetailModal = function closeDetailModal() {
+      document.getElementById('detailModal').classList.remove('open');
+      document.body.style.overflow = '';
+      currentAgentId = null;
+    };
+
+    window.closeModal = function closeModal(event) {
+      if (event.target === document.getElementById('detailModal')) window.closeDetailModal();
+    };
+
+    window.openReport = function openReport(id) {
+      window.location.href = `${REPORT_URL}?agent_id=${id}`;
+    };
+
+    window.closeReportModal = function closeReportModal(event) {
+      if (!event || event.target === document.getElementById('reportModal')) {
+        document.getElementById('reportModal').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    };
+
+    window.submitReport = function submitReport() {
+      window.closeReportModal();
+    };
+
+    window.goReport = function goReport() {
+      const cfg = getText();
+      {% if current_user.is_auth and current_user.role == 'worker' %}
+      window.location.href = REPORT_URL;
+      {% elif current_user.is_auth %}
+      alert(cfg.onlyWorkers);
+      {% else %}
+      window.location.href = LOGIN_URL;
+      {% endif %}
+    };
+
+    window.setLang = function setLang(lang) {
+      currentLang = TRANSLATIONS[lang] ? lang : 'en';
+      try {
+        localStorage.setItem('agentsPageLang', currentLang);
+      } catch (error) {
+        // Ignore storage issues.
+      }
+      applyStaticTranslations();
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        currentLang = localStorage.getItem('agentsPageLang') || 'en';
+      } catch (error) {
+        currentLang = 'en';
+      }
+      if (!TRANSLATIONS[currentLang]) currentLang = 'en';
+      applyStaticTranslations();
+      window.setView('grid');
+      updateResultsCount({{ agents|length }});
+    });
+  })();
 </script>
 </body>
 </html>

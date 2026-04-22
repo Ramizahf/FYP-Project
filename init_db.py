@@ -121,7 +121,17 @@ CREATE TABLE IF NOT EXISTS job_listings (
     job_title   TEXT    NOT NULL,
     location    TEXT    NOT NULL,
     description TEXT    NOT NULL,
+    status      TEXT    NOT NULL DEFAULT 'live',
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+"""
+
+CREATE_JOB_INTERESTS = """
+CREATE TABLE IF NOT EXISTS job_interests (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    worker_id  INTEGER NOT NULL REFERENCES users(id),
+    job_id     INTEGER NOT NULL REFERENCES job_listings(id),
+    created_at TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 """
 
@@ -223,6 +233,7 @@ def init_db():
     cur.execute(CREATE_ENQUIRIES)
     cur.execute(CREATE_WORKER_JOB_PREFERENCES)
     cur.execute(CREATE_JOB_LISTINGS)
+    cur.execute(CREATE_JOB_INTERESTS)
     conn.commit()
     print("  ✓ Tables created.")
 
@@ -281,6 +292,10 @@ def init_db():
     if 'google_sub' not in existing_cols:
         cur.execute("ALTER TABLE users ADD COLUMN google_sub TEXT")
         print("  OK Migration: added 'google_sub' column to users table.")
+    job_listing_cols = [row[1] for row in cur.execute("PRAGMA table_info(job_listings)").fetchall()]
+    if 'status' not in job_listing_cols:
+        cur.execute("ALTER TABLE job_listings ADD COLUMN status TEXT NOT NULL DEFAULT 'live'")
+        print("  OK Migration: added 'status' column to job_listings table.")
     cur.execute("UPDATE users SET email = lower(trim(email)) WHERE email IS NOT NULL")
     cur.execute("""
         UPDATE users
@@ -328,6 +343,10 @@ def init_db():
     cur.execute(
         "CREATE INDEX IF NOT EXISTS idx_job_listings_agent_id_created_at "
         "ON job_listings(agent_id, created_at DESC)"
+    )
+    cur.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_job_interests_worker_job "
+        "ON job_interests(worker_id, job_id)"
     )
 
     legacy_chatbot_logs = cur.execute(

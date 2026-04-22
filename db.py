@@ -106,7 +106,21 @@ def ensure_database_schema():
                 job_title   TEXT    NOT NULL,
                 location    TEXT    NOT NULL,
                 description TEXT    NOT NULL,
+                status      TEXT    NOT NULL DEFAULT 'live',
                 created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+            )
+        """)
+        job_listing_cols = {
+            row[1] for row in cur.execute("PRAGMA table_info(job_listings)").fetchall()
+        }
+        if 'status' not in job_listing_cols:
+            cur.execute("ALTER TABLE job_listings ADD COLUMN status TEXT NOT NULL DEFAULT 'live'")
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS job_interests (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                worker_id  INTEGER NOT NULL REFERENCES users(id),
+                job_id     INTEGER NOT NULL REFERENCES job_listings(id),
+                created_at TEXT    NOT NULL DEFAULT (datetime('now'))
             )
         """)
         cur.execute(
@@ -116,6 +130,10 @@ def ensure_database_schema():
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_job_listings_agent_id_created_at "
             "ON job_listings(agent_id, created_at DESC)"
+        )
+        cur.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_job_interests_worker_job "
+            "ON job_interests(worker_id, job_id)"
         )
 
         legacy_chatbot_logs = cur.execute(

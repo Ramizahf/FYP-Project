@@ -29,16 +29,10 @@
     .sb-logout{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.8rem;display:block;text-align:center;text-decoration:none;transition:all .18s}
     .sb-logout:hover{background:rgba(255,255,255,.09);color:var(--white)}
     .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column}
-    .lang-bar{background:#2E1E3A;padding:10px 32px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-    .lang-bar .lbl{font-size:.72rem;color:rgba(255,255,255,.6);font-weight:600}
-    .lang-pill{padding:4px 13px;border-radius:100px;background:rgba(255,255,255,.1);color:var(--white);font-size:.74rem;font-weight:600;border:1px solid rgba(255,255,255,.15);cursor:pointer;transition:background .2s}
-    .lang-pill:hover{background:rgba(255,255,255,.2)}
-    .lang-pill.active{background:#8B5CF6;border-color:#8B5CF6}
-    .topbar{position:sticky;top:0;z-index:100;background:rgba(249,245,240,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
-    .topbar h1{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark)}
-    .topbar p{font-size:.76rem;color:var(--muted);margin-top:1px}
-    .notif{width:34px;height:34px;border-radius:8px;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;position:relative}
-    .notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+    .sb-lang{margin:12px 14px 4px;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+    .sb-lang label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+    .sb-lang-select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
+    .sb-lang-select option{color:var(--text);background:var(--white)}
     .content{padding:28px 32px;flex:1}
     .page{display:none}.page.active{display:block}
     .banner{background:linear-gradient(130deg,#1a0f2e 0%,#2E1E3A 60%,#2a1a4a 100%);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;overflow:hidden}
@@ -96,6 +90,14 @@
 
 <aside class="sidebar">
   <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
+  <div class="sb-lang">
+    <label for="sidebarLangSelect" data-t="lang_label">Language</label>
+    <select id="sidebarLangSelect" class="sb-lang-select" onchange="setLang(this.value)">
+      <option value="en">English</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="bn">বাংলা</option>
+    </select>
+  </div>
   <div class="sb-section" data-t="sb_mgmt">Management</div>
   <button class="sb-item active" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_overview">Overview</span></button>
   <button class="sb-item" onclick="go('agents',this)">
@@ -123,19 +125,6 @@
 </aside>
 
 <main class="main">
-  <div class="lang-bar">
-    <span class="lbl">🌐</span>
-    <span class="lang-pill active" onclick="setLang('en',this)">🇬🇧 English</span>
-    <span class="lang-pill" onclick="setLang('ms',this)">🇲🇾 Melayu</span>
-    <span class="lang-pill" onclick="setLang('bn',this)">🇧🇩 বাংলা</span>
-  </div>
-
-  <div class="topbar">
-    <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Toggle sidebar">&#9776;</button>
-    <div><h1 id="tbTitle" data-t="page_home">Overview</h1><p>Hello, {{ current_user.name or 'Admin' }} 👋</p></div>
-    <div class="notif">🔔<span class="notif-dot"></span></div>
-  </div>
-
   <div class="content">
 
     <!-- HOME -->
@@ -292,6 +281,7 @@
 // (admin role requires English literacy for operational accuracy)
 const T = {
   en: {
+    lang_label:'Language',
     sb_mgmt:'Management', sb_overview:'Overview', sb_agents:'Manage Agents',
     sb_reports:'Reports Queue', sb_users:'Manage Users', sb_system:'System',
     sb_settings:'Settings', sb_back:'Back to Homepage',
@@ -314,6 +304,7 @@ const T = {
     lbl_email:'Email', lbl_role:'Role', lbl_access:'Access Level', lbl_full_access:'Full Platform Access',
   },
   ms: {
+    lang_label:'Bahasa',
     sb_mgmt:'Pengurusan', sb_overview:'Gambaran Keseluruhan', sb_agents:'Urus Ejen',
     sb_reports:'Baris Gilir Laporan', sb_users:'Urus Pengguna', sb_system:'Sistem',
     sb_settings:'Tetapan', sb_back:'Kembali ke Laman Utama',
@@ -336,6 +327,7 @@ const T = {
     lbl_email:'E-mel', lbl_role:'Peranan', lbl_access:'Tahap Akses', lbl_full_access:'Akses Platform Penuh',
   },
   bn: {
+    lang_label:'ভাষা',
     sb_mgmt:'ব্যবস্থাপনা', sb_overview:'সংক্ষিপ্ত বিবরণ', sb_agents:'এজেন্ট পরিচালনা',
     sb_reports:'রিপোর্ট কিউ', sb_users:'ব্যবহারকারী পরিচালনা', sb_system:'সিস্টেম',
     sb_settings:'সেটিংস', sb_back:'হোমপেজে ফিরুন',
@@ -367,10 +359,10 @@ const PAGE_TITLES = {
 
 let currentLang = 'en', currentPage = 'home';
 
-function setLang(lang, btn) {
+function setLang(lang) {
   currentLang = lang;
-  document.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  const select = document.getElementById('sidebarLangSelect');
+  if (select) select.value = lang;
   const D = T[lang];
   document.querySelectorAll('[data-t]').forEach(el => {
     const k = el.getAttribute('data-t');

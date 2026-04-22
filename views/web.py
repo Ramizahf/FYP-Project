@@ -530,9 +530,16 @@ def dashboard_worker():
         SELECT jl.*, a.agency_name
         FROM job_listings jl
         JOIN agents a ON a.id = jl.agent_id
+        WHERE jl.status = 'live'
         ORDER BY jl.created_at DESC, jl.id DESC
         """
     ))
+    interested_job_ids = {
+        row['job_id'] for row in query_db(
+            "SELECT job_id FROM job_interests WHERE worker_id = ?",
+            (user_id,)
+        )
+    }
 
     return render_template(
         'dashboard-worker.html',
@@ -543,6 +550,7 @@ def dashboard_worker():
         worker_profile=worker_profile,
         job_preferences=job_preferences,
         job_listings=job_listings,
+        interested_job_ids=interested_job_ids,
         initial_page=initial_page,
     )
 
@@ -553,14 +561,16 @@ def dashboard_agent():
     user_id = session['user_id']
     initial_page = pick_dashboard_page(
         request.args.get('page', '').strip(),
-        {'home', 'profile-agency', 'job-listings', 'worker-preferences', 'reviews', 'settings'},
+        {'home', 'profile-agency', 'job-listings', 'reviews'},
     )
     agent = get_agent_profile_for_user(user_id)
+    if agent:
+        for optional_field in ('industry', 'phone', 'description'):
+            agent[optional_field] = agent.get(optional_field) or ''
 
     reports = []
     enquiries = []
     agent_job_listings = []
-    worker_preferences = []
     if agent:
         reports = rows_to_dicts(query_db(
             "SELECT * FROM reports WHERE agent_id = ? ORDER BY created_at DESC",
@@ -591,37 +601,41 @@ def dashboard_agent():
             """,
             (agent['id'],)
         ))
+        interested_workers = rows_to_dicts(query_db(
+            """
+            SELECT
+                ji.job_id,
+                u.id AS worker_id,
+                u.full_name AS worker_name,
+                u.email AS worker_email,
+                wjp.desired_job,
+                wjp.preferred_location,
+                wjp.job_description
+            FROM job_interests ji
+            JOIN users u ON u.id = ji.worker_id
+            LEFT JOIN worker_job_preferences wjp ON wjp.worker_id = u.id
+            JOIN job_listings jl ON jl.id = ji.job_id
+            WHERE jl.agent_id = ? AND u.role = 'worker'
+            ORDER BY ji.created_at DESC, u.full_name ASC
+            """,
+            (agent['id'],)
+        ))
+        interested_by_job = {}
+        for worker in interested_workers:
+            interested_by_job.setdefault(worker['job_id'], []).append(worker)
+        for listing in agent_job_listings:
+            listing['interested_workers'] = interested_by_job.get(listing['id'], [])
+            listing['interest_count'] = len(listing['interested_workers'])
 
-    worker_preferences = rows_to_dicts(query_db(
-        """
-        SELECT
-            u.full_name AS worker_name,
-            wjp.desired_job,
-            wjp.preferred_location,
-            wjp.job_description
-        FROM worker_job_preferences wjp
-        JOIN users u ON u.id = wjp.worker_id
-        WHERE u.role = 'worker'
-        ORDER BY u.full_name ASC
-        """
-    ))
-
-    open_report_count = sum(1 for r in reports if r['status'] == 'open')
-    open_enquiry_count = sum(1 for e in enquiries if e['status'] == 'open')
     profile_views = 0
-    average_rating = None
 
     return render_template(
         'dashboard-agent.html',
         agent=agent,
         reports=reports,
         enquiries=enquiries,
-        open_report_count=open_report_count,
-        open_enquiry_count=open_enquiry_count,
         profile_views=profile_views,
-        average_rating=average_rating,
         agent_job_listings=agent_job_listings,
-        worker_preferences=worker_preferences,
         initial_page=initial_page,
     )
 
@@ -991,14 +1005,110 @@ def create_job_listing():
 
     execute_db(
         """
-        INSERT INTO job_listings (agent_id, job_title, location, description)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO job_listings (agent_id, job_title, location, description, status)
+        VALUES (?, ?, ?, ?, 'live')
         """,
         (agent['id'], job_title, location, description)
     )
 
     flash('Job listing published.', 'success')
     return redirect(url_for('dashboard_agent', page='job-listings'))
+
+
+@role_required('agent')
+def close_job_listing(job_id):
+    """Allow an agent to close one of their own job listings."""
+    agent = get_agent_profile_for_user(session['user_id'])
+    if not agent:
+        flash('Please complete your agency profile before managing job listings.', 'warning')
+        return redirect(url_for('dashboard_agent', page='profile-agency'))
+
+    listing = query_db(
+        "SELECT id, status FROM job_listings WHERE id = ? AND agent_id = ?",
+        (job_id, agent['id']),
+        one=True,
+    )
+    if not listing:
+        flash('Job listing not found.', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+
+    if listing['status'] == 'closed':
+        flash('Job is already closed.', 'info')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+
+    execute_db(
+        "UPDATE job_listings SET status = 'closed' WHERE id = ? AND agent_id = ?",
+        (job_id, agent['id']),
+    )
+    flash('Job closed.', 'success')
+    return redirect(url_for('dashboard_agent', page='job-listings'))
+
+
+@role_required('agent')
+def agent_worker_profile(worker_id):
+    """Show a simple worker profile to an agent when the worker expressed interest."""
+    agent = get_agent_profile_for_user(session['user_id'])
+    if not agent:
+        flash('Please complete your agency profile first.', 'warning')
+        return redirect(url_for('dashboard_agent', page='profile-agency'))
+
+    worker = row_to_dict(query_db(
+        """
+        SELECT
+            u.id AS worker_id,
+            u.full_name AS worker_name,
+            wjp.desired_job,
+            wjp.preferred_location,
+            wjp.job_description
+        FROM users u
+        LEFT JOIN worker_job_preferences wjp ON wjp.worker_id = u.id
+        WHERE u.id = ?
+          AND u.role = 'worker'
+          AND EXISTS (
+              SELECT 1
+              FROM job_interests ji
+              JOIN job_listings jl ON jl.id = ji.job_id
+              WHERE ji.worker_id = u.id
+                AND jl.agent_id = ?
+          )
+        """,
+        (worker_id, agent['id']), one=True
+    ))
+    if not worker:
+        flash('Worker not found or you do not have access to this profile.', 'danger')
+        return redirect(url_for('dashboard_agent', page='job-listings'))
+
+    return render_template(
+        'agent-worker-profile.html',
+        agent=agent,
+        worker=worker,
+        back_url=request.referrer or url_for('dashboard_agent', page='job-listings'),
+    )
+
+
+@role_required('worker')
+def send_job_interest(job_id):
+    """Save that a worker is interested in a job listing."""
+    job_listing = query_db(
+        "SELECT id FROM job_listings WHERE id = ?",
+        (job_id,), one=True
+    )
+    if not job_listing:
+        flash('Job listing not found.', 'danger')
+        return redirect(url_for('dashboard_worker', page='jobs'))
+
+    existing_interest = query_db(
+        "SELECT id FROM job_interests WHERE worker_id = ? AND job_id = ?",
+        (session['user_id'], job_id), one=True
+    )
+    if not existing_interest:
+        execute_db(
+            "INSERT INTO job_interests (worker_id, job_id) VALUES (?, ?)",
+            (session['user_id'], job_id)
+        )
+
+    flash('Interest sent. Agent can view your profile.', 'success')
+    return redirect(url_for('dashboard_worker', page='jobs'))
 
 
 def register_web_routes(app):
@@ -1019,8 +1129,11 @@ def register_web_routes(app):
     app.add_url_rule('/dashboard/agent', endpoint='dashboard_agent', view_func=dashboard_agent)
     app.add_url_rule('/enquiry', endpoint='submit_enquiry', view_func=submit_enquiry, methods=['GET', 'POST'])
     app.add_url_rule('/agent/enquiry/<int:enquiry_id>/reply', endpoint='reply_enquiry', view_func=reply_enquiry, methods=['POST'])
+    app.add_url_rule('/agent/worker/<int:worker_id>', endpoint='agent_worker_profile', view_func=agent_worker_profile)
     app.add_url_rule('/report', endpoint='submit_report', view_func=submit_report, methods=['GET', 'POST'])
+    app.add_url_rule('/job/<int:job_id>/interest', endpoint='send_job_interest', view_func=send_job_interest, methods=['POST'])
     app.add_url_rule('/worker/profile', endpoint='update_worker_profile', view_func=update_worker_profile, methods=['POST'])
     app.add_url_rule('/worker/job-preferences', endpoint='update_worker_job_preferences', view_func=update_worker_job_preferences, methods=['POST'])
     app.add_url_rule('/agent/profile', endpoint='update_agent_profile', view_func=update_agent_profile, methods=['POST'])
     app.add_url_rule('/agent/job-listings', endpoint='create_job_listing', view_func=create_job_listing, methods=['POST'])
+    app.add_url_rule('/agent/job/<int:job_id>/close', endpoint='close_job_listing', view_func=close_job_listing, methods=['POST'])
