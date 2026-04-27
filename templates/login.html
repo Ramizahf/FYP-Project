@@ -21,8 +21,10 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
     .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
-    .nav-home-link{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
-    .nav-home-link:hover{color:var(--teal)}
+    .nav-links{display:flex;align-items:center;gap:28px}
+    .nav-links a{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--teal)}
+    .nav-links a.active{font-weight:600}
     .btn-nav{display:inline-flex;align-items:center;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;background:var(--teal);color:var(--white);transition:background .2s,transform .15s}
     .btn-nav:hover{background:var(--mid);transform:translateY(-1px)}
 
@@ -113,20 +115,13 @@
     }
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_mode = 'fixed' %}
 
-<nav data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-links">
-    <a href="{{ url_for('index') }}" class="nav-home-link">Back to homepage</a>
-  </div>
-  <div class="nav-cta">
-    <a href="{{ url_for('register') }}" class="btn-nav" id="nav-reg">Register Free</a>
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <!-- LANGUAGE BAR -->
 <div style="background:var(--teal);padding:10px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px">
@@ -282,14 +277,23 @@
   let currentLang = 'en';
 
   function setLang(lang, btn) {
+    if (!LANG_LOGIN[lang]) lang = 'en';
     currentLang = lang;
+    try {
+      window.localStorage.setItem('migrantSafeLang', lang);
+    } catch (error) {
+      // Ignore storage errors.
+    }
     const T = LANG_LOGIN[lang];
+    if (!btn) btn = document.querySelector(`.lang-pill[onclick*="'${lang}'"]`);
     document.querySelectorAll('.lang-pill').forEach(p => {
       p.style.background = 'rgba(255,255,255,.15)';
       p.style.borderColor = 'rgba(255,255,255,.2)';
     });
-    btn.style.background = 'var(--amber)';
-    btn.style.borderColor = 'var(--amber)';
+    if (btn) {
+      btn.style.background = 'var(--amber)';
+      btn.style.borderColor = 'var(--amber)';
+    }
     const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
     set('l-badge', T.badge); set('l-title1', T.title1); set('l-title2', T.title2);
     set('l-title3', T.title3); set('l-title4', T.title4); set('l-sub', T.sub);
@@ -310,6 +314,15 @@
     if (inp.type === 'password') { inp.type = 'text';     btn.textContent = T.hide || 'Hide'; }
     else                         { inp.type = 'password'; btn.textContent = T.show || 'Show'; }
   }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      setLang(window.localStorage.getItem('migrantSafeLang') || 'en');
+    } catch (error) {
+      setLang('en');
+    }
+  });
 </script>
+{% include '_footer.html' %}
 </body>
 </html>

@@ -36,12 +36,13 @@
     .btn-amber:hover{background:#d06e28}
 
     /* ── PAGE HERO HEADER ── */
-    .page-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);padding:56px 5% 52px;position:relative;overflow:hidden}
+    .page-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);padding:56px 5% 52px;position:relative;overflow:hidden;border-radius:0}
     .page-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.2) 0%,transparent 70%)}
     .page-hero::after{content:'';position:absolute;bottom:-60px;left:20%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.1) 0%,transparent 70%)}
     .ph-inner{position:relative;z-index:2}
-    .ph-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,380px);gap:32px;align-items:start}
+    .ph-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,520px);gap:32px;align-items:start}
     .ph-content{max-width:700px}
+    .ph-side{width:100%;max-width:620px;justify-self:end;display:flex;flex-direction:column;gap:16px}
     .ph-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(232,131,58,.18);border:1px solid rgba(232,131,58,.35);color:var(--amber-lt);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:5px 13px;border-radius:100px;text-transform:uppercase;margin-bottom:18px}
     .ph-dot{width:6px;height:6px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -52,18 +53,19 @@
     .ph-stat{border-left:2px solid rgba(20,160,151,.45);padding-left:14px}
     .ph-stat-num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--white)}
     .ph-stat-lbl{font-size:.72rem;color:rgba(255,255,255,.5);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-    .ph-control-card{background:linear-gradient(135deg,rgba(22,114,108,.88),rgba(37,121,111,.82));border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:28px 30px;box-shadow:0 18px 46px rgba(7,24,31,.18);backdrop-filter:blur(10px)}
-    .ph-control-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(180px,1.2fr);gap:24px;align-items:center}
-    .ph-control-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.8);margin:0}
-    .ph-control-select{width:100%;padding:18px 20px;border-radius:22px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.14);color:var(--white);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;outline:none;cursor:pointer}
-    .ph-control-select:focus{border-color:rgba(255,255,255,.38);background:rgba(255,255,255,.18)}
+    .ph-control-card{width:100%;background:linear-gradient(135deg,rgba(232,131,58,.22),rgba(255,179,71,.18));border:1px solid rgba(255,202,150,.32);border-radius:18px;padding:18px 20px;box-shadow:0 12px 28px rgba(46,30,10,.18);backdrop-filter:blur(4px)}
+    .ph-control-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,290px);column-gap:18px;align-items:center}
+    .ph-control-label{display:block;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,248,240,.84);margin:0;white-space:nowrap}
+    .ph-control-select{width:100%;min-width:0;padding:11px 14px;border-radius:14px;border:1px solid rgba(255,220,188,.38);background:rgba(255,249,242,.16);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;outline:none;cursor:pointer}
+    .ph-control-select:focus{border-color:rgba(255,233,210,.55);background:rgba(255,249,242,.22)}
     .ph-control-select option{color:var(--dark);background:var(--white)}
 
     /* ── STATUS LEGEND STRIP ── */
-    .legend-strip{background:linear-gradient(135deg,rgba(232,131,58,.16),rgba(255,179,71,.24));border-bottom:1px solid rgba(232,131,58,.24);padding:14px 5%;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-    .legend-title{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
-    .legend-item{display:flex;align-items:center;gap:7px;font-size:.82rem;color:var(--text)}
-    .pill{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:4px 11px;border-radius:100px;white-space:nowrap}
+    .legend-strip{width:100%;display:flex;flex-direction:column;gap:10px;padding:18px 20px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:linear-gradient(135deg,rgba(15,32,39,.92),rgba(26,74,74,.84));box-shadow:0 12px 28px rgba(6,52,55,.18);backdrop-filter:blur(4px)}
+    .legend-title{font-size:.78rem;font-weight:700;color:rgba(255,255,255,.68);letter-spacing:.08em;text-transform:uppercase}
+    .legend-item{display:grid;grid-template-columns:minmax(96px,max-content) minmax(0,1fr);align-items:center;column-gap:12px;font-size:.82rem;color:rgba(255,255,255,.88);line-height:1.5}
+    .legend-item > span:last-child{display:block;min-width:0}
+    .pill{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-size:.7rem;font-weight:700;padding:4px 11px;border-radius:100px;white-space:nowrap}
     .pv{background:#d6f7e5;color:#0d8a49;border:1px solid #78d8a8;box-shadow:inset 0 0 0 1px rgba(13,138,73,.08)}
     .pp{background:#fff1bf;color:#9a6700;border:1px solid #f2c34b;box-shadow:inset 0 0 0 1px rgba(154,103,0,.08)}
     .pr{background:#ffd9d4;color:#b42318;border:1px solid #f08a7f;box-shadow:inset 0 0 0 1px rgba(180,35,24,.08)}
@@ -72,21 +74,21 @@
     .page-body{display:grid;grid-template-columns:280px 1fr;gap:24px;padding:28px 5% 60px;max-width:1300px;margin:0 auto;align-items:start}
 
     /* ── SIDEBAR FILTERS ── */
-    .filters{background:var(--teal);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:24px;position:sticky;top:92px;box-shadow:0 12px 30px rgba(13,110,110,.18)}
+    .filters{background:linear-gradient(180deg,rgba(9,74,74,.99) 0%,rgba(15,32,39,.99) 100%);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:24px;position:sticky;top:92px;box-shadow:0 14px 34px rgba(6,24,31,.28)}
     .filters h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
     .filters h3 button{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.82);background:none;border:none;cursor:pointer}
     .filters h3 button:hover{text-decoration:underline}
     .filter-group{margin-bottom:20px}
     .filter-group label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:9px}
-    .filter-search{width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s;background:rgba(255,255,255,.96)}
-    .filter-search:focus{border-color:var(--teal);background:var(--white)}
+    .filter-search{width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;background:rgba(255,255,255,.96)}
+    .filter-search:focus{border-color:var(--teal-lt);background:var(--white);box-shadow:0 0 0 3px rgba(20,160,151,.12)}
     .check-item{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-size:.86rem;color:rgba(255,255,255,.92)}
     .check-item input[type=checkbox]{width:15px;height:15px;accent-color:#9fe3de;cursor:pointer;flex-shrink:0}
     .check-item span{user-select:none}
     .check-count{margin-left:auto;font-size:.7rem;background:rgba(255,255,255,.16);color:var(--white);padding:1px 7px;border-radius:100px;font-weight:600}
-    .filter-select{width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;background:rgba(255,255,255,.96);cursor:pointer;transition:border-color .2s}
-    .filter-select:focus{border-color:var(--teal);background:var(--white)}
-    .apply-btn{width:100%;padding:11px;background:var(--white);color:var(--teal);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .18s,transform .15s;margin-top:4px}
+    .filter-select{width:100%;border:1.5px solid rgba(255,255,255,.18);border-radius:9px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;background:rgba(255,255,255,.96);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+    .filter-select:focus{border-color:var(--teal-lt);background:var(--white);box-shadow:0 0 0 3px rgba(20,160,151,.12)}
+    .apply-btn{width:100%;padding:11px;background:var(--white);color:var(--teal);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .18s,transform .15s,box-shadow .18s;margin-top:4px;box-shadow:0 8px 18px rgba(7,24,31,.16)}
     .apply-btn:hover{background:#eefafa;transform:translateY(-1px)}
 
     /* ── RESULTS AREA ── */
@@ -225,17 +227,11 @@
     .lang-select option{color:var(--dark);background:var(--white)}
 
     /* ── FOOTER NOTE ── */
-    .safety-note{background:linear-gradient(135deg,var(--dark),var(--mid));padding:36px 5%;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:0}
-    .sn-left{display:flex;align-items:flex-start;gap:14px}
-    .sn-icon{font-size:1.8rem;flex-shrink:0}
-    .sn-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--white);margin-bottom:4px}
-    .sn-sub{font-size:.83rem;color:rgba(255,255,255,.6);line-height:1.6;max-width:500px}
-
     /* ── RESPONSIVE ── */
     @media(max-width:900px){
       .ph-layout{grid-template-columns:1fr}
-      .ph-control-card{max-width:460px}
-      .ph-control-row{grid-template-columns:1fr;gap:14px}
+      .ph-side{justify-self:start}
+      .ph-control-row{grid-template-columns:1fr;row-gap:10px}
       .page-body{grid-template-columns:1fr}
       .filters{position:static;display:none}
       .filters.mob-open{display:block}
@@ -245,6 +241,8 @@
       .search-sort{flex-direction:column}
       .sort-select{width:100%}
       .nav-links{display:none}
+      .ph-control-card,.legend-strip{padding:14px 16px}
+      .legend-item{grid-template-columns:1fr;row-gap:7px}
     }
 
     /* ── ANIMATIONS ── */
@@ -252,27 +250,18 @@
     @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_active = 'agents' %}
+{% set navbar_variant = 'agents' %}
 
 <!-- NAVBAR -->
-<nav data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-links">
-    <a href="index.html#how" id="t-navHow">How It Works</a>
-    <a href="{{ url_for('agents') }}" class="active" id="t-navAgents">Find Agents</a>
-    <a href="{{ url_for('chatbot') }}" id="t-navChatbot">Chatbot</a>
-  </div>
-  <div class="nav-cta">
-    <a href="{{ url_for('login') }}" class="btn btn-outline" id="t-navLogin">Log In</a>
-    <a href="{{ url_for('register') }}" class="btn btn-primary" id="t-navRegister">Register Free</a>
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <!-- PAGE HERO -->
-<div class="page-hero">
+<div class="page-hero agents-hero">
   <div class="ph-inner">
     <div class="ph-layout">
       <div class="ph-content">
@@ -286,6 +275,7 @@
           <div class="ph-stat"><div class="ph-stat-num">{{ stats.reported }}</div><div class="ph-stat-lbl" id="t-statReported">Reported</div></div>
         </div>
       </div>
+      <div class="ph-side">
       <div class="ph-control-card">
         <div class="ph-control-row">
           <label class="ph-control-label" id="t-langLabel" for="languageSelect">Language</label>
@@ -296,10 +286,18 @@
           </select>
         </div>
       </div>
+      <div class="legend-strip">
+        <span class="legend-title" id="t-legend">Status Guide:</span>
+        <span class="legend-item"><span class="pill pv">âœ“ Verified</span> <span id="t-lv">Admin-approved, safe to trust</span></span>
+        <span class="legend-item"><span class="pill pp">â³ Pending</span> <span id="t-lp">Under admin review, not yet confirmed</span></span>
+        <span class="legend-item"><span class="pill pr">âš  Reported</span> <span id="t-lr">Worker complaints filed â€” proceed with caution</span></span>
+      </div>
+      </div>
     </div>
   </div>
 </div>
 
+<template>
 <!-- STATUS LEGEND -->
 <div class="legend-strip">
   <span class="legend-title" id="t-legend">Status Guide:</span>
@@ -307,6 +305,7 @@
   <span class="legend-item"><span class="pill pp">⏳ Pending</span> <span id="t-lp">Under admin review, not yet confirmed</span></span>
   <span class="legend-item"><span class="pill pr">⚠ Reported</span> <span id="t-lr">Worker complaints filed — proceed with caution</span></span>
 </div>
+</template>
 
 <!-- MAIN BODY -->
 <div class="page-body">
@@ -459,20 +458,6 @@
       const AGENTS_DATA = {{ agents | tojson }};
     </script>
   </div>
-</div>
-
-<!-- SAFETY NOTE FOOTER BAND -->
-<div class="safety-note">
-  <div class="sn-left">
-    <div class="sn-icon">⚠️</div>
-    <div>
-      <div class="sn-title" id="t-snt">Protect Yourself — Know Before You Trust</div>
-      <div class="sn-sub" id="t-sns">Recruitment fees must always be paid by the employer, NOT by you. If any agent asks you to pay a large upfront fee, they may be acting illegally. Always verify before paying.</div>
-    </div>
-  </div>
-  {% if current_user.is_auth and current_user.role == 'worker' %}
-  <button onclick="goReport()" class="btn btn-amber" id="t-snbtn" style="white-space:nowrap;cursor:pointer">Report an Agent →</button>
-  {% endif %}
 </div>
 
 <!-- AGENT DETAIL MODAL -->
@@ -842,11 +827,11 @@
         htmlLang: 'en',
         pageTitle: 'Find Verified Agents - MigrantSafe',
         langLabel: 'Language',
-        navHow: 'How It Works',
+        navHow: 'Guide',
         navAgents: 'Find Agents',
         navChatbot: 'Chatbot',
-        navLogin: 'Log In',
-        navRegister: 'Register Free',
+        navLogin: 'Login',
+        navRegister: 'Register',
         tag: 'Agent Directory',
         heroA: 'Find ',
         heroB: 'Trusted',
@@ -886,8 +871,6 @@
         fallbackLocation: 'Malaysia',
         fallbackIndustry: 'General',
         noValue: '-',
-        safetyTitle: 'Protect Yourself - Know Before You Trust',
-        safetyText: 'Recruitment fees must always be paid by the employer, NOT by you. If any agent asks you to pay a large upfront fee, they may be acting illegally. Always verify before paying.',
         safetyBtn: 'Report an Agent ->',
         modalLabels: ['Agency Details', 'Location', 'Industry', 'Contact', 'Email', 'Registration No.', 'Listed Since', 'About this Agency'],
         modalSendEnquiry: 'Send Enquiry',
@@ -921,11 +904,11 @@
         htmlLang: 'ms',
         pageTitle: 'Cari Ejen Disahkan - MigrantSafe',
         langLabel: 'Bahasa',
-        navHow: 'Cara Ia Berfungsi',
+        navHow: 'Panduan',
         navAgents: 'Cari Ejen',
         navChatbot: 'Chatbot',
         navLogin: 'Log Masuk',
-        navRegister: 'Daftar Percuma',
+        navRegister: 'Daftar',
         tag: 'Direktori Ejen',
         heroA: 'Cari ',
         heroB: 'Dipercayai',
@@ -965,8 +948,6 @@
         fallbackLocation: 'Malaysia',
         fallbackIndustry: 'Umum',
         noValue: '-',
-        safetyTitle: 'Lindungi Diri Anda - Tahu Sebelum Percaya',
-        safetyText: 'Yuran pengambilan mesti sentiasa dibayar oleh majikan, BUKAN oleh anda. Jika ada ejen meminta bayaran pendahuluan yang besar, mereka mungkin bertindak secara haram. Sentiasa semak sebelum membayar.',
         safetyBtn: 'Lapor Ejen ->',
         modalLabels: ['Butiran Agensi', 'Lokasi', 'Industri', 'Hubungan', 'E-mel', 'No. Pendaftaran', 'Tersenarai Sejak', 'Tentang Agensi Ini'],
         modalSendEnquiry: 'Hantar Pertanyaan',
@@ -1000,11 +981,11 @@
         htmlLang: 'bn',
         pageTitle: 'বিশ্বস্ত এজেন্ট খুঁজুন - MigrantSafe',
         langLabel: 'ভাষা',
-        navHow: 'কীভাবে কাজ করে',
+        navHow: 'গাইড',
         navAgents: 'এজেন্ট খুঁজুন',
         navChatbot: 'চ্যাটবট',
         navLogin: 'লগ ইন',
-        navRegister: 'ফ্রি রেজিস্টার',
+        navRegister: 'নিবন্ধন',
         tag: 'এজেন্ট ডিরেক্টরি',
         heroA: 'খুঁজুন ',
         heroB: 'বিশ্বস্ত',
@@ -1044,8 +1025,6 @@
         fallbackLocation: 'মালয়েশিয়া',
         fallbackIndustry: 'সাধারণ',
         noValue: '-',
-        safetyTitle: 'নিজেকে সুরক্ষিত রাখুন - বিশ্বাসের আগে জানুন',
-        safetyText: 'রিক্রুটমেন্ট ফি সব সময় নিয়োগকর্তার দেওয়ার কথা, আপনার নয়। যদি কোনো এজেন্ট বড় অঙ্কের অগ্রিম টাকা চায়, তাহলে তা অবৈধ হতে পারে। টাকা দেওয়ার আগে অবশ্যই যাচাই করুন।',
         safetyBtn: 'এজেন্ট রিপোর্ট করুন ->',
         modalLabels: ['এজেন্সির তথ্য', 'অবস্থান', 'শিল্পখাত', 'যোগাযোগ', 'ইমেইল', 'রেজিস্ট্রেশন নম্বর', 'তালিকাভুক্তির তারিখ', 'এই এজেন্সি সম্পর্কে'],
         modalSendEnquiry: 'জিজ্ঞাসা পাঠান',
@@ -1167,9 +1146,12 @@
       const select = document.getElementById('languageSelect');
       if (select) select.value = currentLang;
 
-      const navLinks = document.querySelectorAll('.nav-cta a');
-      if (navLinks[0]) navLinks[0].textContent = cfg.navLogin;
-      if (navLinks[1]) navLinks[1].textContent = cfg.navRegister;
+      const navLogin = document.getElementById('t-navLogin');
+      const navRegister = document.getElementById('t-navRegister');
+      const navDashboard = document.getElementById('t-navDashboard');
+      if (navLogin) navLogin.textContent = cfg.navLogin;
+      if (navRegister) navRegister.textContent = cfg.navRegister;
+      if (navDashboard) navDashboard.textContent = 'Dashboard';
       const navHow = document.getElementById('t-navHow');
       const navAgents = document.getElementById('t-navAgents');
       const navChatbot = document.getElementById('t-navChatbot');
@@ -1197,9 +1179,6 @@
         't-floc': cfg.location,
         't-find': cfg.industry,
         't-fstat': cfg.verificationStatus,
-        't-snt': cfg.safetyTitle,
-        't-sns': cfg.safetyText,
-        't-snbtn': cfg.safetyBtn,
         't-minfo': cfg.modalLabels[0],
         't-mclose': cfg.modalClose,
         't-mdesc': cfg.modalLabels[7],
@@ -1480,7 +1459,7 @@
     window.setLang = function setLang(lang) {
       currentLang = TRANSLATIONS[lang] ? lang : 'en';
       try {
-        localStorage.setItem('agentsPageLang', currentLang);
+        localStorage.setItem('migrantSafeLang', currentLang);
       } catch (error) {
         // Ignore storage issues.
       }
@@ -1489,7 +1468,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       try {
-        currentLang = localStorage.getItem('agentsPageLang') || 'en';
+        currentLang = localStorage.getItem('migrantSafeLang') || localStorage.getItem('agentsPageLang') || 'en';
       } catch (error) {
         currentLang = 'en';
       }
@@ -1500,5 +1479,6 @@
     });
   })();
 </script>
+{% include '_footer.html' %}
 </body>
 </html>

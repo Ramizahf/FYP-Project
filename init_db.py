@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS reports (
     worker_id     INTEGER REFERENCES users(id),
     agent_id      INTEGER REFERENCES agents(id),
     agent_name    TEXT    NOT NULL,
+    agent_staff_name TEXT,
     report_reason TEXT    NOT NULL,
     description   TEXT    NOT NULL,
     incident_date TEXT,

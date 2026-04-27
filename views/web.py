@@ -785,20 +785,42 @@ def submit_report():
             (agent_id_param,), one=True
         ))
 
+    form_data = {
+        'agent_id': str(agent['id']) if agent else '',
+        'agent_staff_name': '',
+        'report_reason': '',
+        'description': '',
+        'incident_date': ''
+    }
+
     if request.method == 'POST':
-        agent_name = request.form.get('agent_name', '').strip()
-        agent_id = request.form.get('agent_id') or None
+        agent_id = request.form.get('agent_id', '').strip()
+        agent_staff_name = request.form.get('agent_staff_name', '').strip()
         report_reason = request.form.get('report_reason', '').strip()
         description = request.form.get('description', '').strip()
         incident_date = request.form.get('incident_date', '').strip() or None
+        selected_agent = row_to_dict(query_db(
+            "SELECT id, agency_name FROM agents WHERE id = ?",
+            (agent_id,), one=True
+        )) if agent_id else None
+        agent_name = selected_agent['agency_name'] if selected_agent else ''
+
+        form_data = {
+            'agent_id': agent_id,
+            'agent_staff_name': agent_staff_name,
+            'report_reason': report_reason,
+            'description': description,
+            'incident_date': incident_date or ''
+        }
 
         errors = []
-        if not agent_name:
-            errors.append('Please enter the agent or agency name.')
-        elif len(agent_name) < 3:
-            errors.append('Agent name must be at least 3 characters.')
-        elif len(agent_name) > 200:
-            errors.append('Agent name is too long (max 200 characters).')
+        if not agent_id:
+            errors.append('Please select an agency name.')
+        elif not selected_agent:
+            errors.append('Please select a valid agency from the list.')
+
+        if agent_staff_name and len(agent_staff_name) > 200:
+            errors.append('Agent / Staff Name is too long (max 200 characters).')
 
         if not report_reason:
             errors.append('Please select the type of issue.')
@@ -817,16 +839,24 @@ def submit_report():
             execute_db(
                 """
                 INSERT INTO reports
-                    (worker_id, agent_id, agent_name, report_reason, description, incident_date)
-                VALUES (?, ?, ?, ?, ?, ?)
+                    (worker_id, agent_id, agent_name, agent_staff_name, report_reason, description, incident_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
-                (session['user_id'], agent_id, agent_name, report_reason, description, incident_date)
+                (
+                    session['user_id'],
+                    selected_agent['id'],
+                    agent_name,
+                    agent_staff_name or None,
+                    report_reason,
+                    description,
+                    incident_date
+                )
             )
             flash('Your report has been submitted. Our admin team will review it within 48 hours.', 'success')
             return redirect(url_for('my_reports'))
 
     all_agents = rows_to_dicts(query_db("SELECT * FROM agents ORDER BY agency_name"))
-    return render_template('report.html', agent=agent, all_agents=all_agents)
+    return render_template('report.html', agent=agent, all_agents=all_agents, form_data=form_data)
 
 
 @role_required('worker')

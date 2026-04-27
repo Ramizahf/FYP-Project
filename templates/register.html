@@ -23,8 +23,10 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:70px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
     .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
-    .nav-home-link{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
-    .nav-home-link:hover{color:var(--teal)}
+    .nav-links{display:flex;align-items:center;gap:28px}
+    .nav-links a{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--teal)}
+    .nav-links a.active{font-weight:600}
     .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:transform .15s,box-shadow .15s}
     .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
     .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
@@ -126,21 +128,14 @@
     }
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_mode = 'fixed' %}
 
 <!-- NAVBAR -->
-<nav data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-links">
-    <a href="{{ url_for('index') }}" class="nav-home-link">Back to homepage</a>
-  </div>
-  <div class="nav-cta">
-    <a href="{{ url_for('login') }}" class="btn btn-outline" id="r-login-btn">Log In</a>
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <!-- LANGUAGE BAR -->
 <div style="background:var(--teal);padding:10px 5%;display:flex;align-items:center;justify-content:flex-end;gap:10px">
@@ -417,14 +412,23 @@
   };
 
   function setRegLang(lang, btn) {
+    if (!LANG_REG[lang]) lang = 'en';
     currentRegLang = lang;
+    try {
+      window.localStorage.setItem('migrantSafeLang', lang);
+    } catch (error) {
+      // Ignore storage errors.
+    }
     const T = LANG_REG[lang];
+    if (!btn) btn = document.querySelector(`.r-lang[onclick*="'${lang}'"]`);
     document.querySelectorAll('.r-lang').forEach(p => {
       p.style.background = 'rgba(255,255,255,.15)';
       p.style.borderColor = 'rgba(255,255,255,.2)';
     });
-    btn.style.background = 'var(--amber)';
-    btn.style.borderColor = 'var(--amber)';
+    if (btn) {
+      btn.style.background = 'var(--amber)';
+      btn.style.borderColor = 'var(--amber)';
+    }
     const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
     set('r-badge', T.badge); set('r-title', T.title); set('r-title2', T.title2); set('r-sub', T.sub);
     set('r-t1h', T.t1h); set('r-t1p', T.t1p);
@@ -436,6 +440,15 @@
     const loginBtn = document.getElementById('r-login-btn');
     if (loginBtn) loginBtn.textContent = T.loginbtn;
   }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      setRegLang(window.localStorage.getItem('migrantSafeLang') || 'en');
+    } catch (error) {
+      setRegLang('en');
+    }
+  });
 </script>
+{% include '_footer.html' %}
 </body>
 </html>

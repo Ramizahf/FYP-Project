@@ -90,6 +90,11 @@ def ensure_database_schema():
             "CREATE INDEX IF NOT EXISTS idx_enquiries_agent_id_status_created_at "
             "ON enquiries(agent_id, status, created_at DESC)"
         )
+        report_cols = {
+            row[1] for row in cur.execute("PRAGMA table_info(reports)").fetchall()
+        }
+        if 'agent_staff_name' not in report_cols:
+            cur.execute("ALTER TABLE reports ADD COLUMN agent_staff_name TEXT")
         cur.execute("""
             CREATE TABLE IF NOT EXISTS worker_job_preferences (
                 id                 INTEGER PRIMARY KEY AUTOINCREMENT,

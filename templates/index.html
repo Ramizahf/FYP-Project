@@ -50,7 +50,8 @@
     .nav-logo-wordmark{transition:transform .2s ease}
     .nav-links{display:flex;align-items:center;gap:32px}
     .nav-links a{font-size:.9rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
-    .nav-links a:hover{color:var(--teal)}
+    .nav-links a:hover,.nav-links a.active{color:var(--teal)}
+    .nav-links a.active{font-weight:600}
     .nav-cta{display:flex;gap:10px}
     .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:transform .15s,box-shadow .15s}
     .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
@@ -138,6 +139,8 @@
     .guide-btn:focus-visible{outline:3px solid rgba(20,160,151,.35);outline-offset:2px}
     .guide-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--white)}
     .guide-btn.primary:hover{background:var(--mid);border-color:var(--mid)}
+    .guide-target{z-index:244}
+    .guide-target:not(.chatbot-float):not(.chatbot-float-label){position:relative}
     .guide-arrow{
       position:fixed;z-index:242;font-size:2rem;line-height:1;color:var(--amber-lt);
       text-shadow:0 12px 24px rgba(0,0,0,.28);opacity:0;pointer-events:none;
@@ -148,7 +151,7 @@
     .guide-arrow.up.active{transform:translateY(0)}
 
     /* HERO */
-    .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 5% 60px;background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);position:relative;overflow:hidden}
+    .hero{min-height:auto;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:84px 5% 48px;background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);position:relative;overflow:visible}
     .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.25) 0%,transparent 70%);animation:pulse 6s ease-in-out infinite}
     .hero::after{content:'';position:absolute;bottom:-120px;left:30%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.15) 0%,transparent 70%);animation:pulse 8s ease-in-out infinite reverse}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
@@ -159,16 +162,19 @@
     .hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,4.5vw,3.8rem);font-weight:900;line-height:1.15;color:var(--white);margin-bottom:20px;animation:fadeUp .7s .1s ease both}
     .hero-title .accent{color:var(--teal-lt)}
     .hero-title .accent2{color:var(--amber-lt)}
-    .hero-sub{font-size:1.05rem;font-weight:300;line-height:1.7;color:rgba(255,255,255,.72);max-width:520px;margin-bottom:36px;animation:fadeUp .7s .2s ease both}
+    .hero-sub{font-size:1.05rem;font-weight:300;line-height:1.7;color:rgba(255,255,255,.72);max-width:520px;margin-bottom:28px;animation:fadeUp .7s .2s ease both}
     .hero-actions{display:flex;flex-wrap:wrap;gap:14px;animation:fadeUp .7s .3s ease both}
-    .hero-stats{display:flex;gap:32px;margin-top:52px;animation:fadeUp .7s .4s ease both}
-    .stat{border-left:2px solid rgba(20,160,151,.5);padding-left:16px}
-    .stat-num{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--white)}
-    .stat-label{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+    .hero-stats{display:flex;align-items:center;gap:18px;margin-top:24px;animation:fadeUp .7s .4s ease both}
+    .stat{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;column-gap:10px;min-width:0;padding-right:16px}
+    .stat:not(:last-child)::after{content:'';position:absolute;right:0;top:6px;bottom:6px;width:1.5px;background:rgba(20,160,151,.56);box-shadow:0 0 10px rgba(20,160,151,.2)}
+    .stat-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(20,160,151,.82),rgba(13,110,110,.98));box-shadow:0 10px 22px rgba(3,38,40,.2), inset 0 0 0 1px rgba(255,255,255,.12);color:#fff}
+    .stat-icon svg{width:25px;height:25px;stroke:currentColor;stroke-width:2.05;fill:none;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.22))}
+    .stat-num{font-family:'DM Sans',sans-serif;font-size:1.08rem;font-weight:700;color:var(--white);line-height:1;text-shadow:0 2px 10px rgba(0,0,0,.24)}
+    .stat-label{font-size:.54rem;color:rgba(255,255,255,.68);font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.25;margin-top:5px}
 
     /* hero visual */
     .hero-visual{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;animation:fadeUp .8s .2s ease both}
-    .hero-scene{position:relative;width:min(100%,520px);height:580px;display:flex;align-items:flex-end;justify-content:center}
+    .hero-scene{position:relative;width:min(100%,520px);min-height:auto;display:flex;align-items:center;justify-content:center}
     .hero-glow,
     .hero-glow::after{
       position:absolute;content:'';border-radius:50%;pointer-events:none;filter:blur(6px)
@@ -181,73 +187,31 @@
       width:250px;height:250px;right:-20px;top:26px;
       background:radial-gradient(circle,rgba(232,131,58,.18) 0%, transparent 68%);
     }
-    .phone-shell{
-      position:relative;z-index:2;width:290px;height:560px;padding:14px;border-radius:40px;
-      background:linear-gradient(180deg,#0b181d 0%, #163036 100%);
-      box-shadow:0 28px 75px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.18)
+    .language-card{
+      position:relative;z-index:2;width:min(100%,430px);padding:42px 34px 36px;border-radius:28px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:0 20px 50px rgba(0,0,0,.2);
+      text-align:center;backdrop-filter:blur(12px)
     }
-    .phone-shell::before{
-      content:'';position:absolute;top:12px;left:50%;transform:translateX(-50%);
-      width:112px;height:24px;border-radius:20px;background:rgba(0,0,0,.72);z-index:4
+    .language-card-icon{
+      width:72px;height:72px;margin:0 auto 22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      background:rgba(232,131,58,.12);
+      border:1px solid rgba(232,131,58,.18);box-shadow:0 0 25px rgba(232,131,58,.3);color:var(--amber)
     }
-    .phone-screen{
-      position:relative;height:100%;border-radius:30px;overflow:hidden;
-      background:
-        radial-gradient(circle at 50% 28%, rgba(255,255,255,.22) 0%, transparent 22%),
-        radial-gradient(circle at 50% 42%, rgba(20,160,151,.28) 0%, transparent 34%),
-        radial-gradient(circle at 58% 58%, rgba(232,131,58,.22) 0%, transparent 28%),
-        linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.02) 100%);
-      border:1px solid rgba(255,255,255,.08)
+    .language-card-icon svg{width:46px;height:46px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .language-card-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.55rem);font-weight:800;color:var(--white);line-height:1.15;margin-bottom:14px;text-shadow:0 4px 18px rgba(0,0,0,.28)}
+    .language-card-sub{font-size:1rem;line-height:1.55;color:rgba(255,255,255,.72);margin:0 auto 28px;max-width:300px}
+    .language-options{display:grid;gap:12px}
+    .language-option{
+      width:100%;display:flex;align-items:center;justify-content:center;gap:14px;min-height:58px;padding:12px 16px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--white);opacity:.9;
+      font-family:'DM Sans',sans-serif;font-size:1.08rem;font-weight:600;cursor:pointer;transition:all .2s ease
     }
-    .phone-screen::before{
-      content:'';position:absolute;inset:0;
-      background:linear-gradient(180deg, rgba(255,255,255,.12), transparent 18%, transparent 82%, rgba(255,255,255,.06));
-      pointer-events:none
-    }
-    .screen-header{
-      position:absolute;top:26px;left:22px;right:22px;display:flex;align-items:center;justify-content:space-between;
-      color:rgba(255,255,255,.88);font-size:.78rem;font-weight:600;z-index:2
-    }
-    .screen-status{display:flex;align-items:center;gap:6px}
-    .screen-status span{width:7px;height:7px;border-radius:50%;background:var(--teal-lt);box-shadow:0 0 10px rgba(20,160,151,.6)}
-    .assistant-orb{
-      position:absolute;top:116px;left:50%;transform:translateX(-50%);
-      width:160px;height:160px;border-radius:50%;
-      background:
-        radial-gradient(circle at 35% 30%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.35) 16%, transparent 26%),
-        radial-gradient(circle at 50% 45%, rgba(20,160,151,.95) 0%, rgba(20,160,151,.24) 38%, transparent 68%),
-        radial-gradient(circle at 70% 70%, rgba(232,131,58,.9) 0%, rgba(232,131,58,.14) 32%, transparent 56%);
-      box-shadow:0 0 0 16px rgba(255,255,255,.05), 0 18px 50px rgba(20,160,151,.18);
-      animation:pulse 6s ease-in-out infinite
-    }
-    .screen-panel{
-      position:absolute;left:18px;right:18px;bottom:22px;padding:18px 16px;border-radius:22px;
-      background:rgba(255,255,255,.08);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);z-index:2
-    }
-    .screen-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px}
-    .screen-title{font-size:1rem;font-weight:700;color:var(--white);margin-bottom:8px}
-    .screen-copy{font-size:.82rem;line-height:1.55;color:rgba(255,255,255,.68)}
-    .bubble{
-      position:absolute;z-index:3;max-width:220px;padding:12px 16px;border-radius:22px;
-      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px);
-      color:rgba(255,255,255,.9);font-size:.82rem;line-height:1.45;box-shadow:0 18px 40px rgba(0,0,0,.16)
-    }
-    .bubble strong{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.46);margin-bottom:6px}
-    .bubble.user{background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.06))}
-    .bubble.reply{background:linear-gradient(135deg,rgba(20,160,151,.28),rgba(20,160,151,.14))}
-    .bubble.reply.warm{background:linear-gradient(135deg,rgba(232,131,58,.26),rgba(232,131,58,.12))}
-    .bubble.b1{top:70px;left:0}
-    .bubble.b2{top:158px;right:0}
-    .bubble.b3{bottom:170px;left:24px}
-    .bubble.b4{bottom:84px;right:18px}
-
-    /* LANG STRIP */
-    .lang-strip{background:var(--teal);padding:16px 5%;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-    .lang-strip > span{color:rgba(255,255,255,.75);font-size:.88rem;font-weight:500}
-    .lang-pill{padding:7px 20px;border-radius:100px;background:rgba(255,255,255,.15);color:var(--white);font-size:.84rem;font-weight:600;border:1px solid rgba(255,255,255,.25);cursor:pointer;transition:background .2s,transform .15s;user-select:none}
-    .lang-pill:hover{background:rgba(255,255,255,.25);transform:translateY(-1px)}
-    .lang-pill.active{background:var(--amber);border-color:var(--amber);box-shadow:0 4px 14px rgba(232,131,58,.4)}
-
+    .language-option:hover{background:rgba(255,255,255,.12);transform:translateY(-1px);opacity:1}
+    .language-option.active{background:var(--teal);border-color:var(--teal-lt);box-shadow:0 6px 20px rgba(13,110,110,.25);font-weight:600;opacity:1}
+    .language-option-arrow{position:absolute;right:22px;color:var(--teal-lt);font-size:1.6rem;line-height:1;opacity:.6}
+    .language-option{position:relative}
     /* SECTIONS */
     section{padding:90px 5%}
     .section-tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
@@ -329,17 +293,6 @@
     .cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
 
     /* FOOTER */
-    footer{background:var(--dark);padding:52px 5% 28px;border-top:1px solid rgba(255,255,255,.07)}
-    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
-    .footer-brand .flogo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--white);margin-bottom:12px}
-    .footer-brand .flogo .dot{color:var(--amber)}
-    .footer-brand p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.75;max-width:360px}
-    .footer-col h4{font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:16px}
-    .footer-col a{display:block;font-size:.84rem;color:rgba(255,255,255,.55);text-decoration:none;margin-bottom:10px;transition:color .2s}
-    .footer-col a:hover{color:var(--teal-lt)}
-    .footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:rgba(255,255,255,.35);flex-wrap:wrap;gap:12px}
-    .sdg-tag{color:var(--amber);font-weight:600}
-
     /* ANIMS */
     @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
     .reveal{opacity:0;transform:translateY(30px);transition:opacity .65s ease,transform .65s ease}
@@ -347,30 +300,28 @@
 
     /* RESPONSIVE */
     @media(max-width:1100px){
-      .hero-scene{height:520px;width:min(100%,460px)}
-      .phone-shell{width:262px;height:516px}
-      .bubble{max-width:190px;font-size:.78rem}
-      .bubble.b1{left:8px}
-      .bubble.b2{right:6px}
-      .bubble.b3{left:0}
-      .bubble.b4{right:0}
+      .hero-scene{min-height:auto;width:min(100%,460px)}
+      .language-card{width:min(100%,390px)}
     }
     @media(max-width:900px){
-      .hero{grid-template-columns:1fr;padding:110px 5% 60px}
+      .hero{grid-template-columns:1fr;padding:96px 5% 52px}
       .hero-visual{margin-top:34px}
-      .hero-scene{height:480px}
-      .phone-shell{width:250px;height:490px}
-      .bubble{max-width:176px;padding:10px 14px}
+      .hero-scene{min-height:auto}
+      .language-card{width:min(100%,430px)}
       .features-grid{grid-template-columns:1fr}
       .feat-card.big{grid-column:span 1;grid-template-columns:1fr}
       .who-grid{grid-template-columns:1fr}
       .chatbot-section{grid-template-columns:1fr}
       .sdg-section{flex-direction:column;align-items:flex-start}
-      .footer-grid{grid-template-columns:1fr 1fr}
       .nav-links{display:none}
     }
+    @media(max-width:760px){
+      .hero-stats{flex-direction:column;align-items:stretch;gap:18px}
+      .stat{padding-right:0}
+      .stat:not(:last-child)::after{display:none}
+    }
     @media(max-width:640px){
-      .hero-visual{display:none}
+      .hero-visual{display:flex}
       .nav-logo-mark{width:30px;height:30px;border-radius:10px}
       .nav-logo-wordmark{font-size:1.22rem}
       .chatbot-float-label{right:82px;bottom:34px;padding:8px 12px;font-size:.76rem}
@@ -383,29 +334,16 @@
     }
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_id = 'navbar' %}
+{% set navbar_mode = 'fixed' %}
+{% set navbar_variant = 'index' %}
 
 <!-- NAVBAR -->
-<nav id="navbar" data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home">
-    <img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/>
-    <span class="nav-logo-wordmark" aria-hidden="true">
-      <span class="nav-logo-main">Migrant</span><span class="nav-logo-accent">Safe</span>
-    </span>
-  </a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-links">
-    <a href="#how"      data-t="nav_how">How It Works</a>
-    <a href="#features" data-t="nav_feat">Features</a>
-    <a href="#who"      data-t="nav_who">For You</a>
-  </div>
-  <div class="nav-cta">
-    <a href="{{ url_for('login') }}"    class="btn btn-outline"  data-t="nav_login" data-guide="login-btn">Log In</a>
-    <a href="{{ url_for('register') }}" class="btn btn-primary"  data-t="nav_reg" data-guide="register-btn">Register Free</a>
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <!-- HERO -->
 <section class="hero">
@@ -416,73 +354,81 @@
       <span data-t="h1d">Work </span><span class="accent2" data-t="h1e">Safely</span><span>.</span><br/>
       <span data-t="h1f">Know Your Rights.</span>
     </h1>
-    <p class="hero-sub" data-t="hero_sub">MigrantSafe helps migrant workers verify recruitment agents, report fraud, and get guidance in their own language — 24 hours a day, for free.</p>
+    <p class="hero-sub" data-t="hero_sub">🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.</p>
     <div class="hero-actions">
       <a href="{{ url_for('register') }}" class="btn btn-amber btn-lg" data-t="cta1">Get Started — It's Free</a>
       <a href="#how" class="btn btn-lg" style="color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.3);" data-t="cta2">See How It Works</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num">3M+</div><div class="stat-label" data-t="st1">Migrants in Malaysia</div></div>
-      <div class="stat"><div class="stat-num">3</div><div class="stat-label" data-t="st2">Languages Supported</div></div>
-      <div class="stat"><div class="stat-num">24/7</div><div class="stat-label" data-t="st3">Chatbot Guidance</div></div>
+      <div class="stat">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8.6"></circle>
+            <path d="M3.8 12h16.4M12 3.4v17.2"></path>
+            <path d="M5.4 8.2h13.2M5.4 15.8h13.2"></path>
+            <path d="M12 3.4c2.2 2.1 3.4 5.1 3.4 8.6s-1.2 6.5-3.4 8.6M12 3.4C9.8 5.5 8.6 8.5 8.6 12s1.2 6.5 3.4 8.6"></path>
+          </svg>
+        </div>
+        <div><div class="stat-num">3</div><div class="stat-label" data-t="st1">Languages Supported</div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3.3 5.8 5.9v5.4c0 4 2.4 7.2 6.2 9.4 3.8-2.2 6.2-5.4 6.2-9.4V5.9L12 3.3Z"></path>
+            <path d="m8.7 12 2.2 2.2 4.5-4.9"></path>
+            <path d="M8.3 7.1 12 5.6l3.7 1.5"></path>
+          </svg>
+        </div>
+        <div><div class="stat-num">100%</div><div class="stat-label" data-t="st2">Confidential Reporting</div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M7.3 17.1 4 19.4v-3.8a7.1 7.1 0 0 1-1-3.5C3 7.7 7 4.2 12 4.2s9 3.5 9 7.9-4 7.9-9 7.9a10.2 10.2 0 0 1-4.7-1.1Z"></path>
+            <path d="M8 9.7h8M8 12.5h8M8 15.3h4.8"></path>
+            <path d="M17.6 17.1 20 18.8v-3"></path>
+          </svg>
+        </div>
+        <div><div class="stat-num">24/7</div><div class="stat-label" data-t="st3">AI Chatbot Guidance</div></div>
+      </div>
     </div>
   </div>
   <div class="hero-visual">
     <div class="hero-scene">
       <div class="hero-glow"></div>
-
-      <div class="bubble user b1">
-        <strong data-t="vc1l">Agent check</strong>
-        <span data-t="vc1b">Is this agent verified?</span>
-      </div>
-
-      <div class="bubble reply b2">
-        <strong data-t="vc2l">MigrantSafe</strong>
-        <span data-t="vc2q">Yes, this agent is verified.</span>
-      </div>
-
-      <div class="bubble user b3">
-        <strong data-t="vc3l">Report help</strong>
-        <span data-t="vc3n">How do I report fraud?</span>
-      </div>
-
-      <div class="bubble reply warm b4">
-        <strong data-t="vc3s">Guidance</strong>
-        <span data-t="vc3b">You can submit a report in your language.</span>
-      </div>
-
-      <div class="phone-shell" aria-hidden="true">
-        <div class="phone-screen">
-          <div class="screen-header">
-            <span>09:41</span>
-            <div class="screen-status"><span></span><em data-t="vc4l" style="font-style:normal">Live support</em></div>
-          </div>
-          <div class="assistant-orb"></div>
-          <div class="screen-panel">
-            <div class="screen-label" data-t="vc4q">Safe migration assistant</div>
-            <div class="screen-title" data-t="vc4a">Answers about agents, documents, fees, and worker rights.</div>
-            <div class="screen-copy" data-t="vc5a">Designed to guide workers clearly and calmly before problems become serious.</div>
-          </div>
+      <div class="language-card" aria-labelledby="languageCardTitle">
+        <div class="language-card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8.6"></circle>
+            <path d="M3.8 12h16.4M12 3.4v17.2"></path>
+            <path d="M5.4 8.2h13.2M5.4 15.8h13.2"></path>
+            <path d="M12 3.4c2.2 2.1 3.4 5.1 3.4 8.6s-1.2 6.5-3.4 8.6M12 3.4C9.8 5.5 8.6 8.5 8.6 12s1.2 6.5 3.4 8.6"></path>
+          </svg>
+        </div>
+        <h2 class="language-card-title" id="languageCardTitle">Choose Your Language</h2>
+        <p class="language-card-sub">Select your preferred language to get started.</p>
+        <div class="language-options" role="listbox" aria-label="Choose language" data-guide="language-selector">
+          <button type="button" class="language-option active" data-lang="en" onclick="setLang('en')" onkeydown="handleLanguageKey(event, 'en')" aria-selected="true">
+            English <span class="language-option-arrow" aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="language-option" data-lang="ms" onclick="setLang('ms')" onkeydown="handleLanguageKey(event, 'ms')" aria-selected="false">
+            Bahasa Melayu <span class="language-option-arrow" aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="language-option" data-lang="bn" onclick="setLang('bn')" onkeydown="handleLanguageKey(event, 'bn')" aria-selected="false">
+            বাংলা <span class="language-option-arrow" aria-hidden="true">→</span>
+          </button>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- LANG STRIP -->
-<div class="lang-strip">
-  <span data-t="lang_label">Available in:</span>
-  <span class="lang-pill active" onclick="setLang('en')">🇬🇧 English</span>
-  <span class="lang-pill"        onclick="setLang('ms')">🇲🇾 Bahasa Melayu</span>
-  <span class="lang-pill"        onclick="setLang('bn')">🇧🇩 বাংলা</span>
-</div>
-
 <!-- HOW IT WORKS -->
 <section class="how" id="how">
   <div class="reveal">
     <div class="section-tag" data-t="how_tag">Simple Steps</div>
     <h2 class="section-title" data-t="how_h">How MigrantSafe Works</h2>
-    <p class="section-sub" data-t="how_p">Anyone can use this platform — no technical skills needed. Just follow these 4 simple steps.</p>
+    <p class="section-sub" data-t="how_p">Anyone can use this platform — no technical skills needed. Just follow these 5 simple steps.</p>
   </div>
   <div class="how-grid">
     <div class="step-card reveal" data-num="01"><div class="step-icon" style="background:#e6f4f4">🧑‍💼</div><h3 data-t="s1h">Create Your Account</h3><p data-t="s1p">Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.</p></div>
@@ -615,31 +561,7 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="flogo">Migrant<span class="dot">Safe</span></div>
-      <p data-t="ft_desc">A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.</p>
-    </div>
-    <div class="footer-col">
-      <h4 data-t="ft_h1">Platform</h4>
-      <a href="{{ url_for('register') }}" data-t="ft_reg">Register</a>
-      <a href="{{ url_for('login') }}"    data-t="ft_login">Login</a>
-      <a href="{{ url_for('agents') }}"   data-t="ft_agents">Agent Directory</a>
-      <a href="{{ url_for('chatbot') }}"  data-t="ft_chatbot">Chatbot</a>
-    </div>
-    <div class="footer-col">
-      <h4 data-t="ft_h3">Languages</h4>
-      <a href="#" onclick="setLang('en');return false">🇬🇧 English</a>
-      <a href="#" onclick="setLang('ms');return false">🇲🇾 Bahasa Melayu</a>
-      <a href="#" onclick="setLang('bn');return false">🇧🇩 বাংলা</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span data-t="ft_copy">© 2025 MigrantSafe · Final Year Project · APU Malaysia</span>
-    <span>Supporting <span class="sdg-tag" data-t="ft_sdg">SDG 8 — Decent Work &amp; Economic Growth</span></span>
-  </div>
-</footer>
+{% include '_footer.html' %}
 
 <!-- ═══════════════════════════════════════
      TRANSLATION ENGINE
@@ -652,7 +574,7 @@
   <div class="guide-kicker">Quick Guide</div>
   <div class="guide-title" id="guideTitle">Start Here</div>
   <div class="guide-text" id="guideText">Start here to create your account.</div>
-  <div class="guide-count" id="guideCount">Step 1 of 4</div>
+  <div class="guide-count" id="guideCount">Step 1 of 5</div>
   <div class="guide-actions">
     <button type="button" class="guide-btn" id="guideBack">Back</button>
     <button type="button" class="guide-btn" id="guideSkip">Skip</button>
@@ -670,20 +592,20 @@
 // ──────────────────────────────────────────────────────────
 const T = {
   en: {
-    nav_how:"How It Works", nav_feat:"Features", nav_who:"For You", nav_chat:"Chatbot",
-    nav_login:"Log In", nav_reg:"Register Free",
+    nav_how:"Find Agents", nav_feat:"Chatbot", nav_who:"Guide", nav_chat:"Chatbot",
+    nav_login:"Login", nav_reg:"Register",
     badge:"Protecting Migrant Workers in Malaysia",
     h1a:"Find ", h1b:"Trusted", h1c:" Agents.", h1d:"Work ", h1e:"Safely", h1f:"Know Your Rights.",
-    hero_sub:"MigrantSafe helps migrant workers verify recruitment agents, report fraud, and get guidance in their own language — 24 hours a day, for free.",
+    hero_sub:"🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.",
     cta1:"Get Started — It's Free", cta2:"See How It Works",
-    st1:"Migrants in Malaysia", st2:"Languages Supported", st3:"Chatbot Guidance",
+    st1:"Languages Supported", st2:"Confidential Reporting", st3:"AI Chatbot Guidance",
     vc1l:"Agent check", vc1b:"Is this agent verified?",
     vc2l:"MigrantSafe", vc2q:"Yes, this agent is verified.", vc2a:"2–4 weeks after medical check ✓",
     vc3l:"Report help", vc3n:"How do I report fraud?", vc3s:"Guidance", vc3b:"You can submit a report in your language.",
     vc4l:"Live support", vc4q:"Safe migration assistant", vc4a:"Answers about agents, documents, fees, and worker rights.", vc5a:"Designed to guide workers clearly and calmly before problems become serious.",
     lang_label:"Available in:",
     how_tag:"Simple Steps", how_h:"How MigrantSafe Works",
-    how_p:"Anyone can use this platform — no technical skills needed. Just follow these 4 simple steps.",
+    how_p:"Anyone can use this platform — no technical skills needed. Just follow these 5 simple steps.",
     s1h:"Create Your Account",    s1p:"Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.",
     s2h:"Search for Agents",      s2p:"Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.",
     s3h:"Report Bad Actors",      s3p:"If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.",
@@ -729,8 +651,16 @@ const T = {
     ft_desc:"A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.",
     ft_h1:"Platform", ft_h3:"Languages",
     ft_reg:"Register", ft_login:"Login", ft_agents:"Agent Directory", ft_chatbot:"Chatbot",
-    ft_copy:"© 2025 MigrantSafe · Final Year Project · APU Malaysia",
+    ft_help_h:"Need help?", ft_help_p:"Talk to our assistant anytime", ft_help_btn:"Start Chat →", ft_report:"Report Agent",
+    ft_copy:"© 2026 MigrantSafe",
     ft_sdg:"SDG 8 — Decent Work & Economic Growth",
+    guide_kicker:"Quick Guide",
+    guide_back:"Back", guide_skip:"Skip", guide_next:"Next", guide_done:"Done", guide_step:"Step", guide_of:"of",
+    guide_lang_title:"Select Your Language", guide_lang_text:"Choose English, Bahasa Melayu, or Bangla. The guide will continue in your selected language.",
+    guide_register_title:"Register Account", guide_register_text:"Create your free account to use MigrantSafe.",
+    guide_login_title:"Log In", guide_login_text:"Already registered? Log in here.",
+    guide_chatbot_title:"Use Chatbot", guide_chatbot_text:"Use the bottom-right chat icon to ask for help anytime.",
+    guide_agents_title:"Browse / Find Agents", guide_agents_text:"Check recruitment agents before you trust them.",
     r_default:"Thank you for your question! For a full answer, please use the chatbot page. 😊",
     r_visa:"Your visa application usually takes 2–6 weeks. Make sure your medical check is complete first!",
     r_agent:"To check if an agent is verified, go to the Agent Directory and look for the green ✓ Verified badge.",
@@ -738,20 +668,20 @@ const T = {
     r_report:"To report an agent, log in and click 'Report Agent' on their profile. Our admin team will review it.",
   },
   ms: {
-    nav_how:"Cara Berfungsi", nav_feat:"Ciri-ciri", nav_who:"Untuk Anda", nav_chat:"Chatbot",
-    nav_login:"Log Masuk", nav_reg:"Daftar Percuma",
+    nav_how:"Cari Ejen", nav_feat:"Chatbot", nav_who:"Panduan", nav_chat:"Chatbot",
+    nav_login:"Log Masuk", nav_reg:"Daftar",
     badge:"Melindungi Pekerja Asing di Malaysia",
     h1a:"Cari ", h1b:"Ejen Dipercayai", h1c:".", h1d:"Bekerja ", h1e:"dengan Selamat", h1f:"Ketahui Hak Anda.",
-    hero_sub:"MigrantSafe membantu pekerja asing mengesahkan ejen pengambilan, melaporkan penipuan, dan mendapatkan panduan dalam bahasa mereka sendiri — 24 jam sehari, secara percuma.",
+    hero_sub:"🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.",
     cta1:"Mulakan — Percuma", cta2:"Lihat Cara Ia Berfungsi",
-    st1:"Pekerja Asing di Malaysia", st2:"Bahasa Disokong", st3:"Panduan Chatbot",
+    st1:"Languages Supported", st2:"Confidential Reporting", st3:"AI Chatbot Guidance",
     vc1l:"Semakan ejen", vc1b:"Adakah ejen ini disahkan?",
     vc2l:"MigrantSafe", vc2q:"Ya, ejen ini telah disahkan.", vc2a:"2–4 minggu selepas pemeriksaan perubatan ✓",
     vc3l:"Bantuan laporan", vc3n:"Bagaimana saya laporkan penipuan?", vc3s:"Panduan", vc3b:"Anda boleh hantar laporan dalam bahasa anda.",
     vc4l:"Sokongan langsung", vc4q:"Pembantu migrasi selamat", vc4a:"Jawapan tentang ejen, dokumen, yuran, dan hak pekerja.", vc5a:"Direka untuk membimbing pekerja dengan jelas dan tenang sebelum masalah menjadi serius.",
     lang_label:"Tersedia dalam:",
     how_tag:"Langkah Mudah", how_h:"Cara MigrantSafe Berfungsi",
-    how_p:"Sesiapa pun boleh menggunakan platform ini — tiada kemahiran teknikal diperlukan. Ikuti sahaja 4 langkah mudah ini.",
+    how_p:"Sesiapa pun boleh menggunakan platform ini — tiada kemahiran teknikal diperlukan. Ikuti sahaja 5 langkah mudah ini.",
     s1h:"Buat Akaun Anda",      s1p:"Daftar sebagai pekerja asing atau ejen pengambilan. Ia percuma sepenuhnya dan mengambil masa kurang dari 2 minit.",
     s2h:"Cari Ejen",            s2p:"Layari pangkalan data agensi pengambilan kami. Lihat status pengesahan mereka — Disahkan, Belum Disahkan, atau Dilaporkan.",
     s3h:"Laporkan Ejen Palsu",  s3p:"Jika ejen menipu atau mengelirukan anda, isi borang laporan mudah. Admin akan menyemaknya dan mengemas kini status ejen.",
@@ -797,8 +727,16 @@ const T = {
     ft_desc:"Platform berbilang bahasa yang membantu pekerja asing di Malaysia mencari ejen yang disahkan dan memahami hak mereka.",
     ft_h1:"Platform", ft_h3:"Bahasa",
     ft_reg:"Daftar", ft_login:"Log Masuk", ft_agents:"Direktori Ejen", ft_chatbot:"Chatbot",
-    ft_copy:"© 2025 MigrantSafe · Projek Tahun Akhir · APU Malaysia",
+    ft_help_h:"Perlu bantuan?", ft_help_p:"Bercakap dengan pembantu kami bila-bila masa", ft_help_btn:"Mula Chat →", ft_report:"Laporkan Ejen",
+    ft_copy:"© 2026 MigrantSafe",
     ft_sdg:"SDG 8 — Kerja Layak & Pertumbuhan Ekonomi",
+    guide_kicker:"Panduan Ringkas",
+    guide_back:"Kembali", guide_skip:"Langkau", guide_next:"Seterusnya", guide_done:"Selesai", guide_step:"Langkah", guide_of:"daripada",
+    guide_lang_title:"Pilih Bahasa Anda", guide_lang_text:"Pilih English, Bahasa Melayu, atau Bangla. Panduan akan diteruskan dalam bahasa pilihan anda.",
+    guide_register_title:"Daftar Akaun", guide_register_text:"Cipta akaun percuma anda untuk menggunakan MigrantSafe.",
+    guide_login_title:"Log Masuk", guide_login_text:"Sudah berdaftar? Log masuk di sini.",
+    guide_chatbot_title:"Guna Chatbot", guide_chatbot_text:"Guna ikon chat di bahagian kanan bawah untuk mendapatkan bantuan bila-bila masa.",
+    guide_agents_title:"Cari Ejen", guide_agents_text:"Semak ejen pengambilan sebelum anda mempercayai mereka.",
     r_default:"Terima kasih atas soalan anda! Untuk jawapan penuh, sila gunakan halaman chatbot. 😊",
     r_visa:"Permohonan visa anda biasanya mengambil masa 2–6 minggu. Pastikan pemeriksaan perubatan anda selesai terlebih dahulu!",
     r_agent:"Untuk menyemak sama ada ejen disahkan, pergi ke Direktori Ejen dan cari lencana hijau ✓ Disahkan.",
@@ -806,20 +744,20 @@ const T = {
     r_report:"Untuk melaporkan ejen, log masuk dan klik 'Laporkan Ejen' pada profil mereka.",
   },
   bn: {
-    nav_how:"কীভাবে কাজ করে", nav_feat:"বৈশিষ্ট্য", nav_who:"আপনার জন্য", nav_chat:"চ্যাটবট",
-    nav_login:"লগ ইন", nav_reg:"বিনামূল্যে নিবন্ধন",
+    nav_how:"এজেন্ট খুঁজুন", nav_feat:"চ্যাটবট", nav_who:"গাইড", nav_chat:"চ্যাটবট",
+    nav_login:"লগ ইন", nav_reg:"নিবন্ধন",
     badge:"মালয়েশিয়ায় অভিবাসী শ্রমিকদের সুরক্ষা",
     h1a:"বিশ্বস্ত ", h1b:"এজেন্ট", h1c:" খুঁজুন।", h1d:"", h1e:"নিরাপদে কাজ করুন", h1f:"আপনার অধিকার জানুন।",
-    hero_sub:"MigrantSafe অভিবাসী শ্রমিকদের নিয়োগ এজেন্ট যাচাই করতে, প্রতারণা রিপোর্ট করতে এবং তাদের নিজের ভাষায় গাইডেন্স পেতে সাহায্য করে — দিনে ২৪ ঘণ্টা, বিনামূল্যে।",
+    hero_sub:"🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.",
     cta1:"শুরু করুন — বিনামূল্যে", cta2:"কীভাবে কাজ করে দেখুন",
-    st1:"মালয়েশিয়ায় অভিবাসী", st2:"ভাষা সমর্থিত", st3:"চ্যাটবট গাইডেন্স",
+    st1:"Languages Supported", st2:"Confidential Reporting", st3:"AI Chatbot Guidance",
     vc1l:"এজেন্ট যাচাই", vc1b:"এই এজেন্টটি কি যাচাইকৃত?",
     vc2l:"MigrantSafe", vc2q:"হ্যাঁ, এই এজেন্ট যাচাইকৃত।", vc2a:"মেডিকেলের পর ২–৪ সপ্তাহ ✓",
     vc3l:"রিপোর্ট সহায়তা", vc3n:"আমি কীভাবে প্রতারণা রিপোর্ট করব?", vc3s:"গাইডেন্স", vc3b:"আপনি আপনার ভাষায় রিপোর্ট জমা দিতে পারেন।",
     vc4l:"লাইভ সাপোর্ট", vc4q:"নিরাপদ মাইগ্রেশন অ্যাসিস্ট্যান্ট", vc4a:"এজেন্ট, নথি, ফি, এবং শ্রমিক অধিকার নিয়ে উত্তর।", vc5a:"সমস্যা গুরুতর হওয়ার আগে শ্রমিকদের স্পষ্ট ও শান্তভাবে গাইড করার জন্য ডিজাইন করা হয়েছে।",
     lang_label:"পাওয়া যাচ্ছে:",
     how_tag:"সহজ পদক্ষেপ", how_h:"MigrantSafe কীভাবে কাজ করে",
-    how_p:"যে কেউ এই প্ল্যাটফর্ম ব্যবহার করতে পারবেন — কোনো প্রযুক্তিগত দক্ষতার প্রয়োজন নেই। শুধু এই ৪টি সহজ পদক্ষেপ অনুসরণ করুন।",
+    how_p:"যে কেউ এই প্ল্যাটফর্ম ব্যবহার করতে পারবেন — কোনো প্রযুক্তিগত দক্ষতার প্রয়োজন নেই। শুধু এই ৫টি সহজ পদক্ষেপ অনুসরণ করুন।",
     s1h:"আপনার অ্যাকাউন্ট তৈরি করুন", s1p:"অভিবাসী শ্রমিক বা নিয়োগ এজেন্ট হিসেবে নিবন্ধন করুন। এটি সম্পূর্ণ বিনামূল্যে এবং ২ মিনিটেরও কম সময় নেয়।",
     s2h:"এজেন্ট খুঁজুন",            s2p:"আমাদের নিয়োগ সংস্থার ডেটাবেস ব্রাউজ করুন। তাদের যাচাইকরণ স্ট্যাটাস দেখুন — যাচাইকৃত, মুলতুবি, বা রিপোর্টেড।",
     s3h:"খারাপ এজেন্ট রিপোর্ট করুন", s3p:"যদি কোনো এজেন্ট আপনাকে প্রতারণা করে, একটি সহজ রিপোর্ট ফর্ম পূরণ করুন। অ্যাডমিন এটি পর্যালোচনা করবে।",
@@ -865,8 +803,16 @@ const T = {
     ft_desc:"একটি বহুভাষিক প্ল্যাটফর্ম যা মালয়েশিয়ায় অভিবাসী শ্রমিকদের যাচাইকৃত এজেন্ট খুঁজে পেতে এবং তাদের অধিকার বুঝতে সহায়তা করে।",
     ft_h1:"প্ল্যাটফর্ম", ft_h3:"ভাষা",
     ft_reg:"নিবন্ধন", ft_login:"লগ ইন", ft_agents:"এজেন্ট ডিরেক্টরি", ft_chatbot:"চ্যাটবট",
-    ft_copy:"© ২০২৫ MigrantSafe · চূড়ান্ত বর্ষ প্রকল্প · APU মালয়েশিয়া",
+    ft_help_h:"সাহায্য দরকার?", ft_help_p:"যেকোনো সময় আমাদের সহকারীর সাথে কথা বলুন", ft_help_btn:"চ্যাট শুরু করুন →", ft_report:"এজেন্ট রিপোর্ট করুন",
+    ft_copy:"© ২০২৬ MigrantSafe",
     ft_sdg:"SDG ৮ — সম্মানজনক কাজ ও অর্থনৈতিক প্রবৃদ্ধি",
+    guide_kicker:"দ্রুত গাইড",
+    guide_back:"পেছনে", guide_skip:"এড়িয়ে যান", guide_next:"পরবর্তী", guide_done:"শেষ", guide_step:"ধাপ", guide_of:"এর",
+    guide_lang_title:"আপনার ভাষা নির্বাচন করুন", guide_lang_text:"English, Bahasa Melayu, অথবা বাংলা বেছে নিন। এরপর গাইড আপনার নির্বাচিত ভাষায় চলবে।",
+    guide_register_title:"অ্যাকাউন্ট নিবন্ধন করুন", guide_register_text:"MigrantSafe ব্যবহার করতে বিনামূল্যে অ্যাকাউন্ট তৈরি করুন।",
+    guide_login_title:"লগ ইন করুন", guide_login_text:"আগে নিবন্ধন করেছেন? এখানে লগ ইন করুন।",
+    guide_chatbot_title:"চ্যাটবট ব্যবহার করুন", guide_chatbot_text:"যেকোনো সময় সাহায্যের জন্য নিচের ডান পাশের চ্যাট আইকন ব্যবহার করুন।",
+    guide_agents_title:"এজেন্ট খুঁজুন", guide_agents_text:"বিশ্বাস করার আগে নিয়োগ এজেন্ট যাচাই করুন।",
     r_default:"আপনার প্রশ্নের জন্য ধন্যবাদ! সম্পূর্ণ উত্তরের জন্য চ্যাটবট পাতায় যান। 😊",
     r_visa:"আপনার ভিসা আবেদন সাধারণত ২–৬ সপ্তাহ সময় নেয়। প্রথমে মেডিকেল চেক সম্পন্ন করুন!",
     r_agent:"এজেন্ট যাচাইকৃত কিনা জানতে এজেন্ট ডিরেক্টরিতে যান এবং সবুজ ✓ ব্যাজ খুঁজুন।",
@@ -879,9 +825,28 @@ const T = {
 // APPLY TRANSLATIONS
 // ──────────────────────────────────────────────────────────
 let lang = 'en';
+const LANGUAGE_STORAGE_KEY = 'migrantSafeLang';
+
+function getSavedLanguage() {
+  try {
+    const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    return T[saved] ? saved : 'en';
+  } catch (error) {
+    return 'en';
+  }
+}
+
+function saveLanguage(l) {
+  try {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, l);
+  } catch (error) {
+    // Ignore storage errors.
+  }
+}
 
 function applyLang(l) {
   const D = T[l];
+  document.documentElement.lang = { en: 'en', ms: 'ms', bn: 'bn' }[l] || 'en';
   document.querySelectorAll('[data-t]').forEach(el => {
     const k = el.getAttribute('data-t');
     if (D[k] !== undefined) el.innerHTML = D[k];
@@ -907,15 +872,34 @@ function buildDemoChat(l) {
   body.scrollTop = body.scrollHeight;
 }
 
+function syncLanguageCard(l) {
+  document.querySelectorAll('.language-option').forEach(option => {
+    const active = option.dataset.lang === l;
+    option.classList.toggle('active', active);
+    option.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+}
+
+function handleLanguageKey(event, l) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  setLang(l);
+}
+
 function setLang(l) {
-  if (l === lang) return;
+  if (!T[l]) return;
+  saveLanguage(l);
+  if (l === lang) {
+    syncLanguageCard(l);
+    refreshGuideContent();
+    return;
+  }
   lang = l;
   document.body.classList.add('fading');
   setTimeout(() => {
     applyLang(l);
-    document.querySelectorAll('.lang-pill').forEach((p,i) => {
-      p.classList.toggle('active', ['en','ms','bn'][i] === l);
-    });
+    syncLanguageCard(l);
+    refreshGuideContent();
     document.body.classList.remove('fading');
   }, 220);
 }
@@ -960,18 +944,20 @@ function sendDemo() {
 // ----------------------------------------------------------
 // HOMEPAGE GUIDE
 // ----------------------------------------------------------
-const GUIDE_KEY = 'ms-index-guide-done';
+const GUIDE_KEY = 'ms-index-guide-v2-done';
 const GUIDE_STEPS = [
-  { target: 'register-btn', title: 'Register', text: 'Start here to create your account' },
-  { target: 'login-btn', title: 'Login', text: 'Log in here if you already have an account' },
-  { target: 'chatbot-btn', title: 'Chatbot', text: 'Ask for help here anytime' },
-  { target: 'agents-btn', title: 'Browse Agents', text: 'Check agents here before trusting them' }
+  { target: 'language-selector', titleKey: 'guide_lang_title', textKey: 'guide_lang_text' },
+  { target: 'register-btn', titleKey: 'guide_register_title', textKey: 'guide_register_text' },
+  { target: 'login-btn', titleKey: 'guide_login_title', textKey: 'guide_login_text' },
+  { target: 'chatbot-btn', titleKey: 'guide_chatbot_title', textKey: 'guide_chatbot_text' },
+  { target: 'agents-btn', titleKey: 'guide_agents_title', textKey: 'guide_agents_text' }
 ];
 
 const guideReplayBtn = document.getElementById('guideReplayBtn');
 const guideOverlay = document.getElementById('guideOverlay');
 const guideArrow = document.getElementById('guideArrow');
 const guideCard = document.getElementById('guideCard');
+const guideKicker = guideCard.querySelector('.guide-kicker');
 const guideTitle = document.getElementById('guideTitle');
 const guideText = document.getElementById('guideText');
 const guideCount = document.getElementById('guideCount');
@@ -1045,6 +1031,16 @@ function ensureGuideTargetVisible(target) {
   return target;
 }
 
+function scrollGuideTargetIntoView(target) {
+  if (!target || window.getComputedStyle(target).position === 'fixed') return;
+  const nav = document.querySelector('nav[data-mobile-nav]');
+  const navHeight = nav ? nav.getBoundingClientRect().height : 0;
+  const rect = target.getBoundingClientRect();
+  const absoluteTop = rect.top + window.scrollY;
+  const targetTop = Math.max(0, absoluteTop - navHeight - 36);
+  window.scrollTo({ top: targetTop, behavior: 'smooth' });
+}
+
 function clearGuideTarget() {
   if (activeGuideTarget) activeGuideTarget.classList.remove('guide-target');
   activeGuideTarget = null;
@@ -1055,6 +1051,7 @@ function getGuideFocusable() {
 }
 
 function updateGuideButtons() {
+  const D = T[lang] || T.en;
   const isFirst = guideIndex === 0;
   const isLast = guideIndex === GUIDE_STEPS.length - 1;
 
@@ -1063,7 +1060,23 @@ function updateGuideButtons() {
   guideNext.hidden = isLast;
   guideDone.hidden = !isLast;
   guideDone.classList.toggle('primary', isLast);
-  guideCount.textContent = `Step ${guideIndex + 1} of ${GUIDE_STEPS.length}`;
+  guideBack.textContent = D.guide_back || T.en.guide_back;
+  guideSkip.textContent = D.guide_skip || T.en.guide_skip;
+  guideNext.textContent = D.guide_next || T.en.guide_next;
+  guideDone.textContent = D.guide_done || T.en.guide_done;
+  guideCount.textContent = `${D.guide_step || T.en.guide_step} ${guideIndex + 1} ${D.guide_of || T.en.guide_of} ${GUIDE_STEPS.length}`;
+}
+
+function refreshGuideContent() {
+  if (!guideOpen) return;
+  const step = GUIDE_STEPS[guideIndex];
+  if (!step) return;
+  const D = T[lang] || T.en;
+  guideKicker.textContent = D.guide_kicker || T.en.guide_kicker;
+  guideTitle.textContent = D[step.titleKey] || T.en[step.titleKey];
+  guideText.textContent = D[step.textKey] || T.en[step.textKey];
+  updateGuideButtons();
+  scheduleGuidePosition();
 }
 
 function clampGuideValue(value, min, max) {
@@ -1188,13 +1201,10 @@ function showGuideStep(index) {
   activeGuideTarget = target;
   activeGuideTarget.classList.add('guide-target');
 
-  guideTitle.textContent = step.title;
-  guideText.textContent = step.text;
+  refreshGuideContent();
   updateGuideButtons();
 
-  if (window.getComputedStyle(target).position !== 'fixed') {
-    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-  }
+  scrollGuideTargetIntoView(target);
   window.clearTimeout(guideScrollTimer);
   scheduleGuidePosition();
   guideScrollTimer = window.setTimeout(() => scheduleGuidePosition(), 260);
@@ -1305,7 +1315,9 @@ document.addEventListener('keydown', event => {
 window.addEventListener('resize', positionActiveGuide);
 window.addEventListener('scroll', positionActiveGuide, { passive: true });
 
-buildDemoChat('en');
+lang = getSavedLanguage();
+applyLang(lang);
+syncLanguageCard(lang);
 
 window.addEventListener('load', () => {
   if (!getGuideSeen()) {

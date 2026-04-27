@@ -1,0 +1,25 @@
+{% set navbar_active = navbar_active|default('') %}
+{% set navbar_mode = navbar_mode|default('sticky') %}
+{% set navbar_id = navbar_id|default('') %}
+{% set navbar_variant = navbar_variant|default('default') %}
+{% set dashboard_href = url_for('dashboard_worker') if current_user.role == 'worker' else url_for('dashboard_agent') if current_user.role == 'agent' else url_for('dashboard_admin') if current_user.role == 'admin' else url_for('dashboard') %}
+<nav{% if navbar_id %} id="{{ navbar_id }}"{% endif %} class="ms-navbar navbar-{{ navbar_mode }}" data-mobile-nav>
+  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home">
+    <img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/>
+    <span class="nav-logo-text">Migrant<span class="dot">Safe</span></span>
+  </a>
+  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
+  <div class="nav-links">
+    <a href="{{ url_for('agents') }}" class="{% if navbar_active == 'agents' %}active{% endif %}"{% if navbar_active == 'agents' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navAgents"{% elif navbar_variant == 'index' %} data-t="nav_how"{% endif %}>Find Agents</a>
+    <a href="{{ url_for('chatbot') }}" class="{% if navbar_active == 'chatbot' %}active{% endif %}"{% if navbar_active == 'chatbot' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navChatbot"{% elif navbar_variant == 'index' %} data-t="nav_feat"{% endif %}>Chatbot</a>
+    <a href="{{ url_for('migration_guide') }}" class="{% if navbar_active == 'guide' %}active{% endif %}"{% if navbar_active == 'guide' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navHow"{% elif navbar_variant == 'index' %} data-t="nav_who"{% endif %}>Guide</a>
+  </div>
+  <div class="nav-cta">
+    {% if current_user.is_auth %}
+    <a href="{{ dashboard_href }}" class="nav-btn nav-btn-primary"{% if navbar_variant == 'agents' %} id="t-navDashboard"{% endif %}>Dashboard</a>
+    {% else %}
+    <a href="{{ url_for('login') }}" class="nav-btn nav-btn-outline"{% if navbar_variant == 'agents' %} id="t-navLogin"{% elif navbar_variant == 'index' %} data-t="nav_login" data-guide="login-btn"{% endif %}>Login</a>
+    <a href="{{ url_for('register') }}" class="nav-btn nav-btn-primary"{% if navbar_variant == 'agents' %} id="t-navRegister"{% elif navbar_variant == 'index' %} data-t="nav_reg" data-guide="register-btn"{% endif %}>Register</a>
+    {% endif %}
+  </div>
+</nav>

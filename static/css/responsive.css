@@ -12,7 +12,7 @@ body {
   gap: 0.7rem;
   line-height: 1;
   flex-shrink: 0;
-  margin-left: -2.8rem;
+  margin-left: -4.5rem;
 }
 
 .nav-logo-icon {
@@ -28,6 +28,7 @@ body {
   display: inline-flex;
   align-items: baseline;
   line-height: 1;
+  color: var(--teal, #0D6E6E);
 }
 
 .nav-logo-text,
@@ -181,6 +182,10 @@ nav[data-mobile-nav].nav-open .nav-cta button {
   border-radius: 0;
 }
 
+.page-hero.agents-hero {
+  border-radius: 0;
+}
+
 .page-hero,
 .banner,
 .form-card,
@@ -236,7 +241,6 @@ nav[data-mobile-nav].nav-open .nav-cta button {
 .modal-actions,
 .topbar,
 .lang-bar,
-.lang-strip,
 .sdg-section {
   flex-direction: column;
   align-items: stretch;
@@ -266,12 +270,6 @@ nav[data-mobile-nav].nav-open .nav-cta button {
 .hero-scene {
   height: auto;
   min-height: 24rem;
-}
-
-.phone-shell {
-  width: min(100%, 18rem);
-  height: auto;
-  aspect-ratio: 290 / 560;
 }
 
 .bubble,
@@ -404,11 +402,6 @@ body.sidebar-open .sidebar-overlay {
   justify-content: flex-start;
 }
 
-.lang-strip {
-  justify-content: flex-start;
-  padding: 1rem;
-}
-
 .topbar {
   gap: 0.75rem;
   height: auto;
@@ -513,8 +506,7 @@ body.sidebar-open .sidebar-overlay {
   .arc-actions,
   .card-actions,
   .modal-actions,
-  .lang-bar,
-  .lang-strip {
+  .lang-bar {
     flex-direction: row;
     align-items: center;
   }
@@ -578,10 +570,18 @@ body.sidebar-open .sidebar-overlay {
   }
 
   nav[data-mobile-nav] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: 1.5rem;
     flex-wrap: nowrap;
     padding-top: 0;
     padding-bottom: 0;
     min-height: 4.25rem;
+  }
+
+  nav[data-mobile-nav] .nav-logo {
+    justify-self: start;
+    min-width: max-content;
   }
 
   nav[data-mobile-nav] .nav-links,
@@ -598,11 +598,20 @@ body.sidebar-open .sidebar-overlay {
 
   nav[data-mobile-nav] .nav-links {
     flex-direction: row;
+    justify-self: center;
+    justify-content: center;
+    gap: clamp(2.5rem, 3vw, 4rem);
+  }
+
+  nav[data-mobile-nav] .nav-links a {
+    white-space: nowrap;
   }
 
   nav[data-mobile-nav] .nav-cta {
     flex-direction: row;
     margin-left: 0;
+    justify-self: end;
+    min-width: max-content;
   }
 
   .hero,

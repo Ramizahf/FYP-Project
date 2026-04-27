@@ -19,6 +19,10 @@
     nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06)}
     .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
+    .nav-links{display:flex;align-items:center;gap:28px}
+    .nav-links a{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--teal)}
+    .nav-links a.active{font-weight:600}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .18s}
     .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
     .btn-outline:hover{background:var(--teal-bg)}
@@ -84,24 +88,17 @@
     @media(max-width:600px){.info-grid{grid-template-columns:1fr}.info-card.full{grid-column:span 1}}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_active = 'agents' %}
+{% set navbar_variant = 'agents' %}
 
-<nav data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-cta">
-    <a href="{{ url_for('agents') }}" class="btn btn-outline">← All Agents</a>
-    {% if current_user.is_auth and current_user.role == 'worker' %}
-    <a href="{{ url_for('submit_enquiry') }}?agent_id={{ agent['id'] }}" class="btn btn-primary">Send Enquiry</a>
-    <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red">🚨 Report</a>
-    {% endif %}
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <div class="page-wrap">
-  <a href="{{ url_for('agents') }}" class="back-link">← Back to Agent Directory</a>
+  <a href="{{ url_for('agents') }}" class="back-link" data-t="back_directory">← Back to Agent Directory</a>
 
   {# ── HERO ── #}
   <div class="agent-hero">
@@ -218,6 +215,7 @@
   </div>
 
 </div>
+{% include '_footer.html' %}
 </body>
 </html>
 

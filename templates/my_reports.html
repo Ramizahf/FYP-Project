@@ -9,7 +9,7 @@
     :root{--teal:#0D6E6E;--teal-lt:#14A097;--teal-bg:#E6F4F4;--amber:#E8833A;--amber-lt:#FFB347;--dark:#0F2027;--mid:#1E3A3A;--text:#2C2C2C;--muted:#6B7B7B;--white:#FFFFFF;--cream:#F9F5F0;--border:#D4E8E8;--sw:260px}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;min-height:100vh}
-    .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200}
+    .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
     .sb-logo{padding:18px 20px 16px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
     .sb-logo-icon{display:block;width:auto;height:2.8rem;object-fit:contain;flex-shrink:0}
     .sb-logo-text{display:inline-flex;align-items:baseline;line-height:1;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;letter-spacing:-.035em}
@@ -19,15 +19,19 @@
     .sb-item{display:flex;align-items:center;gap:11px;padding:10px 14px;margin:2px 8px;border-radius:9px;font-size:.86rem;font-weight:500;color:rgba(255,255,255,.6);text-decoration:none;transition:background .18s,color .18s}
     .sb-item:hover{background:rgba(255,255,255,.07);color:var(--white)}
     .sb-item.active{background:rgba(20,160,151,.22);color:var(--teal-lt);font-weight:600}
-    .sb-icon{font-size:.95rem;width:18px;text-align:center}
+    .sb-icon{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
     .sb-icon img{width:18px;height:18px}
     .sb-footer{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.07)}
     .sb-user{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.05);margin-bottom:8px}
-    .sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--white)}
+    .sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:var(--white);flex-shrink:0}
     .sb-uname{font-size:.8rem;font-weight:600;color:var(--white)}
     .sb-urole{font-size:.68rem;color:rgba(255,255,255,.4)}
     .sb-logout{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .18s;text-decoration:none;display:block;text-align:center}
     .sb-logout:hover{background:rgba(255,255,255,.09);color:var(--white)}
+    .sb-lang{margin:12px 14px 4px;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+    .sb-lang label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+    .sb-lang-select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
+    .sb-lang-select option{color:var(--text);background:var(--white)}
     .main{margin-left:var(--sw);flex:1}
     .topbar{position:sticky;top:0;z-index:100;background:rgba(249,245,240,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
     .topbar h1{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark)}
@@ -66,14 +70,25 @@
 
 <aside class="sidebar">
   <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
+  <div class="sb-lang">
+    <label for="sidebarLangSelect">Language</label>
+    <select id="sidebarLangSelect" class="sb-lang-select">
+      <option value="en" selected>English</option>
+      <option value="ms">Bahasa Melayu</option>
+      <option value="bn">বাংলা</option>
+    </select>
+  </div>
   <div class="sb-section">Main</div>
   <a href="{{ url_for('dashboard_worker') }}" class="sb-item"><span class="sb-icon">🏠</span> Home</a>
   <a href="{{ url_for('agents') }}" class="sb-item"><span class="sb-icon">🔍</span> Find Agents</a>
   <a href="{{ url_for('submit_report') }}" class="sb-item"><span class="sb-icon">🚨</span> Report an Agent</a>
-  <a href="{{ url_for('chatbot') }}" class="sb-item"><span class="sb-icon"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"/></span> AI Chatbot</a>
+  <a href="{{ url_for('chatbot') }}" class="sb-item"><span class="sb-icon">💬</span> AI Chatbot</a>
   <a href="{{ url_for('migration_guide') }}" class="sb-item"><span class="sb-icon">🗺️</span> Migration Guide</a>
   <div class="sb-section">Account</div>
+  <a href="{{ url_for('dashboard_worker', page='profile') }}" class="sb-item"><span class="sb-icon">👤</span> My Profile</a>
+  <a href="{{ url_for('dashboard_worker', page='jobs') }}" class="sb-item"><span class="sb-icon">💼</span> Job Listings</a>
   <a href="{{ url_for('my_reports') }}" class="sb-item active"><span class="sb-icon">📋</span> My Reports</a>
+  <a href="{{ url_for('my_enquiries') }}" class="sb-item"><span class="sb-icon">✉️</span> My Enquiries</a>
   <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> Back to Homepage</a>
   <div class="sb-footer">
     <div class="sb-user">
@@ -143,5 +158,6 @@
 
   </div>
 </main>
+{% include '_footer.html' %}
 </body>
 </html>

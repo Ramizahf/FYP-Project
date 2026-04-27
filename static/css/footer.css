@@ -1,0 +1,119 @@
+.site-footer {
+  flex-shrink: 0;
+  background: var(--dark, #0F2027);
+  padding: 52px 5% 28px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-brand .flogo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--white, #FFFFFF);
+  margin-bottom: 12px;
+}
+
+.footer-brand .flogo .dot {
+  color: var(--amber, #E8833A);
+}
+
+.footer-brand p {
+  font-size: .84rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.75;
+  max-width: 360px;
+}
+
+.footer-col h4 {
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 16px;
+}
+
+.footer-col a {
+  display: block;
+  font-size: .84rem;
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  margin-bottom: 10px;
+  transition: color .2s;
+}
+
+.footer-col a:hover {
+  color: var(--teal-lt, #14A097);
+}
+
+.footer-help p {
+  font-size: .84rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.footer-help-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.footer-help .footer-chat-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: var(--amber, #E8833A);
+  color: var(--white, #FFFFFF);
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.footer-help .footer-chat-btn:hover {
+  background: #d06e28;
+  color: var(--white, #FFFFFF);
+}
+
+.footer-help .footer-report-link {
+  margin-bottom: 0;
+  color: rgba(255,255,255,.65);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .78rem;
+  color: rgba(255,255,255,.35);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sdg-tag {
+  color: var(--amber, #E8833A);
+  font-weight: 600;
+}
+
+@media(max-width:900px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media(max-width:640px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}

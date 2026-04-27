@@ -15,8 +15,12 @@
     .nav-logo .dot{color:var(--amber)}
     .nav-links{display:flex;align-items:center;gap:24px}
     .nav-links a{font-size:.86rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
-    .nav-links a:hover{color:var(--teal)}
+    .nav-links a:hover,.nav-links a.active{color:var(--teal)}
+    .nav-links a.active{font-weight:600}
+    .nav-cta{display:flex;gap:10px}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:all .18s}
+    .btn-outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+    .btn-outline:hover{background:var(--teal-bg)}
     .btn-primary{background:var(--teal);color:var(--white)}
     .btn-primary:hover{background:var(--mid)}
 
@@ -90,26 +94,13 @@
     @media(max-width:600px){.nav-links{display:none}.step-card{flex-direction:column}.step-num{width:32px;height:32px;font-size:.85rem}.lang-select-wrap{grid-template-columns:1fr;padding:14px 16px;row-gap:10px}.lang-select{width:100%}}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_active = 'guide' %}
 
-<nav data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-links">
-    <a href="{{ url_for('agents') }}">Find Agents</a>
-    <a href="{{ url_for('chatbot') }}">Chatbot</a>
-    <a href="{{ url_for('migration_guide') }}" style="color:var(--teal);font-weight:600">Migration Guide</a>
-  </div>
-  <div class="nav-cta">
-    {% if current_user.is_auth %}
-    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">My Dashboard</a>
-    {% else %}
-    <a href="{{ url_for('register') }}" class="btn btn-primary">Register Free</a>
-    {% endif %}
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <div class="page-hero guide-hero">
   <div class="hero-layout">
@@ -428,7 +419,26 @@
     }
   }
 
+  function saveLanguage(lang) {
+    try {
+      window.localStorage.setItem('migrantSafeLang', lang);
+    } catch (error) {
+      // Ignore storage errors.
+    }
+  }
+
+  function getSavedLanguage() {
+    try {
+      const saved = window.localStorage.getItem('migrantSafeLang');
+      return ['en', 'ms', 'bn'].includes(saved) ? saved : 'en';
+    } catch (error) {
+      return 'en';
+    }
+  }
+
   function setLang(lang) {
+    if (!['en', 'ms', 'bn'].includes(lang)) lang = 'en';
+    saveLanguage(lang);
     // Hide all content
     document.querySelectorAll('.lang-en,.lang-ms,.lang-bn').forEach(el => el.classList.remove('visible'));
     // Show selected
@@ -451,7 +461,8 @@
     updateGuideControls(lang);
   }
 
-  updateGuideControls('en');
+  setLang(getSavedLanguage());
 </script>
+{% include '_footer.html' %}
 </body>
 </html>

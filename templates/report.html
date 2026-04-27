@@ -22,6 +22,11 @@
     nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06)}
     .nav-logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--teal);text-decoration:none}
     .nav-logo .dot{color:var(--amber)}
+    .nav-links{display:flex;align-items:center;gap:28px}
+    .nav-links a{font-size:.88rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--teal)}
+    .nav-links a.active{font-weight:600}
+    .nav-links > a:not(.nav-middle-link){display:none}
 
     /* PAGE */
     .page-wrap{max-width:680px;margin:0 auto;padding:48px 5% 80px}
@@ -70,18 +75,13 @@
     .safety-note-text strong{color:var(--dark)}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
 <body>
+{% set navbar_active = 'agents' %}
 
-<nav data-mobile-nav>
-  <a href="{{ url_for('index') }}" class="nav-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="nav-logo-icon" width="668" height="727" decoding="async"/><span class="nav-logo-text">Migrant<span class="dot">Safe</span></span></a>
-  <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-label="Toggle navigation">&#9776;</button>
-  <div class="nav-links">
-    <a href="{{ url_for('agents') }}" style="font-size:.86rem;color:var(--muted);text-decoration:none">Find Agents</a>
-    <a href="{{ url_for('dashboard') }}" style="font-size:.86rem;font-weight:600;color:var(--teal);text-decoration:none">← Dashboard</a>
-  </div>
-</nav>
+{% include '_navbar.html' with context %}
 
 <div class="page-wrap">
 
@@ -108,41 +108,38 @@
   <div class="form-card">
     <form method="POST" action="{{ url_for('submit_report') }}">
 
-      <!-- If a specific agent was linked, pre-fill their info -->
-      {% if agent %}
       <div class="form-group">
-        <label>Agent / Agency Name <span class="required">*</span></label>
-        <input type="text" name="agent_name" value="{{ agent['agency_name'] }}"
-               class="prefilled" readonly/>
-        <input type="hidden" name="agent_id" value="{{ agent['id'] }}"/>
-      </div>
-      {% else %}
-      <div class="form-group">
-        <label>Agent / Agency Name <span class="required">*</span></label>
-        <input type="text" name="agent_name"
-               placeholder="Enter the name of the agent or agency"
-               list="agentSuggestions"/>
-        <!-- Datalist gives users autocomplete suggestions from the database -->
-        <datalist id="agentSuggestions">
+        <label>Agency name <span class="required">*</span></label>
+        <select name="agent_id" required{% if agent %} class="prefilled"{% endif %}>
+          <option value="">— Select an agency —</option>
           {% for a in all_agents %}
-          <option value="{{ a['agency_name'] }}">
+          <option value="{{ a['id'] }}"
+                  {% if form_data.get('agent_id') == (a['id'] | string) %}selected{% endif %}>
+            {{ a['agency_name'] }}
+          </option>
           {% endfor %}
-        </datalist>
+        </select>
       </div>
-      {% endif %}
+
+      <div class="form-group">
+        <label>Agent / Staff Name <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" name="agent_staff_name"
+               placeholder="Enter the person’s name if known"
+               value="{{ form_data.get('agent_staff_name', '') }}"/>
+      </div>
 
       <div class="form-group">
         <label>Type of Issue <span class="required">*</span></label>
         <select name="report_reason" required>
           <option value="">— Select the type of issue —</option>
-          <option>Charged excessive fees</option>
-          <option>Provided false job information</option>
-          <option>Withheld passport or documents</option>
-          <option>Threatened or harassed worker</option>
-          <option>Did not deliver on promises</option>
-          <option>Arranged fraudulent documents</option>
-          <option>Salary not paid or withheld</option>
-          <option>Other</option>
+          <option{% if form_data.get('report_reason') == 'Charged excessive fees' %} selected{% endif %}>Charged excessive fees</option>
+          <option{% if form_data.get('report_reason') == 'Provided false job information' %} selected{% endif %}>Provided false job information</option>
+          <option{% if form_data.get('report_reason') == 'Withheld passport or documents' %} selected{% endif %}>Withheld passport or documents</option>
+          <option{% if form_data.get('report_reason') == 'Threatened or harassed worker' %} selected{% endif %}>Threatened or harassed worker</option>
+          <option{% if form_data.get('report_reason') == 'Did not deliver on promises' %} selected{% endif %}>Did not deliver on promises</option>
+          <option{% if form_data.get('report_reason') == 'Arranged fraudulent documents' %} selected{% endif %}>Arranged fraudulent documents</option>
+          <option{% if form_data.get('report_reason') == 'Salary not paid or withheld' %} selected{% endif %}>Salary not paid or withheld</option>
+          <option{% if form_data.get('report_reason') == 'Other' %} selected{% endif %}>Other</option>
         </select>
       </div>
 
@@ -150,12 +147,12 @@
         <label>Describe what happened <span class="required">*</span></label>
         <textarea name="description" rows="5"
                   placeholder="Please describe the incident in as much detail as you can. The more information you provide, the better our admins can investigate."
-                  required></textarea>
+                  required>{{ form_data.get('description', '') }}</textarea>
       </div>
 
       <div class="form-group">
         <label>Date of Incident <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-        <input type="date" name="incident_date"/>
+        <input type="date" name="incident_date" value="{{ form_data.get('incident_date', '') }}"/>
       </div>
 
       <div class="alert alert-warning">
@@ -176,5 +173,6 @@
   </div>
 
 </div>
+{% include '_footer.html' %}
 </body>
 </html>

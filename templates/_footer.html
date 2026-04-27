@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}"/>
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="flogo">Migrant<span class="dot">Safe</span></div>
+      <p data-t="ft_desc">A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="ft_h1">Platform</h4>
+      <a href="{{ url_for('register') }}" data-t="ft_reg">Register</a>
+      <a href="{{ url_for('login') }}" data-t="ft_login">Login</a>
+      <a href="{{ url_for('agents') }}" data-t="ft_agents">Agent Directory</a>
+      <a href="{{ url_for('chatbot') }}" data-t="ft_chatbot">Chatbot</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="ft_h3">Languages</h4>
+      <a href="#" onclick="return setFooterLang('en')">🇬🇧 English</a>
+      <a href="#" onclick="return setFooterLang('ms')">🇲🇾 Bahasa Melayu</a>
+      <a href="#" onclick="return setFooterLang('bn')">🇧🇩 বাংলা</a>
+    </div>
+    <div class="footer-col footer-help">
+      <h4 data-t="ft_help_h">Need help?</h4>
+      <p data-t="ft_help_p">Talk to our assistant anytime</p>
+      <div class="footer-help-actions">
+        <a href="{{ url_for('chatbot') }}" class="footer-chat-btn" data-t="ft_help_btn">Start Chat →</a>
+        <a href="{{ url_for('submit_report') }}" class="footer-report-link" data-t="ft_report">Report Agent</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span data-t="ft_copy">© 2026 MigrantSafe</span>
+    <span>Supporting <span class="sdg-tag" data-t="ft_sdg">SDG 8 — Decent Work &amp; Economic Growth</span></span>
+  </div>
+</footer>
+
+<script>
+  const FOOTER_TRANSLATIONS = {
+    en: {
+      ft_desc: 'A multilingual platform helping migrant workers in Malaysia find verified agents, understand their rights, and seek help when needed.',
+      ft_h1: 'Platform',
+      ft_reg: 'Register',
+      ft_login: 'Login',
+      ft_agents: 'Agent Directory',
+      ft_chatbot: 'Chatbot',
+      ft_h3: 'Languages',
+      ft_help_h: 'Need help?',
+      ft_help_p: 'Talk to our assistant anytime',
+      ft_help_btn: 'Start Chat →',
+      ft_report: 'Report Agent',
+      ft_copy: '© 2026 MigrantSafe',
+      ft_sdg: 'SDG 8 — Decent Work & Economic Growth'
+    },
+    ms: {
+      ft_desc: 'Platform berbilang bahasa yang membantu pekerja asing di Malaysia mencari ejen yang disahkan dan memahami hak mereka.',
+      ft_h1: 'Platform',
+      ft_reg: 'Daftar',
+      ft_login: 'Log Masuk',
+      ft_agents: 'Direktori Ejen',
+      ft_chatbot: 'Chatbot',
+      ft_h3: 'Bahasa',
+      ft_help_h: 'Perlu bantuan?',
+      ft_help_p: 'Bercakap dengan pembantu kami bila-bila masa',
+      ft_help_btn: 'Mula Chat →',
+      ft_report: 'Laporkan Ejen',
+      ft_copy: '© 2026 MigrantSafe',
+      ft_sdg: 'SDG 8 — Kerja Layak & Pertumbuhan Ekonomi'
+    },
+    bn: {
+      ft_desc: 'একটি বহুভাষিক প্ল্যাটফর্ম যা মালয়েশিয়ায় অভিবাসী শ্রমিকদের যাচাইকৃত এজেন্ট খুঁজে পেতে এবং তাদের অধিকার বুঝতে সহায়তা করে।',
+      ft_h1: 'প্ল্যাটফর্ম',
+      ft_reg: 'নিবন্ধন',
+      ft_login: 'লগ ইন',
+      ft_agents: 'এজেন্ট ডিরেক্টরি',
+      ft_chatbot: 'চ্যাটবট',
+      ft_h3: 'ভাষা',
+      ft_help_h: 'সাহায্য দরকার?',
+      ft_help_p: 'যেকোনো সময় আমাদের সহকারীর সাথে কথা বলুন',
+      ft_help_btn: 'চ্যাট শুরু করুন →',
+      ft_report: 'এজেন্ট রিপোর্ট করুন',
+      ft_copy: '© ২০২৬ MigrantSafe',
+      ft_sdg: 'SDG ৮ — সম্মানজনক কাজ ও অর্থনৈতিক প্রবৃদ্ধি'
+    }
+  };
+
+  function applyFooterLang(lang) {
+    const cfg = FOOTER_TRANSLATIONS[lang] || FOOTER_TRANSLATIONS.en;
+    Object.entries(cfg).forEach(([key, value]) => {
+      document.querySelectorAll(`.site-footer [data-t="${key}"]`).forEach(el => {
+        el.textContent = value;
+      });
+    });
+  }
+
+  function setFooterLang(lang) {
+    if (!FOOTER_TRANSLATIONS[lang]) lang = 'en';
+    try {
+      window.localStorage.setItem('migrantSafeLang', lang);
+    } catch (error) {
+      // Ignore storage errors.
+    }
+    applyFooterLang(lang);
+    if (typeof window.setLang === 'function') {
+      try {
+        window.setLang(lang);
+      } catch (error) {
+        return false;
+      }
+    } else if (typeof window.setRegLang === 'function') {
+      try {
+        window.setRegLang(lang);
+      } catch (error) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  (() => {
+    try {
+      applyFooterLang(window.localStorage.getItem('migrantSafeLang') || 'en');
+    } catch (error) {
+      applyFooterLang('en');
+    }
+  })();
+</script>
