@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS reports (
     report_reason TEXT    NOT NULL,
     description   TEXT    NOT NULL,
     incident_date TEXT,
+    evidence_path TEXT,
     status        TEXT    NOT NULL DEFAULT 'open'
                   CHECK(status IN ('open', 'resolved', 'dismissed')),
     created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
@@ -293,6 +294,10 @@ def init_db():
     if 'google_sub' not in existing_cols:
         cur.execute("ALTER TABLE users ADD COLUMN google_sub TEXT")
         print("  OK Migration: added 'google_sub' column to users table.")
+    report_cols = [row[1] for row in cur.execute("PRAGMA table_info(reports)").fetchall()]
+    if 'evidence_path' not in report_cols:
+        cur.execute("ALTER TABLE reports ADD COLUMN evidence_path TEXT")
+        print("  OK Migration: added 'evidence_path' column to reports table.")
     job_listing_cols = [row[1] for row in cur.execute("PRAGMA table_info(job_listings)").fetchall()]
     if 'status' not in job_listing_cols:
         cur.execute("ALTER TABLE job_listings ADD COLUMN status TEXT NOT NULL DEFAULT 'live'")

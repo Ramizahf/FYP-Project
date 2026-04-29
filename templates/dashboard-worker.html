@@ -176,7 +176,7 @@
         <button class="qa" data-tour="report" onclick="window.location.href='{{ url_for('submit_report') }}'"><div class="qa-icon">🚨</div><div class="qa-lbl" data-t="q_report">Report Agent</div></button>
         <button class="qa" data-tour="chatbot" onclick="window.location.href='{{ url_for('chatbot') }}'"><div class="qa-icon">💬</div><div class="qa-lbl" data-t="q_chatbot">Ask Chatbot</div></button>
         <button class="qa" data-tour="profile" onclick="go('profile',null)"><div class="qa-icon">👤</div><div class="qa-lbl" data-t="q_profile">My Profile</div></button>
-        <button class="qa" onclick="go('jobs',null)"><div class="qa-icon">💼</div><div class="qa-lbl" data-t="q_jobs">View Jobs</div></button>
+        <button class="qa" data-tour="jobs" onclick="go('jobs',null)"><div class="qa-icon">💼</div><div class="qa-lbl" data-t="q_jobs">View Jobs</div></button>
       </div>
 
       <div class="grid2">
@@ -248,7 +248,11 @@
           <div style="margin-bottom:18px">
             <label style="display:block;font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:5px" data-t="lbl_phone">Phone Number</label>
             <input type="tel" name="phone"
-                   placeholder="+60 12-345 6789"
+                   placeholder="+60123456789"
+                   pattern="^\+?[0-9]{8,15}$"
+                   title="Enter a valid phone number!"
+                   oninvalid="this.setCustomValidity('Enter a valid phone number!')"
+                   oninput="this.setCustomValidity('')"
                    value="{{ worker_profile.phone if worker_profile and worker_profile.phone else '' }}"
                    style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;background:var(--white);transition:border-color .2s"/>
           </div>
@@ -329,7 +333,7 @@
 <div class="tour-overlay" id="tourOverlay" hidden></div>
 <div class="tour-arrow" id="tourArrow" aria-hidden="true">↓</div>
 <div class="tour-card" id="tourCard" hidden>
-  <div class="tour-step" id="tourStep">Step 1 of 4</div>
+  <div class="tour-step" id="tourStep">Step 1 of 5</div>
   <div class="tour-text" id="tourText">Tap here to find agents.</div>
   <div class="tour-actions">
     <button type="button" class="tour-btn" id="tourBack">Skip</button>
@@ -424,12 +428,13 @@ const T = {
 
 const initialPage = '{{ initial_page or "home" }}';
 let currentLang = 'en', currentPage = 'home';
-const TOUR_KEY = 'ms-worker-onboarding-v2-{{ current_user.id or "guest" }}';
+const TOUR_KEY = 'ms-worker-onboarding-v3-{{ current_user.id or "guest" }}';
 const TOUR_STEPS = [
   { key:'agents', page:'home', text:'Tap here to find agents.' },
   { key:'report', page:'home', text:'Tap here to report an agent.' },
   { key:'chatbot', page:'home', text:'Tap here to ask the chatbot.' },
-  { key:'profile', page:'home', text:'Tap here to open your  profile, where you can edit your personal information.' }
+  { key:'profile', page:'home', text:'Tap here to open your  profile, where you can edit your personal information.' },
+  { key:'jobs', page:'home', text:'Tap here to view job listings posted by agents.' }
 ];
 let tourIndex = -1;
 

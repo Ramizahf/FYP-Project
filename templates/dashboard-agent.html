@@ -265,7 +265,7 @@
             </select>
           </div>
           <div class="fg"><label data-t="form_industry">Industry / Sector</label><input type="text" id="aIndustry" placeholder="e.g. Construction, Hospitality" value="{{ agent['industry'] if agent and agent['industry'] else '' }}"/></div>
-          <div class="fg"><label data-t="form_phone">Office Phone Number</label><input type="tel" id="aPhone" placeholder="+60 3-1234 5678" value="{{ agent['phone'] if agent and agent['phone'] else '' }}"/></div>
+          <div class="fg"><label data-t="form_phone">Office Phone Number</label><input type="tel" id="aPhone" placeholder="+60312345678" pattern="^\+?[0-9]{8,15}$" title="Enter a valid phone number!" oninvalid="this.setCustomValidity('Enter a valid phone number!')" oninput="this.setCustomValidity('')" value="{{ agent['phone'] if agent and agent['phone'] else '' }}"/></div>
           <div class="fg"><label data-t="form_desc">Brief Description</label><textarea id="aDesc" rows="3" placeholder="Describe your agency…">{{ agent['description'] if agent else '' }}</textarea></div>
           <button class="btn-amber" onclick="saveProfile()" data-t="save_btn">Save Profile →</button>
         </div>
@@ -694,9 +694,11 @@ function saveProfile() {
   const industry       = document.getElementById('aIndustry')?.value.trim() || '';
   const phone          = document.getElementById('aPhone')?.value.trim() || '';
   const description    = document.getElementById('aDesc')?.value.trim()  || '';
+  const phonePattern   = /^\+?[0-9]{8,15}$/;
   if (!agency_name)    { toast('⚠️ Agency name is required.');              return; }
   if (!license_number) { toast('⚠️ JTK registration number is required.'); return; }
   if (!state)          { toast('⚠️ Please select your state.');             return; }
+  if (phone && !phonePattern.test(phone)) { toast('Enter a valid phone number!'); return; }
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = '{{ url_for("update_agent_profile") }}';

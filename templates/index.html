@@ -124,6 +124,11 @@
       opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .22s ease,transform .22s ease
     }
     .guide-card.active{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .guide-card.guide-preparing,
+    .guide-arrow.guide-preparing,
+    .guide-spotlight.guide-preparing{
+      visibility:hidden;transition:none!important
+    }
     .guide-kicker{font-size:.69rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
     .guide-title{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:6px}
     .guide-text{font-size:.9rem;line-height:1.55;color:var(--muted)}
@@ -946,11 +951,11 @@ function sendDemo() {
 // ----------------------------------------------------------
 const GUIDE_KEY = 'ms-index-guide-v2-done';
 const GUIDE_STEPS = [
-  { target: 'language-selector', titleKey: 'guide_lang_title', textKey: 'guide_lang_text' },
+  { target: 'language-selector', titleKey: 'guide_lang_title', textKey: 'guide_lang_text', placement: 'top' },
   { target: 'register-btn', titleKey: 'guide_register_title', textKey: 'guide_register_text' },
   { target: 'login-btn', titleKey: 'guide_login_title', textKey: 'guide_login_text' },
   { target: 'chatbot-btn', titleKey: 'guide_chatbot_title', textKey: 'guide_chatbot_text' },
-  { target: 'agents-btn', titleKey: 'guide_agents_title', textKey: 'guide_agents_text' }
+  { target: 'agents-btn', titleKey: 'guide_agents_title', textKey: 'guide_agents_text', placement: 'right' }
 ];
 
 const guideReplayBtn = document.getElementById('guideReplayBtn');
@@ -972,6 +977,8 @@ let activeGuideTarget = null;
 let guidePreviousFocus = null;
 let guideScrollTimer = null;
 let guidePositionFrame = null;
+let guideTransitionTimer = null;
+let guideTransitionCleanup = null;
 let guideOpenedMenu = false;
 
 guideArrow.hidden = true;
@@ -1031,14 +1038,35 @@ function ensureGuideTargetVisible(target) {
   return target;
 }
 
-function scrollGuideTargetIntoView(target) {
+function scrollGuideTargetIntoView(target, behavior = 'smooth', placement = null) {
   if (!target || window.getComputedStyle(target).position === 'fixed') return;
   const nav = document.querySelector('nav[data-mobile-nav]');
   const navHeight = nav ? nav.getBoundingClientRect().height : 0;
   const rect = target.getBoundingClientRect();
   const absoluteTop = rect.top + window.scrollY;
-  const targetTop = Math.max(0, absoluteTop - navHeight - 36);
-  window.scrollTo({ top: targetTop, behavior: 'smooth' });
+  const cardRect = guideCard.getBoundingClientRect();
+  const cardHeight = cardRect.height || 184;
+  const gap = 18;
+  const padding = 18;
+  let desiredTargetTop = navHeight + 36;
+
+  if (placement === 'top') {
+    desiredTargetTop = Math.min(
+      window.innerHeight - Math.min(rect.height, 120) - padding,
+      Math.max(navHeight + cardHeight + gap + padding, window.innerHeight * 0.48)
+    );
+  } else if (placement === 'left' || placement === 'right') {
+    desiredTargetTop = Math.max(
+      navHeight + padding,
+      (window.innerHeight / 2) - (rect.height / 2)
+    );
+  }
+
+  const maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const targetTop = clampGuideValue(absoluteTop - desiredTargetTop, 0, maxScrollY);
+  if (Math.abs(window.scrollY - targetTop) > 1) {
+    window.scrollTo({ top: targetTop, behavior });
+  }
 }
 
 function clearGuideTarget() {
@@ -1048,6 +1076,27 @@ function clearGuideTarget() {
 
 function getGuideFocusable() {
   return [guideBack, guideSkip, guideDone, guideNext].filter(btn => !btn.hidden && !btn.disabled);
+}
+
+function setGuideControlsDisabled(disabled) {
+  [guideBack, guideSkip, guideDone, guideNext].forEach(btn => {
+    btn.disabled = disabled;
+  });
+}
+
+function setGuideChromeActive(active) {
+  guideSpotlight.classList.toggle('active', active);
+  guideArrow.classList.toggle('active', active);
+  guideCard.classList.toggle('active', active);
+}
+
+function clearGuideTransitionTimer() {
+  window.clearTimeout(guideTransitionTimer);
+  guideTransitionTimer = null;
+  if (guideTransitionCleanup) {
+    guideTransitionCleanup();
+    guideTransitionCleanup = null;
+  }
 }
 
 function updateGuideButtons() {
@@ -1067,7 +1116,7 @@ function updateGuideButtons() {
   guideCount.textContent = `${D.guide_step || T.en.guide_step} ${guideIndex + 1} ${D.guide_of || T.en.guide_of} ${GUIDE_STEPS.length}`;
 }
 
-function refreshGuideContent() {
+function refreshGuideContent(positionAfterRefresh = true) {
   if (!guideOpen) return;
   const step = GUIDE_STEPS[guideIndex];
   if (!step) return;
@@ -1076,7 +1125,7 @@ function refreshGuideContent() {
   guideTitle.textContent = D[step.titleKey] || T.en[step.titleKey];
   guideText.textContent = D[step.textKey] || T.en[step.textKey];
   updateGuideButtons();
-  scheduleGuidePosition();
+  if (positionAfterRefresh) scheduleGuidePosition();
 }
 
 function clampGuideValue(value, min, max) {
@@ -1086,6 +1135,8 @@ function clampGuideValue(value, min, max) {
 function positionGuide(target) {
   if (!target || guideCard.hidden) return;
 
+  const step = GUIDE_STEPS[guideIndex];
+  const preferredPlacement = step ? step.placement : null;
   const rect = target.getBoundingClientRect();
   const spotlightPad = 6;
   const cardRect = guideCard.getBoundingClientRect();
@@ -1116,8 +1167,16 @@ function positionGuide(target) {
   guideSpotlight.style.height = `${spotlightHeight}px`;
   guideSpotlight.style.borderRadius = targetRadius;
 
-  let placement = 'bottom';
-  if (roomBelow >= cardHeight + gap || roomBelow >= roomAbove) {
+  let placement = preferredPlacement || 'bottom';
+  if (preferredPlacement === 'top' && roomAbove >= cardHeight + gap) {
+    placement = 'top';
+  } else if (preferredPlacement === 'bottom' && roomBelow >= cardHeight + gap) {
+    placement = 'bottom';
+  } else if (preferredPlacement === 'left' && roomLeft >= cardWidth + gap) {
+    placement = 'left';
+  } else if (preferredPlacement === 'right' && roomRight >= cardWidth + gap) {
+    placement = 'right';
+  } else if (roomBelow >= cardHeight + gap || roomBelow >= roomAbove) {
     placement = 'bottom';
   } else if (roomAbove >= cardHeight + gap) {
     placement = 'top';
@@ -1127,7 +1186,7 @@ function positionGuide(target) {
     placement = 'left';
   }
 
-  if ((placement === 'bottom' || placement === 'top') && Math.min(roomAbove, roomBelow) < (cardHeight * 0.45)) {
+  if (!preferredPlacement && (placement === 'bottom' || placement === 'top') && Math.min(roomAbove, roomBelow) < (cardHeight * 0.45)) {
     placement = roomRight >= roomLeft ? 'right' : 'left';
   }
 
@@ -1191,23 +1250,59 @@ function positionActiveGuide() {
   scheduleGuidePosition();
 }
 
-function showGuideStep(index) {
+function finishGuideStepTransition(target) {
+  if (!guideOpen || activeGuideTarget !== target) return;
+  clearGuideTransitionTimer();
+  positionGuide(target);
+  window.requestAnimationFrame(() => {
+    if (!guideOpen || activeGuideTarget !== target) return;
+    positionGuide(target);
+    guideSpotlight.classList.remove('guide-preparing');
+    guideArrow.classList.remove('guide-preparing');
+    guideCard.classList.remove('guide-preparing');
+    setGuideControlsDisabled(false);
+    setGuideChromeActive(true);
+    scheduleGuidePosition();
+  });
+}
+
+function showGuideStep(index, options = {}) {
   const step = GUIDE_STEPS[index];
   const target = step ? ensureGuideTargetVisible(getGuideTarget(step)) : null;
   if (!step || !target) return;
+  const instantPosition = options.instant === true;
+  const shouldFadeBetweenSteps = !instantPosition && guideCard.classList.contains('active');
 
+  clearGuideTransitionTimer();
+  if (shouldFadeBetweenSteps) {
+    setGuideControlsDisabled(true);
+    setGuideChromeActive(false);
+    guideSpotlight.classList.add('guide-preparing');
+    guideArrow.classList.add('guide-preparing');
+    guideCard.classList.add('guide-preparing');
+  }
   guideIndex = index;
   clearGuideTarget();
   activeGuideTarget = target;
   activeGuideTarget.classList.add('guide-target');
 
-  refreshGuideContent();
+  refreshGuideContent(false);
   updateGuideButtons();
 
-  scrollGuideTargetIntoView(target);
+  scrollGuideTargetIntoView(target, instantPosition ? 'auto' : 'smooth', step.placement);
   window.clearTimeout(guideScrollTimer);
-  scheduleGuidePosition();
-  guideScrollTimer = window.setTimeout(() => scheduleGuidePosition(), 260);
+  if (instantPosition) {
+    positionGuide(target);
+    window.requestAnimationFrame(() => positionGuide(target));
+  } else {
+    const finish = () => finishGuideStepTransition(target);
+    guideScrollTimer = window.setTimeout(() => scheduleGuidePosition(), 260);
+    guideTransitionTimer = window.setTimeout(finish, shouldFadeBetweenSteps ? 420 : 260);
+    if ('onscrollend' in window) {
+      window.addEventListener('scrollend', finish, { once: true });
+      guideTransitionCleanup = () => window.removeEventListener('scrollend', finish);
+    }
+  }
 }
 
 function startGuide(forceStart) {
@@ -1220,15 +1315,31 @@ function startGuide(forceStart) {
   guideSpotlight.hidden = false;
   guideArrow.hidden = false;
   guideCard.hidden = false;
-  guideOverlay.classList.add('active');
-  guideSpotlight.classList.add('active');
-  guideArrow.classList.add('active');
-  guideCard.classList.add('active');
   guideReplayBtn.hidden = true;
+  guideSpotlight.classList.add('guide-preparing');
+  guideArrow.classList.add('guide-preparing');
+  guideCard.classList.add('guide-preparing');
 
-  showGuideStep(0);
+  showGuideStep(0, { instant: true });
+
+  window.requestAnimationFrame(() => {
+    if (!guideOpen) return;
+    window.requestAnimationFrame(() => {
+      if (!guideOpen) return;
+      positionGuide(activeGuideTarget);
+      guideSpotlight.classList.remove('guide-preparing');
+      guideArrow.classList.remove('guide-preparing');
+      guideCard.classList.remove('guide-preparing');
+      guideOverlay.classList.add('active');
+      guideSpotlight.classList.add('active');
+      guideArrow.classList.add('active');
+      guideCard.classList.add('active');
+      scheduleGuidePosition();
+    });
+  });
 
   window.setTimeout(() => {
+    if (!guideOpen) return;
     const firstFocus = guideNext.hidden ? guideDone : guideNext;
     firstFocus.focus();
   }, 280);
@@ -1237,6 +1348,7 @@ function startGuide(forceStart) {
 function closeGuide(markSeen) {
   guideOpen = false;
   window.clearTimeout(guideScrollTimer);
+  clearGuideTransitionTimer();
   if (guidePositionFrame) {
     window.cancelAnimationFrame(guidePositionFrame);
     guidePositionFrame = null;
@@ -1253,6 +1365,10 @@ function closeGuide(markSeen) {
   guideSpotlight.classList.remove('active');
   guideArrow.classList.remove('active', 'up');
   guideCard.classList.remove('active');
+  guideSpotlight.classList.remove('guide-preparing');
+  guideArrow.classList.remove('guide-preparing');
+  guideCard.classList.remove('guide-preparing');
+  setGuideControlsDisabled(false);
 
   window.setTimeout(() => {
     if (guideOpen) return;

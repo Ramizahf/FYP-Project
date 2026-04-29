@@ -32,8 +32,13 @@
     .btn-red:hover{background:#c0392b;color:var(--white)}
 
     .page-wrap{max-width:860px;margin:0 auto;padding:40px 5% 80px}
+    .detail-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
     .back-link{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;color:var(--teal);text-decoration:none;margin-bottom:28px;font-weight:600}
+    .detail-toolbar .back-link{margin-bottom:0}
     .back-link:hover{text-decoration:underline}
+    .lang-control{display:flex;align-items:center;gap:9px}
+    .lang-control label{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+    .lang-control select{border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;background:var(--white);color:var(--dark);font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:600;outline:none;cursor:pointer}
 
     /* HERO CARD */
     .agent-hero{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 60%,#1a4a4a 100%);border-radius:20px;padding:36px;margin-bottom:24px;position:relative;overflow:hidden}
@@ -85,7 +90,7 @@
     .enquiry-note strong{display:block;font-size:.9rem;color:var(--dark);margin-bottom:4px}
     .enquiry-note p{font-size:.82rem;color:var(--muted);line-height:1.6}
 
-    @media(max-width:600px){.info-grid{grid-template-columns:1fr}.info-card.full{grid-column:span 1}}
+    @media(max-width:600px){.detail-toolbar{align-items:flex-start}.info-grid{grid-template-columns:1fr}.info-card.full{grid-column:span 1}}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}"/>
@@ -98,7 +103,17 @@
 {% include '_navbar.html' with context %}
 
 <div class="page-wrap">
-  <a href="{{ url_for('agents') }}" class="back-link" data-t="back_directory">← Back to Agent Directory</a>
+  <div class="detail-toolbar">
+    <a href="{{ url_for('agents') }}" class="back-link" data-t="back_directory">← Back to Agent Directory</a>
+    <div class="lang-control">
+      <label for="detailLangSelect" data-t="lang_label">Language</label>
+      <select id="detailLangSelect" onchange="setLang(this.value)">
+        <option value="en">English</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="bn">বাংলা</option>
+      </select>
+    </div>
+  </div>
 
   {# ── HERO ── #}
   <div class="agent-hero">
@@ -112,10 +127,10 @@
         <div class="hero-name">{{ agent['agency_name'] }}</div>
         <div class="hero-meta">
           <span>📍 {{ agent['state'] or 'Malaysia' }}</span>
-          <span>🏭 {{ agent['industry'] or 'General' }}</span>
+          <span>🏭 <span data-dynamic="industry">{{ agent['industry'] or 'General' }}</span></span>
           <span style="position:relative;z-index:1">
             {% set s = agent['verification_status'] %}
-            <span class="pill {{ 'pv' if s=='verified' else 'pp' if s=='pending' else 'pr' }}">
+            <span class="pill {{ 'pv' if s=='verified' else 'pp' if s=='pending' else 'pr' }}" data-status-pill="{{ s }}">
               {{ '✓ Verified' if s=='verified' else '⏳ Pending' if s=='pending' else '⚠ Reported' }}
             </span>
           </span>
@@ -130,14 +145,14 @@
     <div class="sb-icon">{{ '✅' if s=='verified' else '⏳' if s=='pending' else '⚠️' }}</div>
     <div>
       {% if s == 'verified' %}
-      <div class="sb-title">✓ Verified Agent — Safe to Proceed</div>
-      <div class="sb-sub">This agency has been reviewed and approved by MigrantSafe admins. Always verify all agreements in writing before paying any fees.</div>
+      <div class="sb-title" data-t="status_verified_title">✓ Verified Agent — Safe to Proceed</div>
+      <div class="sb-sub" data-t="status_verified_desc">This agency has been reviewed and approved by MigrantSafe admins. Always verify all agreements in writing before paying any fees.</div>
       {% elif s == 'pending' %}
-      <div class="sb-title">⏳ Pending Verification</div>
-      <div class="sb-sub">This agency is under admin review and has not yet been verified. We recommend waiting until verification is complete before making any payments or commitments.</div>
+      <div class="sb-title" data-t="status_pending_title">⏳ Pending Verification</div>
+      <div class="sb-sub" data-t="status_pending_desc">This agency is under admin review and has not yet been verified. We recommend waiting until verification is complete before making any payments or commitments.</div>
       {% else %}
-      <div class="sb-title">⚠ Reported — Proceed with Extreme Caution</div>
-      <div class="sb-sub">Worker complaints have been filed against this agency. An admin investigation is active. Do <strong>NOT</strong> engage with this agency or make any payments until the status is cleared.</div>
+      <div class="sb-title" data-t="status_reported_title">⚠ Reported — Proceed with Extreme Caution</div>
+      <div class="sb-sub" data-t-html="status_reported_desc">Worker complaints have been filed against this agency. An admin investigation is active. Do <strong>NOT</strong> engage with this agency or make any payments until the status is cleared.</div>
       {% endif %}
     </div>
   </div>
@@ -148,32 +163,32 @@
     <div class="rw-icon">🚨</div>
     <div>
       <div class="rw-title">{{ report_count }} open report{{ 's' if report_count != 1 else '' }} filed against this agency</div>
-      <div class="rw-sub">MigrantSafe workers have filed formal complaints. Our admin team is investigating. If you have been affected by this agency, please submit a report to help other workers.</div>
+      <div class="rw-sub" data-t="report_warning_desc">MigrantSafe workers have filed formal complaints. Our admin team is investigating. If you have been affected by this agency, please submit a report to help other workers.</div>
     </div>
   </div>
   {% endif %}
 
   <div class="enquiry-note">
-    <strong>Safe contact inside MigrantSafe</strong>
-    <p>Use the enquiry form to contact this agent through the platform. Do not share passport copies, bank details, or other sensitive personal documents in your message.</p>
+    <strong data-t="safe_contact_title">Safe contact inside MigrantSafe</strong>
+    <p data-t="safe_contact_desc">Use the enquiry form to contact this agent through the platform. Do not share passport copies, bank details, or other sensitive personal documents in your message.</p>
   </div>
 
   {# ── DETAILS ── #}
   <div class="info-grid">
     <div class="info-card">
-      <div class="info-label">License / Registration No.</div>
-      <div class="info-value">{{ agent['license_number'] or 'Not provided' }}</div>
+      <div class="info-label" data-t="license_label">License / Registration No.</div>
+      <div class="info-value">{% if agent['license_number'] %}{{ agent['license_number'] }}{% else %}<span data-t="not_provided">Not provided</span>{% endif %}</div>
     </div>
     <div class="info-card">
-      <div class="info-label">State / Location</div>
+      <div class="info-label" data-t="state_label">State / Location</div>
       <div class="info-value">📍 {{ agent['state'] or '—' }}</div>
     </div>
     <div class="info-card">
-      <div class="info-label">Industry / Sector</div>
-      <div class="info-value">{{ agent['industry'] or '—' }}</div>
+      <div class="info-label" data-t="industry_label">Industry / Sector</div>
+      <div class="info-value"><span data-dynamic="industry">{{ agent['industry'] or '—' }}</span></div>
     </div>
     <div class="info-card">
-      <div class="info-label">Phone</div>
+      <div class="info-label" data-t="phone_label">Phone</div>
       <div class="info-value">
         {% if agent['phone'] %}
         <a href="tel:{{ agent['phone'] }}">{{ agent['phone'] }}</a>
@@ -181,7 +196,7 @@
       </div>
     </div>
     <div class="info-card">
-      <div class="info-label">Email</div>
+      <div class="info-label" data-t="email_label">Email</div>
       <div class="info-value">
         {% if agent['email'] %}
         <a href="mailto:{{ agent['email'] }}">{{ agent['email'] }}</a>
@@ -189,7 +204,7 @@
       </div>
     </div>
     <div class="info-card">
-      <div class="info-label">Listed Since</div>
+      <div class="info-label" data-t="listed_label">Listed Since</div>
       <div class="info-value">{{ agent['created_at'][:10] if agent['created_at'] else '—' }}</div>
     </div>
   </div>
@@ -197,24 +212,200 @@
   {# ── DESCRIPTION ── #}
   {% if agent['description'] %}
   <div class="desc-card">
-    <h3>About This Agency</h3>
+    <h3 data-t="about_title">About This Agency</h3>
     <p>{{ agent['description'] }}</p>
   </div>
   {% endif %}
 
   {# ── ACTIONS ── #}
   <div class="actions">
-    <a href="{{ url_for('agents') }}" class="btn btn-outline">← Back to Directory</a>
+    <a href="{{ url_for('agents') }}" class="btn btn-outline" data-t="back_directory_short">← Back to Directory</a>
     {% if current_user.is_auth and current_user.role == 'worker' %}
-    <a href="{{ url_for('submit_enquiry') }}?agent_id={{ agent['id'] }}" class="btn btn-primary">Send Enquiry</a>
-    <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red">🚨 Report this Agent</a>
+    <a href="{{ url_for('submit_enquiry') }}?agent_id={{ agent['id'] }}" class="btn btn-primary" data-t="send_enquiry">Send Enquiry</a>
+    <a href="{{ url_for('submit_report') }}?agent_id={{ agent['id'] }}" class="btn btn-red" data-t="report_agent">🚨 Report this Agent</a>
     {% elif not current_user.is_auth %}
-    <a href="{{ url_for('login') }}" class="btn btn-outline">Log in to Send Enquiry →</a>
-    <a href="{{ url_for('login') }}" class="btn btn-primary">Log in to Report →</a>
+    <a href="{{ url_for('login') }}" class="btn btn-outline" data-t="login_send">Log in to Send Enquiry →</a>
+    <a href="{{ url_for('login') }}" class="btn btn-primary" data-t="login_report">Log in to Report →</a>
     {% endif %}
   </div>
 
 </div>
+<script>
+  const AGENT_STATUS = {{ agent['verification_status']|tojson }};
+  const AGENT_INDUSTRY = {{ (agent['industry'] or 'General')|tojson }};
+  const DETAIL_TRANSLATIONS = {
+    en: {
+      htmlLang: 'en',
+      titleSuffix: 'MigrantSafe',
+      lang_label: 'Language',
+      navAgents: 'Find Agents',
+      navChatbot: 'Chatbot',
+      navHow: 'Guide',
+      navLogin: 'Login',
+      navRegister: 'Register',
+      navDashboard: 'Dashboard',
+      back_directory: '← Back to Agent Directory',
+      back_directory_short: '← Back to Directory',
+      statusPills: { verified: '✓ Verified', pending: '⏳ Pending', reported: '⚠ Reported' },
+      industries: { Construction: 'Construction', Agriculture: 'Agriculture', Hospitality: 'Hospitality', Manufacturing: 'Manufacturing', General: 'General', Technology: 'Technology' },
+      status_verified_title: '✓ Verified Agent — Safe to Proceed',
+      status_verified_desc: 'This agency has been reviewed and approved by MigrantSafe admins. Always verify all agreements in writing before paying any fees.',
+      status_pending_title: '⏳ Pending Verification',
+      status_pending_desc: 'This agency is under admin review and has not yet been verified. We recommend waiting until verification is complete before making any payments or commitments.',
+      status_reported_title: '⚠ Reported — Proceed with Extreme Caution',
+      status_reported_desc: 'Worker complaints have been filed against this agency. An admin investigation is active. Do <strong>NOT</strong> engage with this agency or make any payments until the status is cleared.',
+      report_warning_desc: 'MigrantSafe workers have filed formal complaints. Our admin team is investigating. If you have been affected by this agency, please submit a report to help other workers.',
+      safe_contact_title: 'Safe contact inside MigrantSafe',
+      safe_contact_desc: 'Use the enquiry form to contact this agent through the platform. Do not share passport copies, bank details, or other sensitive personal documents in your message.',
+      license_label: 'License / Registration No.',
+      state_label: 'State / Location',
+      industry_label: 'Industry / Sector',
+      phone_label: 'Phone',
+      email_label: 'Email',
+      listed_label: 'Listed Since',
+      not_provided: 'Not provided',
+      about_title: 'About This Agency',
+      send_enquiry: 'Send Enquiry',
+      report_agent: '🚨 Report this Agent',
+      login_send: 'Log in to Send Enquiry →',
+      login_report: 'Log in to Report →'
+    },
+    ms: {
+      htmlLang: 'ms',
+      titleSuffix: 'MigrantSafe',
+      lang_label: 'Bahasa',
+      navAgents: 'Cari Ejen',
+      navChatbot: 'Chatbot',
+      navHow: 'Panduan',
+      navLogin: 'Log Masuk',
+      navRegister: 'Daftar',
+      navDashboard: 'Papan Pemuka',
+      back_directory: '← Kembali ke Direktori Ejen',
+      back_directory_short: '← Kembali ke Direktori',
+      statusPills: { verified: '✓ Disahkan', pending: '⏳ Tertunda', reported: '⚠ Dilaporkan' },
+      industries: { Construction: 'Pembinaan', Agriculture: 'Pertanian', Hospitality: 'Hospitaliti', Manufacturing: 'Pembuatan', General: 'Umum', Technology: 'Teknologi' },
+      status_verified_title: '✓ Ejen Disahkan — Selamat untuk Diteruskan',
+      status_verified_desc: 'Agensi ini telah disemak dan diluluskan oleh admin MigrantSafe. Sentiasa sahkan semua perjanjian secara bertulis sebelum membuat sebarang bayaran.',
+      status_pending_title: '⏳ Pengesahan Tertunda',
+      status_pending_desc: 'Agensi ini sedang dalam semakan admin dan belum disahkan. Kami mengesyorkan anda menunggu sehingga pengesahan selesai sebelum membuat bayaran atau komitmen.',
+      status_reported_title: '⚠ Dilaporkan — Berhati-hati',
+      status_reported_desc: 'Aduan pekerja telah difailkan terhadap agensi ini. Siasatan admin sedang berjalan. <strong>JANGAN</strong> berurusan atau membuat sebarang bayaran sehingga status ini diselesaikan.',
+      report_warning_desc: 'Pekerja MigrantSafe telah memfailkan aduan rasmi. Pasukan admin kami sedang menyiasat. Jika anda turut terjejas oleh agensi ini, sila hantar laporan untuk membantu pekerja lain.',
+      safe_contact_title: 'Hubungan selamat dalam MigrantSafe',
+      safe_contact_desc: 'Gunakan borang pertanyaan untuk menghubungi ejen ini melalui platform. Jangan kongsi salinan pasport, butiran bank, atau dokumen peribadi sensitif lain dalam mesej anda.',
+      license_label: 'No. Lesen / Pendaftaran',
+      state_label: 'Negeri / Lokasi',
+      industry_label: 'Industri / Sektor',
+      phone_label: 'Telefon',
+      email_label: 'E-mel',
+      listed_label: 'Tersenarai Sejak',
+      not_provided: 'Tidak diberikan',
+      about_title: 'Tentang Agensi Ini',
+      send_enquiry: 'Hantar Pertanyaan',
+      report_agent: '🚨 Laporkan Ejen Ini',
+      login_send: 'Log masuk untuk Hantar Pertanyaan →',
+      login_report: 'Log masuk untuk Lapor →'
+    },
+    bn: {
+      htmlLang: 'bn',
+      titleSuffix: 'MigrantSafe',
+      lang_label: 'ভাষা',
+      navAgents: 'এজেন্ট খুঁজুন',
+      navChatbot: 'চ্যাটবট',
+      navHow: 'গাইড',
+      navLogin: 'লগ ইন',
+      navRegister: 'নিবন্ধন',
+      navDashboard: 'ড্যাশবোর্ড',
+      back_directory: '← এজেন্ট ডিরেক্টরিতে ফিরুন',
+      back_directory_short: '← ডিরেক্টরিতে ফিরুন',
+      statusPills: { verified: '✓ যাচাইকৃত', pending: '⏳ অপেক্ষমান', reported: '⚠ রিপোর্টেড' },
+      industries: { Construction: 'নির্মাণ', Agriculture: 'কৃষি', Hospitality: 'হসপিটালিটি', Manufacturing: 'উৎপাদন', General: 'সাধারণ', Technology: 'প্রযুক্তি' },
+      status_verified_title: '✓ যাচাইকৃত এজেন্ট — এগোনো তুলনামূলক নিরাপদ',
+      status_verified_desc: 'এই এজেন্সিটি MigrantSafe অ্যাডমিনরা পর্যালোচনা ও অনুমোদন করেছেন। কোনো ফি দেওয়ার আগে সব চুক্তি লিখিতভাবে যাচাই করুন।',
+      status_pending_title: '⏳ যাচাই অপেক্ষমান',
+      status_pending_desc: 'এই এজেন্সিটি অ্যাডমিন পর্যালোচনার অধীনে আছে এবং এখনো যাচাই করা হয়নি। কোনো টাকা বা প্রতিশ্রুতি দেওয়ার আগে যাচাই শেষ হওয়া পর্যন্ত অপেক্ষা করার পরামর্শ দিচ্ছি।',
+      status_reported_title: '⚠ রিপোর্টেড — অত্যন্ত সতর্ক থাকুন',
+      status_reported_desc: 'এই এজেন্সির বিরুদ্ধে কর্মীদের অভিযোগ জমা হয়েছে। অ্যাডমিন তদন্ত চলছে। স্ট্যাটাস পরিষ্কার না হওয়া পর্যন্ত এই এজেন্সির সঙ্গে <strong>কোনো লেনদেন করবেন না</strong> বা টাকা দেবেন না।',
+      report_warning_desc: 'MigrantSafe কর্মীরা আনুষ্ঠানিক অভিযোগ জমা দিয়েছেন। আমাদের অ্যাডমিন দল তদন্ত করছে। আপনি যদি এই এজেন্সির কারণে ক্ষতিগ্রস্ত হয়ে থাকেন, অন্য কর্মীদের সাহায্য করতে একটি রিপোর্ট জমা দিন।',
+      safe_contact_title: 'MigrantSafe-এর ভেতরে নিরাপদ যোগাযোগ',
+      safe_contact_desc: 'প্ল্যাটফর্মের মাধ্যমে এই এজেন্টের সঙ্গে যোগাযোগ করতে অনুসন্ধান ফর্ম ব্যবহার করুন। আপনার বার্তায় পাসপোর্ট কপি, ব্যাংক তথ্য, বা অন্য সংবেদনশীল ব্যক্তিগত নথি শেয়ার করবেন না।',
+      license_label: 'লাইসেন্স / নিবন্ধন নম্বর',
+      state_label: 'রাজ্য / অবস্থান',
+      industry_label: 'শিল্প / সেক্টর',
+      phone_label: 'ফোন',
+      email_label: 'ইমেইল',
+      listed_label: 'তালিকাভুক্তির তারিখ',
+      not_provided: 'দেওয়া হয়নি',
+      about_title: 'এই এজেন্সি সম্পর্কে',
+      send_enquiry: 'অনুসন্ধান পাঠান',
+      report_agent: '🚨 এই এজেন্টকে রিপোর্ট করুন',
+      login_send: 'অনুসন্ধান পাঠাতে লগ ইন করুন →',
+      login_report: 'রিপোর্ট করতে লগ ইন করুন →'
+    }
+  };
+
+  function getSavedDetailLang() {
+    try {
+      const saved = window.localStorage.getItem('migrantSafeLang');
+      return DETAIL_TRANSLATIONS[saved] ? saved : 'en';
+    } catch (error) {
+      return 'en';
+    }
+  }
+
+  function setLang(lang) {
+    if (!DETAIL_TRANSLATIONS[lang]) lang = 'en';
+    const cfg = DETAIL_TRANSLATIONS[lang];
+    document.documentElement.lang = cfg.htmlLang;
+    document.title = `${document.querySelector('.hero-name')?.textContent || 'Agent'} — ${cfg.titleSuffix}`;
+
+    try {
+      window.localStorage.setItem('migrantSafeLang', lang);
+    } catch (error) {
+      // Ignore storage errors.
+    }
+
+    const select = document.getElementById('detailLangSelect');
+    if (select) select.value = lang;
+
+    const navMap = {
+      't-navAgents': cfg.navAgents,
+      't-navChatbot': cfg.navChatbot,
+      't-navHow': cfg.navHow,
+      't-navLogin': cfg.navLogin,
+      't-navRegister': cfg.navRegister,
+      't-navDashboard': cfg.navDashboard
+    };
+    Object.entries(navMap).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    });
+
+    document.querySelectorAll('[data-t]').forEach((el) => {
+      const key = el.getAttribute('data-t');
+      if (cfg[key]) el.textContent = cfg[key];
+    });
+    document.querySelectorAll('[data-t-html]').forEach((el) => {
+      const key = el.getAttribute('data-t-html');
+      if (cfg[key]) el.innerHTML = cfg[key];
+    });
+
+    document.querySelectorAll('[data-status-pill]').forEach((el) => {
+      const status = el.getAttribute('data-status-pill') || AGENT_STATUS;
+      el.textContent = cfg.statusPills[status] || status;
+    });
+    document.querySelectorAll('[data-dynamic="industry"]').forEach((el) => {
+      el.textContent = cfg.industries[AGENT_INDUSTRY] || AGENT_INDUSTRY;
+    });
+
+    if (typeof applyFooterLang === 'function') {
+      applyFooterLang(lang);
+    }
+  }
+
+  window.setLang = setLang;
+  setLang(getSavedDetailLang());
+</script>
 {% include '_footer.html' %}
 </body>
 </html>

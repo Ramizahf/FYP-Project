@@ -24,6 +24,7 @@ def register_google_oauth(app):
 
     try:
         from flask_dance.contrib.google import make_google_blueprint
+        from flask_dance.consumer.requests import OAuth2Session
     except ImportError:
         app.config['GOOGLE_OAUTH_DISABLED_REASON'] = 'missing_dependency'
         app.logger.warning(
@@ -36,6 +37,13 @@ def register_google_oauth(app):
 
     os.environ.setdefault('OAUTHLIB_RELAX_TOKEN_SCOPE', '1')
 
+    class GoogleOAuthSession(OAuth2Session):
+        """Ignore inherited proxy env vars for Google OAuth requests."""
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.trust_env = False
+
     google_bp = make_google_blueprint(
         client_id=app.config['GOOGLE_OAUTH_CLIENT_ID'],
         client_secret=app.config['GOOGLE_OAUTH_CLIENT_SECRET'],
@@ -44,6 +52,7 @@ def register_google_oauth(app):
         offline=False,
         reprompt_consent=False,
         reprompt_select_account=True,
+        session_class=GoogleOAuthSession,
     )
     app.register_blueprint(google_bp, url_prefix='/auth')
     app.config['GOOGLE_OAUTH_READY'] = True

@@ -8,7 +8,7 @@
   <style>
     :root{--teal:#0D6E6E;--teal-lt:#14A097;--teal-bg:#E6F4F4;--amber:#E8833A;--dark:#0F2027;--mid:#1E3A3A;--text:#2C2C2C;--muted:#6B7B7B;--white:#FFFFFF;--cream:#F9F5F0;--border:#D4E8E8;--sw:260px}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);display:flex;min-height:100vh}
+    body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);min-height:100vh}
     .sidebar{width:var(--sw);flex-shrink:0;background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
     .sb-logo{padding:18px 20px 16px;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
     .sb-logo-icon{display:block;width:auto;height:2.8rem;object-fit:contain;flex-shrink:0}
@@ -31,7 +31,7 @@
     .sb-lang label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
     .sb-lang-select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
     .sb-lang-select option{color:var(--text);background:var(--white)}
-    .main{margin-left:var(--sw);flex:1}
+    .main{margin-left:var(--sw);width:calc(100% - var(--sw));min-height:100vh}
     .topbar{position:sticky;top:0;z-index:100;background:rgba(249,245,240,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
     .topbar h1{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark)}
     .topbar p{font-size:.76rem;color:var(--muted)}
@@ -54,7 +54,8 @@
     .flash.success{background:#e6faf0;border:1px solid #b6eace;color:#1a9a55}
     .flash.danger{background:#fdecea;border:1px solid #f5b9b4;color:#c0392b}
     .flash.warning{background:#fff8e6;border:1px solid #f5d06a;color:#8a5c00}
-    @media(max-width:860px){.sidebar{display:none}.main{margin-left:0}}
+    .site-footer{margin-left:var(--sw);width:calc(100% - var(--sw))}
+    @media(max-width:860px){.sidebar{display:none}.main{margin-left:0;width:100%}.site-footer{margin-left:0;width:100%}}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
@@ -96,7 +97,7 @@
   <div class="topbar">
     <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Toggle sidebar">&#9776;</button>
     <div><h1>Send Enquiry</h1><p>Contact this agent safely inside MigrantSafe</p></div>
-    <a href="{{ url_for('agent_detail', agent_id=agent['id']) }}" class="btn btn-outline">Back to Agent</a>
+    <a href="{{ url_for('agent_detail', agent_id=agent['id']) }}" class="btn btn-outline">Back to Agent Details</a>
   </div>
 
   <div class="content">

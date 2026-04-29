@@ -49,6 +49,19 @@
     input,select,textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--cream);outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical}
     input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,110,110,.08);background:var(--white)}
     .prefilled{background:var(--teal-bg);color:var(--dark);font-weight:600}
+    .field-help{font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:6px}
+    .upload-status{display:none;font-size:.78rem;font-weight:700;color:var(--success);margin-top:7px}
+    .file-input-hidden{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+    .upload-box{width:100%;border:1.5px dashed var(--border);border-radius:12px;background:var(--cream);padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s}
+    .upload-box:hover,.upload-box:focus{border-color:var(--teal);background:var(--teal-bg);box-shadow:0 0 0 3px rgba(13,110,110,.08);outline:none}
+    .upload-icon{width:42px;height:42px;border-radius:10px;background:var(--white);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;border:1px solid var(--border)}
+    .upload-title{font-size:.9rem;font-weight:700;color:var(--dark);margin-bottom:2px}
+    .upload-sub{font-size:.76rem;color:var(--muted);line-height:1.4}
+    .file-list{display:grid;gap:8px;margin-top:10px}
+    .file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:10px;background:var(--white);padding:9px 10px;font-size:.8rem}
+    .file-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-weight:600}
+    .file-remove{border:1px solid #f5b9b4;background:#fdecea;color:#c0392b;border-radius:8px;padding:5px 9px;font-family:'DM Sans',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;flex-shrink:0}
+    .file-remove:hover{background:#c0392b;color:var(--white)}
 
     /* ALERT */
     .alert{border-radius:10px;padding:12px 16px;font-size:.84rem;margin-bottom:20px;display:flex;align-items:flex-start;gap:8px}
@@ -106,7 +119,7 @@
 
   <!-- FORM CARD -->
   <div class="form-card">
-    <form method="POST" action="{{ url_for('submit_report') }}">
+    <form method="POST" action="{{ url_for('submit_report') }}" enctype="multipart/form-data">
 
       <div class="form-group">
         <label>Agency name <span class="required">*</span></label>
@@ -155,6 +168,21 @@
         <input type="date" name="incident_date" value="{{ form_data.get('incident_date', '') }}"/>
       </div>
 
+      <div class="form-group">
+        <label>Upload Evidence <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="file" name="evidence" id="evidenceInput" class="file-input-hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" multiple/>
+        <div class="upload-box" id="evidenceDrop" role="button" tabindex="0" aria-controls="evidenceInput">
+          <div class="upload-icon">📎</div>
+          <div>
+            <div class="upload-title">Add evidence files</div>
+            <div class="upload-sub">Click to upload photos, screenshots, receipts, contracts, or documents.</div>
+          </div>
+        </div>
+        <p class="field-help">Upload a photo, screenshot, receipt, contract, or document if you have one. Max 5 files, 5MB each.</p>
+        <p class="upload-status" id="evidenceStatus"></p>
+        <div class="file-list" id="evidenceList"></div>
+      </div>
+
       <div class="alert alert-warning">
         <span>⚖️</span>
         <span>By submitting this report, you confirm that the information you have provided is truthful to the best of your knowledge. False reports may be removed.</span>
@@ -174,5 +202,66 @@
 
 </div>
 {% include '_footer.html' %}
+<script>
+  const evidenceInput = document.getElementById('evidenceInput');
+  const evidenceStatus = document.getElementById('evidenceStatus');
+  const evidenceDrop = document.getElementById('evidenceDrop');
+  const evidenceList = document.getElementById('evidenceList');
+  let selectedEvidenceFiles = [];
+
+  function syncEvidenceInput() {
+    const transfer = new DataTransfer();
+    selectedEvidenceFiles.forEach(file => transfer.items.add(file));
+    evidenceInput.files = transfer.files;
+  }
+
+  function renderEvidenceFiles() {
+    const count = selectedEvidenceFiles.length;
+    evidenceList.innerHTML = '';
+
+    selectedEvidenceFiles.forEach((file, index) => {
+      const row = document.createElement('div');
+      row.className = 'file-row';
+
+      const name = document.createElement('span');
+      name.className = 'file-name';
+      name.textContent = file.name;
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'file-remove';
+      remove.textContent = 'Remove';
+      remove.addEventListener('click', () => {
+        selectedEvidenceFiles.splice(index, 1);
+        syncEvidenceInput();
+        renderEvidenceFiles();
+      });
+
+      row.append(name, remove);
+      evidenceList.appendChild(row);
+    });
+
+    evidenceStatus.style.display = count ? 'block' : 'none';
+    evidenceStatus.style.color = count > 5 ? 'var(--error)' : 'var(--success)';
+    evidenceStatus.textContent = count > 5
+      ? 'Please select up to 5 files'
+      : `${count} file${count === 1 ? '' : 's'} added`;
+  }
+
+  if (evidenceInput && evidenceStatus && evidenceDrop && evidenceList) {
+    evidenceDrop.addEventListener('click', () => evidenceInput.click());
+    evidenceDrop.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        evidenceInput.click();
+      }
+    });
+
+    evidenceInput.addEventListener('change', () => {
+      selectedEvidenceFiles = Array.from(evidenceInput.files || []);
+      renderEvidenceFiles();
+    });
+  }
+</script>
 </body>
 </html>

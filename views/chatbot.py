@@ -20,21 +20,24 @@ CHATBOT_SYSTEM = {
         "Answer questions about agent verification, recruitment fees, work documents, reporting abuse, "
         "worker rights, contracts, and scams. Use short paragraphs and simple language. "
         "If the user appears in danger or exploited, include the JTKSM hotline: 03-8000 8000. "
-        "Do not give legal or medical advice. Always respond in English."
+        "Do not give legal or medical advice. Always respond in English only. "
+        "Do not answer romance, dating, sexual, or unrelated personal relationship questions; redirect to MigrantSafe topics."
     ),
     'ms': (
         "Anda ialah MigrantSafe Assistant untuk pekerja asing di Malaysia. "
         "Jawab tentang pengesahan ejen, yuran pengambilan, dokumen kerja, hak pekerja, kontrak, "
         "dan cara membuat laporan. Guna bahasa mudah dan ringkas. "
         "Jika pengguna berada dalam bahaya atau dieksploitasi, berikan hotline JTKSM: 03-8000 8000. "
-        "Jangan beri nasihat perundangan atau perubatan. Jawab dalam Bahasa Melayu sahaja."
+        "Jangan beri nasihat perundangan atau perubatan. Jawab dalam Bahasa Melayu sahaja. "
+        "Jangan jawab soalan romantik, dating, seksual, atau hubungan peribadi yang tidak berkaitan; arahkan kepada topik MigrantSafe."
     ),
     'bn': (
         "You are MigrantSafe Assistant for Bangla-speaking migrant workers in Malaysia. "
         "Answer about agent verification, recruitment fees, work documents, worker rights, contracts, "
         "and reporting scams or abuse. Use very simple language. "
         "If the user appears in danger or exploited, include the JTKSM hotline: 03-8000 8000. "
-        "Do not give legal or medical advice. Respond in Bangla."
+        "Do not give legal or medical advice. Respond in Bangla only. "
+        "Do not answer romance, dating, sexual, or unrelated personal relationship questions; redirect to MigrantSafe topics."
     ),
 }
 
@@ -305,9 +308,7 @@ def clear_chat_history():
 
 def chat_health():
     """Simple live-provider diagnostic for the browser and local testing."""
-    api_key = os.environ.get('OPENCODE_API_KEY', '').strip()
-    model = os.environ.get('OPENCODE_MODEL', 'openai/gpt-oss-120b:free').strip()
-    base_url = os.environ.get('OPENCODE_API_BASE_URL', 'https://openrouter.ai/api/v1').strip().rstrip('/')
+    api_key, base_url, model = _chat_provider_config()
 
     if not api_key:
         return jsonify({
@@ -331,15 +332,15 @@ def chat_health():
 def get_bot_reply(message: str, language: str = 'en', history: list = None) -> str:
     """Call the configured OpenAI-compatible provider, or fall back to local FAQ answers."""
     language = _normalize_chat_language(language)
-    api_key = os.environ.get('OPENCODE_API_KEY', '').strip()
-    base_url = os.environ.get(
-        'OPENCODE_API_BASE_URL',
-        'https://openrouter.ai/api/v1'
-    ).strip().rstrip('/')
-    model = os.environ.get(
-        'OPENCODE_MODEL',
-        'openai/gpt-oss-120b:free'
-    ).strip()
+    guardrail_reply = _guardrail_reply(message, language)
+    if guardrail_reply:
+        return guardrail_reply
+
+    quick_reply = _quick_local_reply(message, language)
+    if quick_reply:
+        return quick_reply
+
+    api_key, base_url, model = _chat_provider_config()
 
     if api_key:
         system_prompt = CHATBOT_SYSTEM.get(language, CHATBOT_SYSTEM['en'])
@@ -369,7 +370,7 @@ def get_bot_reply(message: str, language: str = 'en', history: list = None) -> s
                 if content:
                     return content
             current_app.logger.warning("Chat API returned no message content.")
-            return _api_error_reply(language)
+            return _offline_or_api_error_reply(message, language)
         except urllib.error.HTTPError as exc:
             error_body = _read_http_error_body(exc)
             current_app.logger.warning(
@@ -377,12 +378,35 @@ def get_bot_reply(message: str, language: str = 'en', history: list = None) -> s
                 exc.code,
                 error_body[:1000]
             )
-            return _api_error_reply(language)
+            return _offline_or_api_error_reply(message, language)
         except Exception as exc:
             current_app.logger.warning(f"Chat API error: {exc}")
-            return _api_error_reply(language)
+            return _offline_or_api_error_reply(message, language)
 
     return _offline_reply(message, language)
+
+
+def _chat_provider_config() -> tuple[str, str, str]:
+    """Read OpenAI-compatible provider settings with common env aliases."""
+    api_key = (
+        os.environ.get('OPENCODE_API_KEY')
+        or os.environ.get('OPENROUTER_API_KEY')
+        or os.environ.get('OPENAI_API_KEY')
+        or ''
+    ).strip()
+    base_url = (
+        os.environ.get('OPENCODE_API_BASE_URL')
+        or os.environ.get('OPENROUTER_BASE_URL')
+        or os.environ.get('OPENAI_BASE_URL')
+        or 'https://openrouter.ai/api/v1'
+    ).strip().rstrip('/')
+    model = (
+        os.environ.get('OPENCODE_MODEL')
+        or os.environ.get('OPENROUTER_MODEL')
+        or os.environ.get('OPENAI_MODEL')
+        or 'openai/gpt-oss-120b:free'
+    ).strip()
+    return api_key, base_url, model
 
 
 def _perform_chat_request(api_key: str, base_url: str, payload: bytes) -> dict:
@@ -405,7 +429,14 @@ def _perform_chat_request(api_key: str, base_url: str, payload: bytes) -> dict:
         if certifi is not None
         else ssl.create_default_context()
     )
-    with urllib.request.urlopen(req, timeout=20, context=ssl_context) as resp:
+
+    # Some local/dev environments set HTTP(S)_PROXY to a closed proxy, which
+    # makes urllib fail immediately before the request reaches the AI provider.
+    opener = urllib.request.build_opener(
+        urllib.request.ProxyHandler({}),
+        urllib.request.HTTPSHandler(context=ssl_context),
+    )
+    with opener.open(req, timeout=20) as resp:
         return json.loads(resp.read())
 
 
@@ -438,28 +469,208 @@ def _read_http_error_body(exc: urllib.error.HTTPError) -> str:
         return '<unreadable error body>'
 
 
-def _api_error_reply(language: str) -> str:
-    """Clear, localized message shown only when the live API was expected but failed."""
+def _detect_message_language(message: str) -> str | None:
+    """Best-effort detection for supported chat languages only."""
+    text = (message or '').strip().lower()
+    if not text:
+        return None
+
+    if any('\u0980' <= char <= '\u09ff' for char in text):
+        return 'bn'
+
+    ms_markers = (
+        'saya', 'awak', 'anda', 'boleh', 'tolong', 'terima kasih', 'selamat',
+        'ejen', 'majikan', 'pekerja', 'gaji', 'yuran', 'dokumen', 'lapor',
+        'penipuan', 'permit kerja', 'bahasa melayu'
+    )
+    en_markers = (
+        'i ', 'you', 'can', 'how', 'what', 'why', 'where', 'when', 'agent',
+        'worker', 'fee', 'fees', 'document', 'passport', 'salary', 'report',
+        'contract', 'visa', 'permit', 'employer'
+    )
+
+    ms_score = sum(1 for word in ms_markers if word in text)
+    en_score = sum(1 for word in en_markers if word in text)
+    if ms_score > en_score and ms_score > 0:
+        return 'ms'
+    if en_score > 0:
+        return 'en'
+    return None
+
+
+def _language_switch_reply(language: str, detected_language: str) -> str:
+    replies = {
+        'en': "Please switch the chat language first. I can only reply in the selected language.",
+        'ms': "Sila tukar bahasa chat dahulu. Saya hanya boleh membalas dalam bahasa yang dipilih.",
+        'bn': "Doya kore age chat language bodlan. Ami sudhu selected language e reply korte pari.",
+    }
+    return replies.get(language, replies['en'])
+
+
+def _romance_guardrail_reply(language: str) -> str:
     replies = {
         'en': (
-            "I could not reach the live AI service just now. "
-            "Please try again in a moment. If this keeps happening, check the API key, model, and network connection."
+            "I can only help with MigrantSafe topics like agent checks, fees, documents, worker rights, "
+            "and reporting abuse. For personal or romantic questions, please use another support channel."
         ),
         'ms': (
-            "Saya tidak dapat menghubungi perkhidmatan AI langsung sebentar tadi. "
-            "Sila cuba lagi sebentar lagi. Jika masalah ini berterusan, semak kunci API, model, dan sambungan rangkaian."
+            "Saya hanya boleh membantu topik MigrantSafe seperti semakan ejen, yuran, dokumen, hak pekerja, "
+            "dan laporan penderaan. Untuk soalan peribadi atau romantik, sila gunakan saluran lain."
         ),
         'bn': (
-            "Ami ekhono live AI service e jogajog korte parini. "
-            "Doya kore ektu por abar cheshta korun. Jodi eta bar bar hoy, API key, model, ebong network connection check korun."
+            "Ami sudhu MigrantSafe topic niye help korte pari, jemon agent check, fee, document, worker rights, "
+            "ebong abuse report. Personal ba romantic proshner jonno onno support channel use korun."
         ),
     }
     return replies.get(language, replies['en'])
 
 
+def _guardrail_reply(message: str, language: str) -> str | None:
+    """Local guardrails that should not be sent to the live model."""
+    low = (message or '').strip().lower()
+    if not low:
+        return None
+
+    detected_language = _detect_message_language(low)
+    if detected_language and detected_language != language:
+        return _language_switch_reply(language, detected_language)
+
+    romance_terms = (
+        'love', 'crush', 'romantic', 'romance', 'dating', 'date me', 'girlfriend',
+        'boyfriend', 'marry me', 'kiss', 'flirt', 'sex', 'sexy',
+        'cinta', 'sayang', 'romantik', 'teman lelaki', 'teman wanita', 'janji temu',
+        'kahwin', 'cium', 'seks',
+        'prem', 'bhalobasha', 'valobasha', 'biye', 'chumu', 'girlfriend', 'boyfriend'
+    )
+    if any(term in low for term in romance_terms):
+        return _romance_guardrail_reply(language)
+
+    return None
+
+
+def _quick_local_reply(message: str, language: str) -> str | None:
+    """Instant local replies for tiny conversational turns that do not need AI."""
+    low = (message or '').strip().lower()
+    if not low:
+        return None
+
+    greeting_words = {
+        'en': ('hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening'),
+        'ms': ('hi', 'hai', 'helo', 'hello', 'selamat pagi', 'selamat petang', 'selamat malam'),
+        'bn': ('hi', 'hello', 'assalamualaikum', 'salam'),
+    }
+    thanks_words = {
+        'en': ('thanks', 'thank you', 'thx'),
+        'ms': ('terima kasih', 'thanks', 'thank you'),
+        'bn': ('thanks', 'thank you', 'dhonnobad', 'dhanyabad'),
+    }
+    goodbye_words = {
+        'en': ('bye', 'goodbye', 'see you'),
+        'ms': ('bye', 'selamat tinggal', 'jumpa lagi'),
+        'bn': ('bye', 'goodbye', 'abar dekha hobe'),
+    }
+
+    def matches(words):
+        return any(low == word or low.startswith(f'{word} ') for word in words)
+
+    if matches(greeting_words.get(language, greeting_words['en'])):
+        greetings = {
+            'en': (
+                "Hi, I am MigrantSafe Assistant. I can help with agent checks, fees, work documents, "
+                "worker rights, and reporting unsafe treatment. What do you need help with?"
+            ),
+            'ms': (
+                "Hai, saya MigrantSafe Assistant. Saya boleh bantu semak ejen, faham yuran, dokumen kerja, "
+                "hak pekerja, dan laporan layanan tidak selamat. Apa yang anda perlukan?"
+            ),
+            'bn': (
+                "Hi, ami MigrantSafe Assistant. Ami agent check, fee, work document, rights, "
+                "ba unsafe treatment report korte shahajjo korte pari. Apnar ki shahajjo dorkar?"
+            ),
+        }
+        return greetings.get(language, greetings['en'])
+
+    if matches(thanks_words.get(language, thanks_words['en'])):
+        replies = {
+            'en': "You are welcome. Ask me anytime if you need help with an agent, fees, documents, rights, or reporting abuse.",
+            'ms': "Sama-sama. Tanya saya bila-bila masa tentang ejen, yuran, dokumen, hak pekerja, atau laporan penderaan.",
+            'bn': "Apnake shagotom. Agent, fee, document, rights, ba abuse report niye jekono somoy jiggesh korte paren.",
+        }
+        return replies.get(language, replies['en'])
+
+    if matches(goodbye_words.get(language, goodbye_words['en'])):
+        replies = {
+            'en': "Take care. If you feel unsafe or exploited, contact JTKSM at 03-8000 8000.",
+            'ms': "Jaga diri. Jika anda tidak selamat atau dieksploitasi, hubungi JTKSM di 03-8000 8000.",
+            'bn': "Nijer kheyal rakhun. Unsafe ba exploited mone hole JTKSM 03-8000 8000 e contact korun.",
+        }
+        return replies.get(language, replies['en'])
+
+    return None
+
+
+def _api_error_reply(language: str) -> str:
+    """Friendly localized message shown when live AI fails and no local topic matches."""
+    replies = {
+        'en': (
+            "I am having trouble reaching the live AI service right now, but I can still help with common MigrantSafe topics. "
+            "Ask me about checking an agent, recruitment fees, visa or documents, worker rights, or reporting abuse."
+        ),
+        'ms': (
+            "Saya menghadapi masalah menghubungi perkhidmatan AI langsung sekarang, tetapi saya masih boleh membantu tentang topik biasa MigrantSafe. "
+            "Tanya saya tentang semakan ejen, yuran pengambilan, visa atau dokumen, hak pekerja, atau laporan penderaan."
+        ),
+        'bn': (
+            "Ami ekhono live AI service e jogajog korte parchhi na, kintu MigrantSafe er common topic niye shahajjo korte pari. "
+            "Agent check, recruitment fee, visa ba document, worker rights, ba abuse report niye jiggesh korun."
+        ),
+    }
+    return replies.get(language, replies['en'])
+
+
+def _offline_or_api_error_reply(message: str, language: str) -> str:
+    """Use local guidance when the live provider fails, then explain if no topic matched."""
+    offline_reply = _offline_reply(message, language)
+    clarifier = _offline_reply('', language)
+    if offline_reply != clarifier:
+        return offline_reply
+    return _api_error_reply(language)
+
+
 def _offline_reply(message: str, language: str) -> str:
     """Scored offline fallback for core MigrantSafe support topics."""
-    low = message.lower()
+    low = (message or '').strip().lower()
+
+    greeting_words = {
+        'en': ('hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening'),
+        'ms': ('hi', 'hai', 'helo', 'selamat pagi', 'selamat petang', 'selamat malam'),
+        'bn': ('hi', 'hello', 'assalamualaikum', 'salam'),
+    }
+    if low and any(low == word or low.startswith(f'{word} ') for word in greeting_words.get(language, greeting_words['en'])):
+        greetings = {
+            'en': (
+                "Hi, I am MigrantSafe Assistant. I can help you check agents, understand fees, prepare work documents, "
+                "know your rights, or report unsafe treatment. What do you need help with?"
+            ),
+            'ms': (
+                "Hai, saya MigrantSafe Assistant. Saya boleh bantu semak ejen, faham yuran, sediakan dokumen kerja, "
+                "kenal hak pekerja, atau laporkan layanan tidak selamat. Apa yang anda perlukan?"
+            ),
+            'bn': (
+                "Hi, ami MigrantSafe Assistant. Ami agent check, fee, work document, rights, ba unsafe treatment report korte shahajjo korte pari. "
+                "Apnar ki shahajjo dorkar?"
+            ),
+        }
+        return greetings.get(language, greetings['en'])
+
+    help_words = {
+        'en': ('help', 'what can you do', 'what can i ask'),
+        'ms': ('tolong', 'bantuan', 'apa boleh tanya'),
+        'bn': ('help', 'shahajjo', 'ki jiggesh'),
+    }
+    if low and any(word in low for word in help_words.get(language, help_words['en'])):
+        return _api_error_reply(language)
+
     best_score = 0
     best_topic = None
 

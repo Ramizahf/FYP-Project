@@ -1,7 +1,12 @@
-import sqlite3
+import os
+import re
+import json
+from datetime import datetime
+from uuid import uuid4
 
 from flask import current_app, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from auth_utils import (
     create_unusable_password_hash,
@@ -11,7 +16,7 @@ from auth_utils import (
     normalize_email,
     role_required,
 )
-from db import execute_db, query_db, row_to_dict, rows_to_dicts
+from db import IntegrityError, execute_db, query_db, row_to_dict, rows_to_dicts
 
 
 ROLE_LABELS = {
@@ -34,6 +39,79 @@ GOOGLE_OAUTH_SESSION_KEYS = (
     'google_oauth_state',
     'google_oauth_code_verifier',
 )
+
+PHONE_RE = re.compile(r'^\+?[0-9]{8,15}$')
+PHONE_ERROR = 'Enter a valid phone number!'
+REPORT_EVIDENCE_ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'}
+REPORT_EVIDENCE_MAX_FILES = 5
+
+
+def is_valid_phone(phone):
+    """Allow digits with one optional leading plus, 8-15 digits."""
+    return bool(PHONE_RE.fullmatch(phone or ''))
+
+
+def allowed_report_evidence_file(filename):
+    """Return True when filename has an approved evidence extension."""
+    return (
+        bool(filename)
+        and '.' in filename
+        and filename.rsplit('.', 1)[1].lower() in REPORT_EVIDENCE_ALLOWED_EXTENSIONS
+    )
+
+
+def get_upload_size(upload):
+    """Measure an uploaded file without consuming it."""
+    stream = upload.stream
+    position = stream.tell()
+    stream.seek(0, os.SEEK_END)
+    size = stream.tell()
+    stream.seek(position)
+    return size
+
+
+def validate_report_evidence_uploads(uploads):
+    """Validate optional report evidence uploads and return error messages."""
+    uploads = [upload for upload in uploads if upload and upload.filename]
+    if not uploads:
+        return None
+
+    errors = []
+    if len(uploads) > REPORT_EVIDENCE_MAX_FILES:
+        errors.append('You can upload up to 5 evidence files.')
+
+    for upload in uploads:
+        if not allowed_report_evidence_file(upload.filename):
+            errors.append('Upload evidence must be JPG, PNG, PDF, DOC, or DOCX files only.')
+            break
+        if get_upload_size(upload) > current_app.config['REPORT_EVIDENCE_MAX_BYTES']:
+            errors.append('Each evidence file must be 5MB or smaller.')
+            break
+
+    return errors
+
+
+def save_report_evidence(upload, report_id):
+    """Save report evidence using a generated safe filename."""
+    original_name = secure_filename(upload.filename)
+    if not original_name:
+        extension = upload.filename.rsplit('.', 1)[1].lower()
+        original_name = f"evidence.{extension}"
+    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    filename = f"report_{report_id}_{timestamp}_{uuid4().hex[:8]}_{original_name}"
+    upload_dir = current_app.config['REPORT_EVIDENCE_FOLDER']
+    os.makedirs(upload_dir, exist_ok=True)
+    upload.save(os.path.join(upload_dir, filename))
+    return f"report_evidence/{filename}"
+
+
+def save_report_evidence_uploads(uploads, report_id):
+    """Save all uploaded evidence files and return their relative paths."""
+    return [
+        save_report_evidence(upload, report_id)
+        for upload in uploads
+        if upload and upload.filename
+    ]
 
 
 def build_google_name(profile, email):
@@ -264,7 +342,7 @@ def google_oauth_callback():
                 "INSERT INTO users (full_name, email, password_hash, role, google_sub) VALUES (?, ?, ?, ?, ?)",
                 (full_name, email, create_unusable_password_hash(), 'worker', google_sub)
             )
-        except sqlite3.IntegrityError:
+        except IntegrityError:
             user = query_db(
                 "SELECT * FROM users WHERE google_sub = ? OR email = ?",
                 (google_sub, email),
@@ -348,6 +426,8 @@ def register():
             error = 'Password must contain at least one number (e.g. 1, 2, 3).'
         elif password != confirm:
             error = 'Passwords do not match.'
+        elif role == 'worker' and not is_valid_phone(form_data['phone']):
+            error = PHONE_ERROR
         elif role == 'agent' and not form_data['reg_num']:
             error = 'Please enter your JTK registration number.'
         elif role == 'agent' and not form_data['agent_state']:
@@ -799,6 +879,7 @@ def submit_report():
         report_reason = request.form.get('report_reason', '').strip()
         description = request.form.get('description', '').strip()
         incident_date = request.form.get('incident_date', '').strip() or None
+        evidence_uploads = request.files.getlist('evidence')
         selected_agent = row_to_dict(query_db(
             "SELECT id, agency_name FROM agents WHERE id = ?",
             (agent_id,), one=True
@@ -832,11 +913,15 @@ def submit_report():
         elif len(description) > 2000:
             errors.append('Description is too long (max 2000 characters).')
 
+        evidence_errors = validate_report_evidence_uploads(evidence_uploads)
+        if evidence_errors:
+            errors.extend(evidence_errors)
+
         if errors:
             for error in errors:
                 flash(error, 'danger')
         else:
-            execute_db(
+            report_id = execute_db(
                 """
                 INSERT INTO reports
                     (worker_id, agent_id, agent_name, agent_staff_name, report_reason, description, incident_date)
@@ -852,6 +937,12 @@ def submit_report():
                     incident_date
                 )
             )
+            evidence_paths = save_report_evidence_uploads(evidence_uploads, report_id)
+            if evidence_paths:
+                execute_db(
+                    "UPDATE reports SET evidence_path = ? WHERE id = ?",
+                    (json.dumps(evidence_paths), report_id)
+                )
             flash('Your report has been submitted. Our admin team will review it within 48 hours.', 'success')
             return redirect(url_for('my_reports'))
 
@@ -866,8 +957,8 @@ def update_worker_profile():
     country = request.form.get('country', '').strip()
     phone = request.form.get('phone', '').strip()
 
-    if phone and len(phone) > 20:
-        flash('Phone number is too long (max 20 characters).', 'danger')
+    if phone and not is_valid_phone(phone):
+        flash(PHONE_ERROR, 'danger')
         return redirect(url_for('dashboard_worker'))
 
     execute_db(
@@ -967,8 +1058,8 @@ def update_agent_profile():
     if not state:
         errors.append('Please select your state.')
 
-    if phone and len(phone) > 20:
-        errors.append('Phone number is too long.')
+    if phone and not is_valid_phone(phone):
+        errors.append(PHONE_ERROR)
 
     if description and len(description) > 1000:
         errors.append('Description is too long (max 1000 characters).')

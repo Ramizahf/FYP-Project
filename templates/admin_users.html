@@ -69,9 +69,9 @@
 <aside class="sidebar">
   <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
   <div class="sb-section">Management</div>
-  <a href="{{ url_for('dashboard_admin') }}" class="sb-item"><span class="sb-icon">🏠</span> Overview</a>
-  <a href="{{ url_for('dashboard_admin') }}" class="sb-item"><span class="sb-icon">🛡️</span> Manage Agents</a>
-  <a href="{{ url_for('dashboard_admin') }}" class="sb-item"><span class="sb-icon">📋</span> Reports Queue</a>
+  <a href="{{ url_for('dashboard_admin') }}#home" class="sb-item"><span class="sb-icon">🏠</span> Overview</a>
+  <a href="{{ url_for('dashboard_admin') }}#agents" class="sb-item"><span class="sb-icon">🛡️</span> Manage Agents</a>
+  <a href="{{ url_for('dashboard_admin') }}#reports" class="sb-item"><span class="sb-icon">📋</span> Reports Queue</a>
   <a href="{{ url_for('admin_users') }}" class="sb-item active"><span class="sb-icon">👥</span> Manage Users</a>
   <div class="sb-section">System</div>
   <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> Back to Homepage</a>
@@ -193,6 +193,5 @@
     });
   }
 </script>
-{% include '_footer.html' %}
 </body>
 </html>

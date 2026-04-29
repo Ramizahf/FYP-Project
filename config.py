@@ -10,6 +10,10 @@ class Config:
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATABASE = os.path.join(BASE_DIR, 'database.db')
+    DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+    REPORT_EVIDENCE_FOLDER = os.path.join(UPLOAD_FOLDER, 'report_evidence')
+    REPORT_EVIDENCE_MAX_BYTES = 5 * 1024 * 1024
 
     # Set FLASK_DEBUG=True in .env to enable debug mode.
     # Defaults to False so it is safe if the app is ever deployed.

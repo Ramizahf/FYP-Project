@@ -16,6 +16,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{min-height:100%}
     body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--cream);overflow-x:hidden}
+    body.chatbot-page{height:100dvh;overflow:hidden}
 
     /* ── NAVBAR ── */
     nav{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:64px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(13,110,110,.06);z-index:100}
@@ -34,14 +35,17 @@
     .btn-primary:hover{background:var(--mid)}
 
     /* ── MAIN LAYOUT ── */
-    body.chatbot-page .chat-layout{display:grid;grid-template-columns:300px 1fr;overflow:hidden;height:calc(100dvh - 64px);min-height:560px}
+    body.chatbot-page .chat-layout{display:grid;grid-template-columns:300px 1fr;overflow:hidden;height:calc(100dvh - 4.4rem);min-height:0}
 
     /* ── LEFT PANEL ── */
     .left-panel{background:linear-gradient(175deg,var(--dark) 0%,var(--mid) 55%,#1a4a4a 100%);display:flex;flex-direction:column;padding:0;overflow:hidden;position:relative}
     .left-panel::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(20,160,151,.18) 0%,transparent 70%);pointer-events:none}
     .left-panel::after{content:'';position:absolute;bottom:-80px;left:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,131,58,.1) 0%,transparent 70%);pointer-events:none}
 
-    .lp-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:28px 24px;overflow-y:auto}
+    .lp-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:28px 24px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+    .lp-inner::-webkit-scrollbar{width:6px}
+    .lp-inner::-webkit-scrollbar-track{background:transparent}
+    .lp-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.24);border-radius:999px}
 
     .lp-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(232,131,58,.2);border:1px solid rgba(232,131,58,.4);color:var(--amber-lt);font-size:.68rem;font-weight:700;letter-spacing:.1em;padding:5px 12px;border-radius:100px;text-transform:uppercase;margin-bottom:20px;width:fit-content}
     .lp-dot{width:6px;height:6px;border-radius:50%;background:var(--amber-lt);animation:blink 1.4s infinite}
@@ -175,7 +179,7 @@
     /* Toast */
     #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:10px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.22);opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;pointer-events:none}
     #toast.show{opacity:1;transform:translateY(0)}
-    .chatbot-mini-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--dark);border-top:1px solid rgba(255,255,255,.07);padding:18px 5%;font-size:.78rem;color:rgba(255,255,255,.42)}
+    .chatbot-mini-footer{display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--dark);border-top:1px solid rgba(255,255,255,.07);padding:18px 5%;font-size:.78rem;color:rgba(255,255,255,.42)}
     .chatbot-mini-footer .sdg-tag{color:var(--amber);font-weight:700}
 
     /* Responsive */
@@ -534,6 +538,33 @@ Peraturan:
     }
   };
 
+  const TOPIC_QUESTIONS = {
+    en: {
+      agent_verification: 'How do I check if a recruitment agent is real and safe?',
+      recruitment_fees: 'Who should pay recruitment fees, me or the employer?',
+      documents_visas: 'What documents and visas do I need to work legally in Malaysia?',
+      worker_rights: 'What are my rights as a migrant worker in Malaysia?',
+      reporting_fraud: 'How do I report a fake agent or recruitment fraud?',
+      multilingual: 'Can you help me in English, Bahasa Melayu, or Bangla?'
+    },
+    ms: {
+      agent_verification: 'Bagaimana saya boleh semak sama ada ejen pekerjaan itu sah dan selamat?',
+      recruitment_fees: 'Siapa yang perlu membayar yuran pengambilan, saya atau majikan?',
+      documents_visas: 'Dokumen dan visa apa yang saya perlukan untuk bekerja secara sah di Malaysia?',
+      worker_rights: 'Apakah hak saya sebagai pekerja migran di Malaysia?',
+      reporting_fraud: 'Bagaimana saya boleh melaporkan ejen palsu atau penipuan pengambilan?',
+      multilingual: 'Bolehkah anda membantu saya dalam English, Bahasa Melayu, atau Bangla?'
+    },
+    bn: {
+      agent_verification: 'Ami kivabe check korbo recruitment agent real ebong safe kina?',
+      recruitment_fees: 'Recruitment fee ke debe, ami na employer?',
+      documents_visas: 'Malaysia te legally kaj korte amar kon document ebong visa dorkar?',
+      worker_rights: 'Malaysia te migrant worker hisebe amar ki ki rights ache?',
+      reporting_fraud: 'Fake agent ba recruitment fraud kivabe report korbo?',
+      multilingual: 'Apni ki amake English, Bahasa Melayu, ba Bangla te help korte parben?'
+    }
+  };
+
   const DOCUMENT_TABLES = {
     en: {
       headers: ['Document', "Why it's needed", 'How to obtain'],
@@ -840,15 +871,9 @@ Peraturan:
   function sendTopicReply(topicKey) {
     if (isTyping) return;
 
-    const topic = getTopicConfig(topicKey);
-    if (!topic) return;
-
-    const wc = document.getElementById('welcomeCard');
-    if (wc) wc.remove();
-
-    appendMessage('bot', topic.reply);
-    const input = document.getElementById('chatInput');
-    if (input) input.focus();
+    const questions = TOPIC_QUESTIONS[currentLang] || TOPIC_QUESTIONS.en;
+    const question = questions[topicKey] || TOPIC_QUESTIONS.en[topicKey];
+    if (question) sendQuick(question);
   }
 
   function handleKey(e) {
@@ -1017,7 +1042,7 @@ Peraturan:
       if (!statusEl) return;
 
       if (data.ok) {
-        statusEl.textContent = `Online — ${data.model}`;
+        statusEl.textContent = 'Online';
       } else {
         statusEl.textContent = 'Live AI unavailable — check service';
         if (data.message) console.warn('Chat health:', data.message);

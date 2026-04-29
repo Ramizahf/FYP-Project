@@ -28,13 +28,13 @@
     .sb-urole{font-size:.68rem;color:rgba(255,255,255,.4)}
     .sb-logout{width:100%;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.8rem;display:block;text-align:center;text-decoration:none;transition:all .18s}
     .sb-logout:hover{background:rgba(255,255,255,.09);color:var(--white)}
-    .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column}
+    .main{margin-left:var(--sw);width:calc(100% - var(--sw))!important;min-width:0;flex:1 1 auto;display:flex;flex-direction:column}
     .sb-lang{margin:12px 14px 4px;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
     .sb-lang label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
     .sb-lang-select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;cursor:pointer}
     .sb-lang-select option{color:var(--text);background:var(--white)}
-    .content{padding:28px 32px;flex:1}
-    .page{display:none}.page.active{display:block}
+    .content{padding:28px 32px;flex:1;max-width:100%;overflow-x:hidden}
+    .page{display:none;min-width:0}.page.active{display:block}
     .banner{background:linear-gradient(130deg,#1a0f2e 0%,#2E1E3A 60%,#2a1a4a 100%);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;overflow:hidden}
     .banner::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.2) 0%,transparent 70%)}
     .banner h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--white);margin-bottom:5px}
@@ -54,16 +54,125 @@
     .card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
     .card-hdr{font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:16px}
     .pill{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;white-space:nowrap}
-    .pv{background:#e6faf0;color:#1a9a55}.pp{background:#fff8e6;color:#b87d00}.pr{background:#fdecea;color:#c0392b}
-    .tbl{width:100%;border-collapse:collapse;font-size:.83rem}
+    .pv{background:#e6faf0;color:#1a9a55}.pp{background:#fff8e6;color:#b87d00}.pr{background:#fff0e5;color:#d86b1d}.pf{background:#fdecea;color:#c0392b}
+    .tbl{width:100%;border-collapse:collapse;font-size:.83rem;table-layout:fixed}
     .tbl th{text-align:left;padding:9px 12px;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border)}
     .tbl td{padding:12px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
     .tbl tr:last-child td{border-bottom:none}
     .tbl tr:hover td{background:var(--cream)}
-    .act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-size:.72rem;font-weight:600;border:none;cursor:pointer;margin-right:5px;transition:all .15s}
-    .btn-verify{background:#e6faf0;color:#1a9a55;border:1px solid #6adba4}.btn-verify:hover{background:#1a9a55;color:var(--white)}
-    .btn-flag{background:#fdecea;color:#c0392b;border:1px solid #f5a0a0}.btn-flag:hover{background:#c0392b;color:var(--white)}
-    .btn-dismiss{background:#f0f0f0;color:var(--muted);border:1px solid #ccc}.btn-dismiss:hover{background:#ccc;color:var(--dark)}
+    #p-agents .tbl th:nth-child(1){width:20%}
+    #p-agents .tbl th:nth-child(2){width:14%}
+    #p-agents .tbl th:nth-child(3){width:16%}
+    #p-agents .tbl th:nth-child(4){width:16%}
+    #p-agents .tbl th:nth-child(5){width:12%}
+    #p-agents .tbl th:nth-child(6){width:22%}
+    #p-agents .tbl tr:hover td{background:#fbf8f3}
+    #p-agents .tbl td{vertical-align:middle}
+    .reports-table th:nth-child(1){width:17%}
+    .reports-table th:nth-child(2){width:19%}
+    .reports-table th:nth-child(3){width:10%}
+    .reports-table th:nth-child(4){width:32%}
+    .reports-table th:nth-child(5){width:10%}
+    .reports-table th:nth-child(6){width:12%}
+    .reports-table td{vertical-align:top}
+    .reports-table td:nth-child(4){white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;line-height:1.45;max-width:none!important}
+    .reports-table td:nth-child(6) form{display:block!important;margin-bottom:6px}
+    .reports-table td:nth-child(6) .act-btn{margin-right:0;white-space:nowrap}
+    .report-desc{font-size:.78rem;color:var(--muted);line-height:1.45;white-space:normal;overflow-wrap:anywhere;word-break:break-word;max-height:5.8em;overflow:auto;padding-right:4px}
+    .report-actions{display:grid;gap:6px;align-items:start}
+    .report-actions form{display:block}
+    .report-actions .act-btn{margin-right:0;white-space:nowrap}
+    .act-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:28px;padding:0 9px;border-radius:6px;font-size:.7rem;font-weight:700;border:none;cursor:pointer;margin-right:5px;transition:all .15s;line-height:1}
+    .agent-actions{display:flex;align-items:center;justify-content:flex-start;gap:6px;position:relative;white-space:nowrap}
+    .agent-actions form{display:inline-flex}
+    .agent-actions .act-btn{margin-right:0}
+    .btn-verify{background:#1a9a55;color:var(--white);border:1px solid #1a9a55}.btn-verify:hover{background:#147a43;border-color:#147a43}
+    .btn-flag{background:#c0392b;color:var(--white);border:1px solid #c0392b}.btn-flag:hover{background:#a93226;color:var(--white);border-color:#a93226}
+    .btn-dismiss{background:#f4f5f5;color:var(--muted);border:1px solid #d7dddd}.btn-dismiss:hover{background:#e9eeee;color:var(--dark)}
+    .more-menu{position:relative}
+    .more-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--white);color:var(--muted);font-size:1rem;font-weight:700;cursor:pointer;line-height:1}
+    .more-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-bg)}
+    .more-dropdown{display:none;position:absolute;right:0;top:34px;z-index:20;min-width:118px;background:var(--white);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 24px rgba(15,32,39,.14);padding:6px}
+    .more-menu.open .more-dropdown{display:block}
+    .delete-action{width:100%;padding:7px 9px;border-radius:6px;background:#fff;border:none;color:#c0392b;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:700;text-align:left;cursor:pointer}
+    .delete-action:hover{background:#fdecea}
+    .more-dropdown .act-btn{width:100%;justify-content:flex-start;background:#fff!important;color:#c0392b!important;border:none!important;margin:0!important;padding:7px 9px!important}
+    .more-dropdown .act-btn:hover{background:#fdecea!important}
+    .agents-admin-panel{display:grid;gap:14px;min-width:0}
+    .agents-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    .agents-summary-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 22px rgba(15,32,39,.05);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+    .agents-summary-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(15,32,39,.08)}
+    .agents-summary-card.pending{background:#fffdf5;border-color:rgba(184,125,0,.22)}
+    .agents-summary-card.verified{background:#f3fcf7;border-color:rgba(26,154,85,.22)}
+    .agents-summary-card.reported{background:#fff7f0;border-color:rgba(216,107,29,.24)}
+    .agents-summary-card.flagged{background:#fff6f5;border-color:rgba(192,57,43,.22)}
+    .agents-summary-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .agents-summary-icon.pending{background:#fff8e6;color:#b87d00}
+    .agents-summary-icon.verified{background:#e6faf0;color:#1a9a55}
+    .agents-summary-icon.reported{background:#fff0e5;color:#d86b1d}
+    .agents-summary-icon.flagged{background:#fdecea;color:#c0392b}
+    .agents-summary-value{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:800;color:var(--dark);line-height:1}
+    .agents-summary-label{font-size:.76rem;color:var(--muted);margin-top:3px}
+    .agents-tools{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:16px;display:grid;gap:12px}
+    .agents-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+    .agents-search{width:100%;min-width:0;height:42px;border:1px solid var(--border);border-radius:11px;padding:0 14px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--dark);background:#fbfdfd;outline:none}
+    .agents-search:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,160,151,.14)}
+    .agents-filter-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .agent-filter-chip{border:1px solid var(--border);background:var(--white);color:var(--muted);height:34px;padding:0 13px;border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer;transition:all .16s}
+    .agent-filter-chip:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-bg)}
+    .agent-filter-chip.active{background:var(--teal);border-color:var(--teal);color:var(--white)}
+    .agents-filter-meta{font-size:.76rem;color:var(--muted);white-space:nowrap}
+    .agents-review-list{display:grid;gap:14px}
+    .agent-review-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px 22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:20px;align-items:start;box-shadow:0 8px 24px rgba(13,110,110,.04);position:relative;overflow:visible}
+    .agent-review-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--border)}
+    .agent-review-card[data-agent-status="verified"]::before{background:#1a9a55}
+    .agent-review-card[data-agent-status="reported"]::before{background:#d86b1d}
+    .agent-review-card[data-agent-status="flagged"]::before{background:#c0392b}
+    .agent-review-card:hover{border-color:rgba(13,110,110,.28);box-shadow:0 12px 30px rgba(13,110,110,.08)}
+    .agent-review-card.hidden{display:none}
+    .agent-info-section{display:grid;gap:14px;min-width:0}
+    .agent-main{min-width:0;padding-left:4px}
+    .agent-name-line{display:flex;align-items:flex-start;gap:14px;min-width:0}
+    .agent-avatar{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--teal),var(--teal-lt));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800;flex-shrink:0;box-shadow:0 10px 22px rgba(13,110,110,.14)}
+    .agent-title{font-size:1.08rem;font-weight:800;color:var(--dark);line-height:1.22;overflow-wrap:anywhere;margin-top:1px}
+    .agent-subline{font-size:.8rem;color:var(--muted);line-height:1.45;margin-top:3px;max-width:320px}
+    .agent-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .agent-detail{background:#fbfdfd;border:1px solid rgba(13,110,110,.12);border-radius:12px;padding:12px 13px;min-width:0;min-height:76px;display:flex;flex-direction:column;justify-content:flex-start}
+    .agent-detail-label{font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .agent-detail-value{font-size:.9rem;font-weight:800;color:var(--dark);line-height:1.3;overflow-wrap:anywhere}
+    .agent-action-section{display:grid;gap:10px;align-self:stretch;justify-self:stretch;border-left:1px solid var(--border);padding-left:20px;min-width:0}
+    .agent-action-section > div:first-child{text-align:right}
+    .agent-status-note{font-size:.76rem;color:var(--muted);line-height:1.35;margin-top:5px;overflow-wrap:anywhere}
+    .agent-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;max-width:none;align-items:stretch;min-width:0}
+    .agent-primary-actions{display:contents}
+    .agent-history-action{display:grid;min-width:0}
+    .agent-actions form{display:grid;min-width:0}
+    .agent-actions .act-btn{width:100%;height:38px;border-radius:9px;padding:0 10px;font-size:.78rem;margin:0;white-space:nowrap;min-width:0}
+    .agent-actions .more-btn{width:42px;height:42px;border-radius:10px}
+    .btn-history{background:#fbfdfd;color:var(--teal);border:1px solid rgba(13,110,110,.18)}
+    .btn-history:hover{background:#d8eeee;border-color:var(--teal)}
+    .agent-report-history{grid-column:1/-1;border-top:1px solid var(--border);padding-top:14px;display:none}
+    .agent-review-card.history-open .agent-report-history{display:block}
+    .report-history-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .report-history-title{font-size:.86rem;font-weight:800;color:var(--dark)}
+    .report-history-count{font-size:.72rem;font-weight:800;color:var(--teal);background:var(--teal-bg);border-radius:999px;padding:4px 9px}
+    .report-history-list{display:grid;gap:10px}
+    .report-history-item{background:#fbfdfd;border:1px solid rgba(13,110,110,.1);border-radius:12px;padding:12px}
+    .report-history-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+    .report-history-date{font-size:.76rem;color:var(--muted);font-weight:700}
+    .report-history-status{font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:999px;text-transform:capitalize}
+    .report-history-status.open{background:#fff0e5;color:#d86b1d}
+    .report-history-status.resolved{background:#e6faf0;color:#1a9a55}
+    .report-history-status.dismissed{background:#f4f5f5;color:var(--muted)}
+    .report-history-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;font-size:.78rem;line-height:1.45}
+    .report-history-label{font-size:.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+    .report-history-value{color:var(--dark);overflow-wrap:anywhere}
+    .report-history-desc{grid-column:1/-1}
+    .report-history-evidence a{color:var(--teal);font-weight:800;text-decoration:none;display:block;margin-top:2px}
+    .report-history-empty{background:#fbfdfd;border:1px dashed var(--border);border-radius:12px;padding:14px;color:var(--muted);font-size:.82rem}
+    .agents-no-results{display:none;background:var(--white);border:1px dashed var(--border);border-radius:16px;padding:24px;text-align:center;color:var(--muted)}
+    .agents-no-results.show{display:block}
+    .agents-empty{background:var(--white);border:1px dashed var(--border);border-radius:16px;padding:32px;text-align:center;color:var(--muted)}
     .act{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
     .act:last-child{border-bottom:none}
     .act-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
@@ -81,7 +190,14 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
     #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:11px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.22);opacity:0;transform:translateY(10px);transition:opacity .28s,transform .28s;pointer-events:none}
     #toast.show{opacity:1;transform:translateY(0)}
-    @media(max-width:860px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stats{grid-template-columns:1fr 1fr}.qa-grid{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+    @media(max-width:1320px){
+      .agents-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .agent-review-card{grid-template-columns:minmax(0,1fr) minmax(240px,320px)}
+      .agent-actions{justify-content:flex-start}
+    }
+    @media(max-width:980px){.agent-review-card{grid-template-columns:1fr}.agent-action-section{border-left:none;border-top:1px solid var(--border);padding-left:0;padding-top:14px}.agent-action-section > div:first-child{text-align:left}.agent-detail-grid{grid-template-columns:1fr}.agent-actions{grid-template-columns:1fr}}
+    @media(max-width:860px){.sidebar{transform:translateX(-100%)}.main{margin-left:0;width:100%!important}.content{padding:22px 18px}.stats{grid-template-columns:1fr 1fr}.qa-grid{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.agents-summary{grid-template-columns:1fr}}
+    @media(max-width:720px){.report-history-grid{grid-template-columns:1fr}.agents-search-row{grid-template-columns:1fr}.agents-filter-meta{justify-self:start}}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
@@ -99,18 +215,18 @@
     </select>
   </div>
   <div class="sb-section" data-t="sb_mgmt">Management</div>
-  <button class="sb-item active" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_overview">Overview</span></button>
-  <button class="sb-item" onclick="go('agents',this)">
+  <button class="sb-item active" data-page="home" onclick="go('home',this)"><span class="sb-icon">🏠</span> <span data-t="sb_overview">Overview</span></button>
+  <button class="sb-item" data-page="agents" onclick="go('agents',this)">
     <span class="sb-icon">🛡️</span> <span data-t="sb_agents">Manage Agents</span>
     {% if stats.pending > 0 %}<span class="sb-badge">{{ stats.pending }}</span>{% endif %}
   </button>
-  <button class="sb-item" onclick="go('reports',this)">
+  <button class="sb-item" data-page="reports" onclick="go('reports',this)">
     <span class="sb-icon">📋</span> <span data-t="sb_reports">Reports Queue</span>
     {% if stats.open_reports > 0 %}<span class="sb-badge">{{ stats.open_reports }}</span>{% endif %}
   </button>
   <a href="{{ url_for('admin_users') }}" class="sb-item"><span class="sb-icon">👥</span> <span data-t="sb_users">Manage Users</span></a>
   <div class="sb-section" data-t="sb_system">System</div>
-  <button class="sb-item" onclick="go('settings',this)"><span class="sb-icon">⚙️</span> <span data-t="sb_settings">Settings</span></button>
+  <button class="sb-item" data-page="settings" onclick="go('settings',this)"><span class="sb-icon">⚙️</span> <span data-t="sb_settings">Settings</span></button>
   <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> <span data-t="sb_back">Back to Homepage</span></a>
   <div class="sb-footer">
     <div class="sb-user">
@@ -179,49 +295,182 @@
     <!-- MANAGE AGENTS -->
     <div class="page" id="p-agents">
       <div class="sec-hdr"><h2 data-t="agents_title">Manage Agents</h2><p data-t="agents_sub">Review, verify, or flag recruitment agencies.</p></div>
-      <div class="card" style="overflow-x:auto">
-        <table class="tbl">
-          <thead><tr><th>Agency Name</th><th>Location</th><th>Industry</th><th>License No.</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody>
-            {% for a in agents %}
-            {% set sc = {'verified':'pv','pending':'pp','reported':'pr'} %}
-            {% set sl = {'verified':'✓ Verified','pending':'⏳ Pending','reported':'⚠ Reported'} %}
-            <tr>
-              <td><strong>{{ a['agency_name'] }}</strong></td>
-              <td>📍 {{ a['state'] or '—' }}</td>
-              <td>{{ a['industry'] or '—' }}</td>
-              <td style="font-size:.75rem;color:var(--muted)">{{ a['license_number'] or '—' }}</td>
-              <td><span class="pill {{ sc.get(a['verification_status'],'pp') }}">{{ sl.get(a['verification_status'],'—') }}</span></td>
-              <td>
+      <div class="agents-admin-panel">
+        <div class="agents-summary" aria-label="Agent review summary">
+          <div class="agents-summary-card pending">
+            <div class="agents-summary-icon pending">⏳</div>
+            <div><div class="agents-summary-value">{{ stats.pending }}</div><div class="agents-summary-label">Need review</div></div>
+          </div>
+          <div class="agents-summary-card reported">
+            <div class="agents-summary-icon reported">⚠</div>
+            <div><div class="agents-summary-value">{{ stats.reported }}</div><div class="agents-summary-label">Reported agencies</div></div>
+          </div>
+          <div class="agents-summary-card verified">
+            <div class="agents-summary-icon verified">✓</div>
+            <div><div class="agents-summary-value">{{ stats.verified }}</div><div class="agents-summary-label">Verified agencies</div></div>
+          </div>
+          <div class="agents-summary-card flagged">
+            <div class="agents-summary-icon flagged">!</div>
+            <div><div class="agents-summary-value">{{ stats.flagged }}</div><div class="agents-summary-label">Flagged by admin</div></div>
+          </div>
+        </div>
+
+        <section class="agents-tools" aria-label="Search and filter agents">
+          <div class="agents-search-row">
+            <input type="search" id="agentSearchInput" class="agents-search" placeholder="Search agency name" aria-label="Search agents by agency name">
+            <div class="agents-filter-meta"><span id="agentFilterCount">{{ agents|length }}</span> shown</div>
+          </div>
+          <div class="agents-filter-chips" role="group" aria-label="Filter agents by status">
+            <button type="button" class="agent-filter-chip active" data-agent-filter="all">All</button>
+            <button type="button" class="agent-filter-chip" data-agent-filter="pending">Pending</button>
+            <button type="button" class="agent-filter-chip" data-agent-filter="reported">Reported</button>
+            <button type="button" class="agent-filter-chip" data-agent-filter="verified">Verified</button>
+            <button type="button" class="agent-filter-chip" data-agent-filter="flagged">Flagged</button>
+          </div>
+        </section>
+
+        <div class="agents-review-list">
+          {% for a in agents %}
+          {% set status_key = a.get('admin_status', 'pending') %}
+          {% set sc = {'verified':'pv','pending':'pp','reported':'pr','flagged':'pf'} %}
+          {% set sl = {'verified':'Verified','pending':'Pending','reported':'Reported','flagged':'Flagged'} %}
+          {% set sl = {'verified':'✓ Verified','pending':'⏳ Pending','reported':'⚠ Reported'} %}
+          {% set sl = {'verified':'Verified','pending':'Pending','reported':'Reported','flagged':'Flagged'} %}
+          <article class="agent-review-card" data-agent-card data-agent-status="{{ status_key }}" data-agent-name="{{ (a['agency_name'] or '')|lower }}">
+            <div class="agent-info-section">
+            <div class="agent-main">
+              <div class="agent-name-line">
+                <div class="agent-avatar">{{ (a['agency_name'] or 'A')[0].upper() }}</div>
+                <div>
+                  <div class="agent-title">{{ a['agency_name'] or 'Unnamed agency' }}</div>
+                  {% if a.get('open_report_count', 0) > 0 %}
+                  <div class="agent-subline">{{ a['open_report_count'] }} open worker report{{ '' if a['open_report_count'] == 1 else 's' }}</div>
+                  {% endif %}
+                  <div class="agent-subline">Agency ID #{{ a['id'] }} · Registered for MigrantSafe review</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="agent-detail-grid">
+              <div class="agent-detail">
+                <div class="agent-detail-label">Location</div>
+                <div class="agent-detail-value">📍 {{ a['state'] or 'Not provided' }}</div>
+              </div>
+              <div class="agent-detail">
+                <div class="agent-detail-label">Industry</div>
+                <div class="agent-detail-value">{{ a['industry'] or 'Not provided' }}</div>
+              </div>
+              <div class="agent-detail">
+                <div class="agent-detail-label">License No.</div>
+                <div class="agent-detail-value">{{ a['license_number'] or 'Not provided' }}</div>
+              </div>
+            </div>
+
+            </div>
+
+            <div class="agent-action-section">
+              <div>
+                {% if status_key == 'flagged' or status_key == 'reported' %}
+                <span class="pill {{ sc.get(status_key,'pp') }}">{{ 'Flagged' if status_key == 'flagged' else 'Reported' }}</span>
+                {% else %}
+                <span class="pill {{ sc.get(a['verification_status'],'pp') }}">{{ sl.get(a['verification_status'],'—') }}</span>
+                {% endif %}
+                <div class="agent-status-note">
+                  {% if status_key == 'flagged' %}
+                  Admin action has flagged this agency for risk.
+                  {% elif a['verification_status'] == 'verified' %}
+                  Workers can see this agency as verified.
+                  {% elif status_key == 'reported' %}
+                  Worker reports are open and need review.
+                  {% elif a['verification_status'] == 'reported' %}
+                  Worker reports or admin concerns are active.
+                  {% else %}
+                  Review the details before approving this agency.
+                  {% endif %}
+                </div>
+              </div>
+              <div class="agent-actions">
+                <div class="agent-primary-actions">
                 {% if a['verification_status'] != 'verified' %}
-                <form method="POST" action="{{ url_for('update_agent_status', agent_id=a['id']) }}" style="display:inline">
+                <form method="POST" action="{{ url_for('update_agent_status', agent_id=a['id']) }}">
                   <input type="hidden" name="status" value="verified">
                   <button type="submit" class="act-btn btn-verify">✓ Verify</button>
                 </form>
                 {% endif %}
                 {% if a['verification_status'] != 'reported' %}
-                <form method="POST" action="{{ url_for('update_agent_status', agent_id=a['id']) }}" style="display:inline">
+                <form method="POST" action="{{ url_for('update_agent_status', agent_id=a['id']) }}">
                   <input type="hidden" name="status" value="reported">
                   <button type="submit" class="act-btn btn-flag">⚠ Flag</button>
                 </form>
                 {% endif %}
                 {% if a['verification_status'] != 'pending' %}
-                <form method="POST" action="{{ url_for('update_agent_status', agent_id=a['id']) }}" style="display:inline">
+                <form method="POST" action="{{ url_for('update_agent_status', agent_id=a['id']) }}">
                   <input type="hidden" name="status" value="pending">
                   <button type="submit" class="act-btn btn-dismiss">Reset</button>
                 </form>
                 {% endif %}
-                <form method="POST" action="{{ url_for('delete_agent', agent_id=a['id']) }}" style="display:inline"
-                      onsubmit="return confirm('Permanently delete this agent? This cannot be undone.')">
-                  <button type="submit" class="act-btn" style="background:#7b1111;color:#fff;border:1px solid #7b1111">🗑 Delete</button>
-                </form>
-              </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No agents registered yet.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+                </div>
+                <div class="agent-history-action">
+                  <button type="button" class="act-btn btn-history" data-history-toggle aria-expanded="false" aria-controls="agentHistory{{ a['id'] }}">View Report History</button>
+                </div>
+              </div>
+            </div>
+            <section class="agent-report-history" id="agentHistory{{ a['id'] }}" aria-label="Report history for {{ a['agency_name'] or 'agent' }}">
+              <div class="report-history-header">
+                <div class="report-history-title">Report History</div>
+                <div class="report-history-count">{{ a.get('report_count', 0) }} total</div>
+              </div>
+              {% if a.get('report_history') %}
+              <div class="report-history-list">
+                {% for report in a['report_history'] %}
+                <div class="report-history-item">
+                  <div class="report-history-top">
+                    <div class="report-history-date">{{ report['created_at'][:10] if report['created_at'] else 'Date not recorded' }}</div>
+                    <span class="report-history-status {{ report['status'] }}">{{ report['status'] }}</span>
+                  </div>
+                  <div class="report-history-grid">
+                    <div>
+                      <div class="report-history-label">Worker</div>
+                      <div class="report-history-value">{{ report['worker_name'] or ('Worker ID #' ~ report['worker_id']) if report['worker_id'] else 'Unknown worker' }}</div>
+                    </div>
+                    <div>
+                      <div class="report-history-label">Reason / Category</div>
+                      <div class="report-history-value">{{ report['report_reason'] or 'Not recorded' }}</div>
+                    </div>
+                    <div class="report-history-desc">
+                      <div class="report-history-label">Description</div>
+                      <div class="report-history-value">{{ report['description'] or 'No description provided.' }}</div>
+                    </div>
+                    <div class="report-history-evidence">
+                      <div class="report-history-label">Evidence</div>
+                      <div class="report-history-value">
+                        {% if report.get('evidence_filenames') %}
+                          {% for filename in report['evidence_filenames'] %}
+                          <a href="{{ url_for('report_evidence', report_id=report['id'], file_index=loop.index0) }}" target="_blank" rel="noopener">{{ filename }}</a>
+                          {% endfor %}
+                        {% else %}
+                        No evidence file
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="report-history-label">Previous Admin Action / Status</div>
+                      <div class="report-history-value">{{ report['status']|capitalize }}</div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="report-history-empty">No reports have been submitted for this agent.</div>
+              {% endif %}
+            </section>
+          </article>
+          {% else %}
+          <div class="agents-empty">No agents registered yet.</div>
+          {% endfor %}
+        </div>
+        <div class="agents-no-results" id="agentsNoResults">No agents match this search or filter.</div>
       </div>
     </div>
 
@@ -229,13 +478,23 @@
     <div class="page" id="p-reports">
       <div class="sec-hdr"><h2 data-t="reports_title">Reports Queue</h2><p data-t="reports_sub">Worker-submitted reports awaiting your review.</p></div>
       <div class="card" style="overflow-x:auto">
-        <table class="tbl">
-          <thead><tr><th>Agent Reported</th><th>Issue Type</th><th>Description</th><th>Submitted</th><th>Actions</th></tr></thead>
+        <table class="tbl reports-table">
+          <thead><tr><th>Agent Reported</th><th>Issue Type</th><th>Evidence</th><th>Description</th><th>Submitted</th><th>Actions</th></tr></thead>
           <tbody>
             {% for r in open_reports %}
             <tr>
               <td><strong>{{ r['agent_name'] }}</strong></td>
               <td>{{ r['report_reason'] }}</td>
+              {% set evidence_paths = r.get('evidence_paths', []) %}
+              <td style="white-space:nowrap;font-size:.78rem">
+                {% if evidence_paths %}
+                  {% for evidence_path in evidence_paths %}
+                  <a href="{{ url_for('report_evidence', report_id=r['id'], file_index=loop.index0) }}" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700;display:block">View file {{ loop.index }}</a>
+                  {% endfor %}
+                {% else %}
+                <span style="color:var(--muted)">None</span>
+                {% endif %}
+              </td>
               <td style="max-width:200px;font-size:.78rem;color:var(--muted)">{{ r['description'][:100] }}{% if r['description']|length > 100 %}…{% endif %}</td>
               <td style="white-space:nowrap;font-size:.78rem">{{ r['created_at'][:10] if r['created_at'] else '—' }}</td>
               <td>
@@ -250,7 +509,7 @@
               </td>
             </tr>
             {% else %}
-            <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">✅ No open reports. All clear!</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">✅ No open reports. All clear!</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -377,10 +636,21 @@ function go(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('p-' + id).classList.add('active');
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  const navItem = btn || document.querySelector(`.sb-item[data-page="${id}"]`);
+  if (navItem) navItem.classList.add('active');
   const tt = document.getElementById('tbTitle');
   if (tt && PAGE_TITLES[currentLang][id]) tt.textContent = PAGE_TITLES[currentLang][id];
+  if (window.location.hash !== `#${id}`) {
+    history.replaceState(null, '', `#${id}`);
+  }
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openInitialAdminPage() {
+  const requested = (window.location.hash || '').replace('#', '');
+  if (['home', 'agents', 'reports', 'settings'].includes(requested)) {
+    go(requested, null);
+  }
 }
 
 function toast(m) {
@@ -389,11 +659,81 @@ function toast(m) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+function toggleMoreMenu(event, button) {
+  event.stopPropagation();
+  const menu = button.closest('.more-menu');
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.more-menu.open').forEach(item => {
+    item.classList.remove('open');
+    const itemButton = item.querySelector('.more-btn');
+    if (itemButton) itemButton.setAttribute('aria-expanded', 'false');
+  });
+  if (!isOpen) {
+    menu.classList.add('open');
+    button.setAttribute('aria-expanded', 'true');
+  }
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.more-menu.open').forEach(item => {
+    item.classList.remove('open');
+    const button = item.querySelector('.more-btn');
+    if (button) button.setAttribute('aria-expanded', 'false');
+  });
+});
+
+const agentSearchInput = document.getElementById('agentSearchInput');
+const agentFilterCount = document.getElementById('agentFilterCount');
+const agentsNoResults = document.getElementById('agentsNoResults');
+let activeAgentFilter = 'all';
+
+function filterAgentCards() {
+  const query = (agentSearchInput ? agentSearchInput.value : '').trim().toLowerCase();
+  let visibleCount = 0;
+  document.querySelectorAll('[data-agent-card]').forEach(card => {
+    const name = card.dataset.agentName || '';
+    const status = card.dataset.agentStatus || 'pending';
+    const matchesSearch = !query || name.includes(query);
+    const matchesStatus = activeAgentFilter === 'all' || status === activeAgentFilter;
+    const visible = matchesSearch && matchesStatus;
+    card.classList.toggle('hidden', !visible);
+    if (visible) visibleCount += 1;
+  });
+  if (agentFilterCount) agentFilterCount.textContent = visibleCount;
+  if (agentsNoResults) agentsNoResults.classList.toggle('show', visibleCount === 0);
+}
+
+document.querySelectorAll('[data-agent-filter]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    activeAgentFilter = chip.dataset.agentFilter || 'all';
+    document.querySelectorAll('[data-agent-filter]').forEach(item => item.classList.remove('active'));
+    chip.classList.add('active');
+    filterAgentCards();
+  });
+});
+
+if (agentSearchInput) {
+  agentSearchInput.addEventListener('input', filterAgentCards);
+}
+
+document.querySelectorAll('[data-history-toggle]').forEach(button => {
+  button.addEventListener('click', () => {
+    const card = button.closest('[data-agent-card]');
+    if (!card) return;
+    const open = !card.classList.contains('history-open');
+    card.classList.toggle('history-open', open);
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    button.textContent = open ? 'Hide Report History' : 'View Report History';
+  });
+});
+
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% for category, message in messages %}
   window.addEventListener('DOMContentLoaded', () => toast("{{ message|replace('"', '\\"') }}"));
   {% endfor %}
 {% endwith %}
+window.addEventListener('DOMContentLoaded', openInitialAdminPage);
 </script>
 </body>
 </html>
+
