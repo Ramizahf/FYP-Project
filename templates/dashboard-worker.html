@@ -114,7 +114,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"/>
   <script defer src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </head>
-<body>
+<body class="dashboard-page">
+
+<header class="dashboard-mobile-bar">
+  <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Open dashboard menu">☰</button>
+  <a href="{{ url_for('index') }}" class="dashboard-mobile-brand" aria-label="MigrantSafe home">
+    <img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" width="668" height="727" decoding="async"/>
+    <span>Migrant<span>Safe</span></span>
+  </a>
+</header>
 
 <aside class="sidebar">
   <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>

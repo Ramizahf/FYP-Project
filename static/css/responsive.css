@@ -97,6 +97,33 @@ button {
   color: var(--teal, #0d6e6e);
 }
 
+.dashboard-mobile-bar {
+  display: none;
+}
+
+.dashboard-mobile-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--teal, #0D6E6E);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.18rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.dashboard-mobile-brand img {
+  width: auto;
+  height: 2.25rem;
+  flex-shrink: 0;
+}
+
+.dashboard-mobile-brand span span {
+  color: var(--amber, #E8833A);
+}
+
 body.mobile-menu-open,
 body.sidebar-open {
   overflow: hidden;
@@ -547,9 +574,156 @@ body.sidebar-open .sidebar-overlay {
   }
 }
 
-@media (max-width: 47.99rem) {
+@media (max-width: 63.99rem) {
   .mobile-hidden-guide {
     display: none !important;
+  }
+
+  .dashboard-mobile-bar {
+    position: sticky;
+    top: 0;
+    z-index: 170;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 4rem;
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.97);
+    border-bottom: 1px solid var(--border, #d4e8e8);
+    box-shadow: 0 0.35rem 1.2rem rgba(15, 32, 39, 0.08);
+  }
+
+  .dashboard-mobile-bar .sidebar-toggle {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    color: var(--teal, #0D6E6E);
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  body.dashboard-page {
+    display: block;
+  }
+
+  body.dashboard-page .main {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  body.dashboard-page .content {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  body.dashboard-page .sidebar {
+    z-index: 220;
+    width: min(82vw, 19rem);
+    max-width: 19rem;
+  }
+
+  body.dashboard-page .sb-logo {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  body.dashboard-page .sb-logo-icon {
+    height: 2.25rem;
+  }
+
+  body.dashboard-page .sb-logo-text {
+    font-size: 1.05rem;
+  }
+
+  body.dashboard-page .sb-lang {
+    margin: 0.75rem 0.75rem 0.25rem;
+    padding: 0.8rem;
+  }
+
+  body.dashboard-page .sb-item {
+    min-height: 2.75rem;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.88rem;
+  }
+
+  body.dashboard-page .sb-footer {
+    padding: 0.75rem;
+  }
+
+  body.dashboard-page .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 1.15rem;
+    border-radius: 1rem;
+  }
+
+  body.dashboard-page .banner h2 {
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+
+  body.dashboard-page .banner p,
+  body.dashboard-page .sec-hdr p {
+    font-size: 0.86rem;
+    line-height: 1.55;
+  }
+
+  body.dashboard-page .stats,
+  body.dashboard-page .agents-summary,
+  body.dashboard-page .qa-grid,
+  body.dashboard-page .grid2,
+  body.dashboard-page .agent-detail-grid,
+  body.dashboard-page .reports-grid,
+  body.dashboard-page .agents-search-row,
+  body.dashboard-page .agent-review-card,
+  body.dashboard-page .report-history-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.dashboard-page .card,
+  body.dashboard-page .stat,
+  body.dashboard-page .qa,
+  body.dashboard-page .agents-tools,
+  body.dashboard-page .agent-review-card,
+  body.dashboard-page .job-card,
+  body.dashboard-page .enquiry-card,
+  body.dashboard-page .status-card {
+    border-radius: 0.9rem;
+    padding: 1rem;
+  }
+
+  body.dashboard-page .agent-action-section {
+    border-left: 0 !important;
+    border-top: 1px solid var(--border, #d4e8e8);
+    padding-left: 0 !important;
+    padding-top: 0.9rem;
+  }
+
+  body.dashboard-page .agent-actions {
+    display: grid;
+    grid-template-columns: 1fr !important;
+  }
+
+  body.dashboard-page .job-card-top,
+  body.dashboard-page .enquiry-top,
+  body.dashboard-page .prof-row,
+  body.dashboard-page .arow,
+  body.dashboard-page .status-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.dashboard-page .prof-val,
+  body.dashboard-page .agent-title,
+  body.dashboard-page .job-title,
+  body.dashboard-page .enquiry-subject {
+    overflow-wrap: anywhere;
+  }
+
+  body.dashboard-page .tbl {
+    min-width: 42rem;
   }
 
   .nav-logo {
