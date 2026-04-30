@@ -548,6 +548,10 @@ body.sidebar-open .sidebar-overlay {
 }
 
 @media (max-width: 47.99rem) {
+  .mobile-hidden-guide {
+    display: none !important;
+  }
+
   .nav-logo {
     margin-left: -0.65rem;
   }

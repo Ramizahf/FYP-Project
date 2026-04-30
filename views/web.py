@@ -119,6 +119,25 @@ def get_agent_profile_for_user(user_id):
     ))
 
 
+def is_mobile_request():
+    """Best-effort mobile detection for routes that are desktop-only."""
+    client_hint = request.headers.get('Sec-CH-UA-Mobile', '').strip().lower()
+    if client_hint == '?1':
+        return True
+
+    user_agent = request.headers.get('User-Agent', '').lower()
+    mobile_markers = (
+        'android',
+        'blackberry',
+        'iphone',
+        'ipod',
+        'mobile',
+        'opera mini',
+        'windows phone',
+    )
+    return any(marker in user_agent for marker in mobile_markers)
+
+
 def index():
     """Landing page - public, no login required."""
     return render_template('index.html')
@@ -363,6 +382,9 @@ def my_enquiries():
 
 def migration_guide():
     """Step-by-step migration process guide."""
+    if is_mobile_request():
+        return redirect(url_for('dashboard' if 'user_id' in session else 'index'))
+
     return render_template('guide.html')
 
 

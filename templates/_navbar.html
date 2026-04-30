@@ -12,7 +12,7 @@
   <div class="nav-links">
     <a href="{{ url_for('agents') }}" class="{% if navbar_active == 'agents' %}active{% endif %}"{% if navbar_active == 'agents' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navAgents"{% elif navbar_variant == 'index' %} data-t="nav_how"{% endif %}>Find Agents</a>
     <a href="{{ url_for('chatbot') }}" class="{% if navbar_active == 'chatbot' %}active{% endif %}"{% if navbar_active == 'chatbot' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navChatbot"{% elif navbar_variant == 'index' %} data-t="nav_feat"{% endif %}>Chatbot</a>
-    <a href="{{ url_for('migration_guide') }}" class="{% if navbar_active == 'guide' %}active{% endif %}"{% if navbar_active == 'guide' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navHow"{% elif navbar_variant == 'index' %} data-t="nav_who"{% endif %}>Guide</a>
+    <a href="{{ url_for('migration_guide') }}" class="mobile-hidden-guide {% if navbar_active == 'guide' %}active{% endif %}"{% if navbar_active == 'guide' %} aria-current="page"{% endif %}{% if navbar_variant == 'agents' %} id="t-navHow"{% elif navbar_variant == 'index' %} data-t="nav_who"{% endif %}>Guide</a>
   </div>
   <div class="nav-cta">
     {% if current_user.is_auth %}
