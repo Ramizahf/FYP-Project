@@ -11,6 +11,10 @@ class Config:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATABASE = os.path.join(BASE_DIR, 'database.db')
     DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+    DATABASE_FALLBACK_TO_SQLITE = os.environ.get(
+        'DATABASE_FALLBACK_TO_SQLITE',
+        'True' if os.environ.get('FLASK_DEBUG', 'False').lower() == 'true' else 'False'
+    ).lower() == 'true'
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     REPORT_EVIDENCE_FOLDER = os.path.join(UPLOAD_FOLDER, 'report_evidence')
     REPORT_EVIDENCE_MAX_BYTES = 5 * 1024 * 1024

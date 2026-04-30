@@ -27,6 +27,18 @@ def _postgres_url():
     return current_app.config['DATABASE_URL']
 
 
+def _allow_sqlite_fallback():
+    return bool(current_app.config.get('DATABASE_FALLBACK_TO_SQLITE'))
+
+
+def _disable_postgres_for_this_process(exc):
+    current_app.logger.warning(
+        "Postgres is unavailable; falling back to SQLite for this process: %s",
+        exc,
+    )
+    current_app.config['DATABASE_URL'] = ''
+
+
 def _translate_sql(sql):
     """Translate the app's SQLite-style SQL into psycopg-compatible SQL."""
     translated = sql.replace('?', '%s')
@@ -199,14 +211,23 @@ def ensure_database_schema():
             raise RuntimeError(
                 'DATABASE_URL is set, but psycopg is not installed. Run: pip install -r requirements.txt'
             )
-        conn = psycopg.connect(_postgres_url(), row_factory=dict_row)
         try:
-            with conn.cursor() as cur:
-                for statement in POSTGRES_SCHEMA:
-                    cur.execute(statement)
-            conn.commit()
-        finally:
-            conn.close()
+            conn = psycopg.connect(_postgres_url(), row_factory=dict_row)
+        except psycopg.OperationalError as exc:
+            if not _allow_sqlite_fallback():
+                raise
+            _disable_postgres_for_this_process(exc)
+        else:
+            try:
+                with conn.cursor() as cur:
+                    for statement in POSTGRES_SCHEMA:
+                        cur.execute(statement)
+                conn.commit()
+            finally:
+                conn.close()
+            return
+
+    if _use_postgres():
         return
 
     conn = sqlite3.connect(current_app.config['DATABASE'])
