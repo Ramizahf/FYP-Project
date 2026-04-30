@@ -1,8 +1,6 @@
-import secrets
 from functools import wraps
 
 from flask import flash, redirect, session, url_for
-from werkzeug.security import generate_password_hash
 
 
 def login_required(f):
@@ -38,16 +36,6 @@ def normalize_email(email):
     if separator and domain == 'googlemail.com':
         domain = 'gmail.com'
     return f'{local_part}@{domain}' if separator else normalized
-
-
-def is_verified_gmail_address(email):
-    """Allow only Gmail addresses for Google OAuth sign-in."""
-    return normalize_email(email).endswith('@gmail.com')
-
-
-def create_unusable_password_hash():
-    """Store a random hash for Google-created accounts without a local password."""
-    return generate_password_hash(secrets.token_urlsafe(32))
 
 
 def log_in_user(user):

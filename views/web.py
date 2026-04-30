@@ -9,14 +9,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 from auth_utils import (
-    create_unusable_password_hash,
-    is_verified_gmail_address,
     log_in_user,
     login_required,
     normalize_email,
     role_required,
 )
-from db import IntegrityError, execute_db, query_db, row_to_dict, rows_to_dicts
+from db import execute_db, query_db, row_to_dict, rows_to_dicts
 
 
 ROLE_LABELS = {
@@ -32,12 +30,6 @@ ENQUIRY_CATEGORIES = (
     'Documents and Process',
     'Accommodation and Travel',
     'Other',
-)
-
-GOOGLE_OAUTH_SESSION_KEYS = (
-    'google_oauth_token',
-    'google_oauth_state',
-    'google_oauth_code_verifier',
 )
 
 PHONE_RE = re.compile(r'^\+?[0-9]{8,15}$')
@@ -112,23 +104,6 @@ def save_report_evidence_uploads(uploads, report_id):
         for upload in uploads
         if upload and upload.filename
     ]
-
-
-def build_google_name(profile, email):
-    """Prefer Google's profile name and fall back to the Gmail username."""
-    full_name = (profile.get('name') or '').strip()
-    if full_name:
-        return full_name
-
-    local_part = email.split('@', 1)[0].replace('.', ' ').replace('_', ' ').strip()
-    fallback_name = ' '.join(word.capitalize() for word in local_part.split())
-    return fallback_name or 'Google User'
-
-
-def clear_google_oauth_session():
-    """Remove any Google OAuth state/token values from the Flask session."""
-    for key in GOOGLE_OAUTH_SESSION_KEYS:
-        session.pop(key, None)
 
 
 def pick_dashboard_page(page_name, allowed_pages, default='home'):
@@ -225,156 +200,6 @@ def login():
             error = 'Incorrect email or password. Please try again.'
 
     return render_template('login.html', error=error)
-
-
-def google_login():
-    """Start the Google OAuth flow."""
-    if 'user_id' in session:
-        return redirect(url_for('dashboard'))
-
-    clear_google_oauth_session()
-
-    if not current_app.config.get('GOOGLE_OAUTH_READY'):
-        reason = current_app.config.get('GOOGLE_OAUTH_DISABLED_REASON')
-        if reason == 'missing_dependency':
-            flash(
-                'Google sign-in is unavailable in this Python environment. '
-                'Install Flask-Dance and restart the app.',
-                'danger'
-            )
-        elif reason == 'missing_config':
-            flash(
-                'Google sign-in is not configured yet. '
-                'Add GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET to your .env file, then restart the app.',
-                'danger'
-            )
-        else:
-            flash(
-                'Google sign-in is not available right now. Restart the app and try again.',
-                'danger'
-            )
-        return redirect(url_for('login'))
-
-    canonical_base_url = current_app.config.get('GOOGLE_OAUTH_BASE_URL', '')
-    current_base_url = request.host_url.rstrip('/')
-    if canonical_base_url and canonical_base_url.lower() != current_base_url.lower():
-        return redirect(f"{canonical_base_url}{url_for('google_login')}")
-
-    return redirect(url_for('google.login'))
-
-
-def google_oauth_callback():
-    """Finish Google OAuth, then log the user into the existing session system."""
-    def fail_google_login(message, category='danger'):
-        clear_google_oauth_session()
-        flash(message, category)
-        return redirect(url_for('login'))
-
-    if not current_app.config.get('GOOGLE_OAUTH_READY'):
-        return fail_google_login('Google sign-in is not available right now.')
-
-    try:
-        from flask_dance.contrib.google import google
-    except ImportError:
-        return fail_google_login(
-            'Google sign-in dependency is missing. Install Flask-Dance and try again.'
-        )
-
-    if not google.authorized:
-        return fail_google_login(
-            'Google sign-in was cancelled or could not be completed. Please try again.',
-            'warning'
-        )
-
-    response = google.get('/oauth2/v2/userinfo')
-    if not response or not response.ok:
-        return fail_google_login('We could not verify your Google account. Please try again.')
-
-    profile = response.json() or {}
-    email = normalize_email(profile.get('email'))
-    google_sub = str(profile.get('id') or profile.get('sub') or '').strip()
-    verified_email = bool(profile.get('verified_email'))
-
-    if not google_sub:
-        return fail_google_login('We could not verify your Google account ID. Please try again.')
-
-    if not email or not verified_email:
-        return fail_google_login('Only verified Google email addresses can be used to sign in.')
-
-    if not is_verified_gmail_address(email):
-        return fail_google_login('Please use a verified Gmail account to continue.', 'warning')
-
-    user = query_db(
-        "SELECT * FROM users WHERE google_sub = ?",
-        (google_sub,),
-        one=True
-    )
-    is_new_user = False
-
-    if not user:
-        user = query_db(
-            "SELECT * FROM users WHERE email = ?",
-            (email,),
-            one=True
-        )
-
-    if user and user['google_sub'] and user['google_sub'] != google_sub:
-        return fail_google_login(
-            'That email is already linked to a different Google account. Please contact support.',
-            'warning'
-        )
-
-    if user and not user['google_sub']:
-        execute_db(
-            "UPDATE users SET google_sub = ? WHERE id = ?",
-            (google_sub, user['id'])
-        )
-        user = query_db(
-            "SELECT * FROM users WHERE id = ?",
-            (user['id'],),
-            one=True
-        )
-
-    if not user:
-        full_name = build_google_name(profile, email)
-        try:
-            new_user_id = execute_db(
-                "INSERT INTO users (full_name, email, password_hash, role, google_sub) VALUES (?, ?, ?, ?, ?)",
-                (full_name, email, create_unusable_password_hash(), 'worker', google_sub)
-            )
-        except IntegrityError:
-            user = query_db(
-                "SELECT * FROM users WHERE google_sub = ? OR email = ?",
-                (google_sub, email),
-                one=True
-            )
-        else:
-            user = query_db(
-                "SELECT * FROM users WHERE id = ?",
-                (new_user_id,),
-                one=True
-            )
-            is_new_user = True
-
-    if not user:
-        return fail_google_login('We could not complete your sign-in. Please try again.')
-
-    log_in_user(user)
-
-    if is_new_user:
-        flash(
-            f"Welcome, {user['full_name']}! "
-            "Your worker account has been created from your verified Gmail.",
-            'success'
-        )
-    else:
-        flash(
-            f"Welcome back, {user['full_name']}! "
-            f"Signed in with Google as {ROLE_LABELS.get(user['role'], user['role'])}.",
-            'success'
-        )
-
-    return redirect(url_for('dashboard'))
 
 
 def register():
@@ -475,7 +300,6 @@ def register():
 
 def logout():
     """Clear the session and go home."""
-    clear_google_oauth_session()
     session.clear()
     response = redirect(url_for('index'))
     response.delete_cookie(
@@ -1237,8 +1061,6 @@ def register_web_routes(app):
     app.add_url_rule('/', endpoint='index', view_func=index)
     app.add_url_rule('/agents', endpoint='agents', view_func=agents)
     app.add_url_rule('/login', endpoint='login', view_func=login, methods=['GET', 'POST'])
-    app.add_url_rule('/login/google', endpoint='google_login', view_func=google_login)
-    app.add_url_rule('/login/google/callback', endpoint='google_oauth_callback', view_func=google_oauth_callback)
     app.add_url_rule('/register', endpoint='register', view_func=register, methods=['GET', 'POST'])
     app.add_url_rule('/logout', endpoint='logout', view_func=logout)
     app.add_url_rule('/agents/<int:agent_id>', endpoint='agent_detail', view_func=agent_detail)

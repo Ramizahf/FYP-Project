@@ -13,51 +13,6 @@ from views.chatbot import register_chatbot_routes
 from views.web import register_web_routes
 
 
-def register_google_oauth(app):
-    """Attach the Google OAuth blueprint when credentials are configured."""
-    app.config['GOOGLE_OAUTH_READY'] = False
-    app.config['GOOGLE_OAUTH_DISABLED_REASON'] = None
-
-    if not app.config.get('GOOGLE_OAUTH_ENABLED'):
-        app.config['GOOGLE_OAUTH_DISABLED_REASON'] = 'missing_config'
-        return
-
-    try:
-        from flask_dance.contrib.google import make_google_blueprint
-        from flask_dance.consumer.requests import OAuth2Session
-    except ImportError:
-        app.config['GOOGLE_OAUTH_DISABLED_REASON'] = 'missing_dependency'
-        app.logger.warning(
-            'Flask-Dance is not installed. Google OAuth is disabled until the dependency is added.'
-        )
-        return
-
-    if app.config.get('DEBUG'):
-        os.environ.setdefault('OAUTHLIB_INSECURE_TRANSPORT', '1')
-
-    os.environ.setdefault('OAUTHLIB_RELAX_TOKEN_SCOPE', '1')
-
-    class GoogleOAuthSession(OAuth2Session):
-        """Ignore inherited proxy env vars for Google OAuth requests."""
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.trust_env = False
-
-    google_bp = make_google_blueprint(
-        client_id=app.config['GOOGLE_OAUTH_CLIENT_ID'],
-        client_secret=app.config['GOOGLE_OAUTH_CLIENT_SECRET'],
-        scope=app.config['GOOGLE_OAUTH_SCOPES'],
-        redirect_to='google_oauth_callback',
-        offline=False,
-        reprompt_consent=False,
-        reprompt_select_account=True,
-        session_class=GoogleOAuthSession,
-    )
-    app.register_blueprint(google_bp, url_prefix='/auth')
-    app.config['GOOGLE_OAUTH_READY'] = True
-
-
 def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
@@ -65,7 +20,6 @@ def create_app():
 
     init_db(app)
     init_auth(app)
-    register_google_oauth(app)
     register_web_routes(app)
     register_admin_routes(app)
     register_chatbot_routes(app)
