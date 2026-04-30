@@ -31,6 +31,15 @@ def _allow_sqlite_fallback():
     return bool(current_app.config.get('DATABASE_FALLBACK_TO_SQLITE'))
 
 
+def _postgres_connect():
+    return psycopg.connect(
+        _postgres_url(),
+        row_factory=dict_row,
+        connect_timeout=10,
+        prepare_threshold=None,
+    )
+
+
 def _disable_postgres_for_this_process(exc):
     current_app.logger.warning(
         "Postgres is unavailable; falling back to SQLite for this process: %s",
@@ -212,7 +221,7 @@ def ensure_database_schema():
                 'DATABASE_URL is set, but psycopg is not installed. Run: pip install -r requirements.txt'
             )
         try:
-            conn = psycopg.connect(_postgres_url(), row_factory=dict_row)
+            conn = _postgres_connect()
         except psycopg.OperationalError as exc:
             if not _allow_sqlite_fallback():
                 raise
@@ -390,7 +399,7 @@ def get_db():
         if _use_postgres():
             if psycopg is None:
                 raise RuntimeError('DATABASE_URL is set, but psycopg is not installed.')
-            g.db = psycopg.connect(_postgres_url(), row_factory=dict_row)
+            g.db = _postgres_connect()
         else:
             g.db = sqlite3.connect(current_app.config['DATABASE'])
             g.db.row_factory = sqlite3.Row
@@ -451,5 +460,9 @@ def execute_db(sql, args=()):
 def init_db(app):
     """Attach DB lifecycle hooks and run startup migrations."""
     app.teardown_appcontext(close_db)
+    if not app.config.get('DATABASE_INIT_ON_STARTUP', True):
+        app.logger.info('Skipping database schema initialization on startup.')
+        return
+
     with app.app_context():
         ensure_database_schema()

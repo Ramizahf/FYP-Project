@@ -15,6 +15,10 @@ class Config:
         'DATABASE_FALLBACK_TO_SQLITE',
         'True' if os.environ.get('FLASK_DEBUG', 'False').lower() == 'true' else 'False'
     ).lower() == 'true'
+    DATABASE_INIT_ON_STARTUP = os.environ.get(
+        'DATABASE_INIT_ON_STARTUP',
+        'False' if os.environ.get('VERCEL') else 'True'
+    ).lower() == 'true'
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     REPORT_EVIDENCE_FOLDER = os.path.join(UPLOAD_FOLDER, 'report_evidence')
     REPORT_EVIDENCE_MAX_BYTES = 5 * 1024 * 1024
