@@ -79,39 +79,39 @@
 <aside class="sidebar">
   <a href="{{ url_for('index') }}" class="sb-logo" aria-label="MigrantSafe home"><img src="{{ url_for('static', filename='img/migrantsafe-header-icon.png') }}" alt="" class="sb-logo-icon" width="668" height="727" decoding="async"/><span class="sb-logo-text" aria-hidden="true"><span class="sb-logo-main">Migrant</span><span class="sb-logo-accent">Safe</span></span></a>
   <div class="sb-lang">
-    <label for="sidebarLangSelect">Language</label>
-    <select id="sidebarLangSelect" class="sb-lang-select">
+    <label for="sidebarLangSelect" data-t="lang_label">Language</label>
+    <select id="sidebarLangSelect" class="sb-lang-select" onchange="setLang(this.value)">
       <option value="en" selected>English</option>
       <option value="ms">Bahasa Melayu</option>
       <option value="bn">বাংলা</option>
     </select>
   </div>
-  <div class="sb-section">Main</div>
-  <a href="{{ url_for('dashboard_worker') }}" class="sb-item"><span class="sb-icon">🏠</span> Home</a>
-  <a href="{{ url_for('agents') }}" class="sb-item"><span class="sb-icon">🔍</span> Find Agents</a>
-  <a href="{{ url_for('submit_report') }}" class="sb-item"><span class="sb-icon">🚨</span> Report an Agent</a>
-  <a href="{{ url_for('chatbot') }}" class="sb-item"><span class="sb-icon">💬</span> AI Chatbot</a>
-  <a href="{{ url_for('migration_guide') }}" class="sb-item mobile-hidden-guide"><span class="sb-icon">🗺️</span> Migration Guide</a>
-  <div class="sb-section">Account</div>
-  <a href="{{ url_for('dashboard_worker', page='profile') }}" class="sb-item"><span class="sb-icon">👤</span> My Profile</a>
-  <a href="{{ url_for('dashboard_worker', page='jobs') }}" class="sb-item"><span class="sb-icon">💼</span> Job Listings</a>
-  <a href="{{ url_for('my_reports') }}" class="sb-item"><span class="sb-icon">📋</span> My Reports</a>
-  <a href="{{ url_for('my_enquiries') }}" class="sb-item active"><span class="sb-icon">✉️</span> My Enquiries</a>
-  <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> Back to Homepage</a>
+  <div class="sb-section" data-t="sb_main">Main</div>
+  <a href="{{ url_for('dashboard_worker') }}" class="sb-item"><span class="sb-icon">🏠</span> <span data-t="sb_home">Home</span></a>
+  <a href="{{ url_for('agents') }}" class="sb-item"><span class="sb-icon">🔍</span> <span data-t="sb_agents">Find Agents</span></a>
+  <a href="{{ url_for('submit_report') }}" class="sb-item"><span class="sb-icon">🚨</span> <span data-t="sb_report">Report an Agent</span></a>
+  <a href="{{ url_for('chatbot') }}" class="sb-item"><span class="sb-icon">💬</span> <span data-t="sb_chatbot">AI Chatbot</span></a>
+  <a href="{{ url_for('migration_guide') }}" class="sb-item mobile-hidden-guide"><span class="sb-icon">🗺️</span> <span data-t="sb_guide">Migration Guide</span></a>
+  <div class="sb-section" data-t="sb_account">Account</div>
+  <a href="{{ url_for('dashboard_worker', page='profile') }}" class="sb-item"><span class="sb-icon">👤</span> <span data-t="sb_profile">My Profile</span></a>
+  <a href="{{ url_for('dashboard_worker', page='jobs') }}" class="sb-item"><span class="sb-icon">💼</span> <span data-t="sb_jobs">Job Listings</span></a>
+  <a href="{{ url_for('my_reports') }}" class="sb-item"><span class="sb-icon">📋</span> <span data-t="sb_myreports">My Reports</span></a>
+  <a href="{{ url_for('my_enquiries') }}" class="sb-item active"><span class="sb-icon">✉️</span> <span data-t="sb_myenquiries">My Enquiries</span></a>
+  <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> <span data-t="sb_back">Back to Homepage</span></a>
   <div class="sb-footer">
     <div class="sb-user">
       <div class="sb-avatar">{{ current_user.name[0].upper() if current_user.name else 'W' }}</div>
-      <div><div class="sb-uname">{{ current_user.name or 'Worker' }}</div><div class="sb-urole">Migrant Worker</div></div>
+      <div><div class="sb-uname">{{ current_user.name or 'Worker' }}</div><div class="sb-urole" data-t="role_label">Migrant Worker</div></div>
     </div>
-    <a href="{{ url_for('logout') }}" class="sb-logout">← Log Out</a>
+    <a href="{{ url_for('logout') }}" class="sb-logout" data-t="logout">← Log Out</a>
   </div>
 </aside>
 
 <main class="main">
   <div class="topbar">
     <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-expanded="false" aria-label="Toggle sidebar">&#9776;</button>
-    <div><h1>My Enquiries</h1><p>Messages you sent to agents inside MigrantSafe</p></div>
-    <a href="{{ url_for('agents') }}" class="btn btn-outline">Find Agents</a>
+    <div><h1 data-t="page_title">My Enquiries</h1><p data-t="page_sub">Messages you sent to agents inside MigrantSafe</p></div>
+    <a href="{{ url_for('agents') }}" class="btn btn-outline" data-t="sb_agents">Find Agents</a>
   </div>
 
   <div class="content">
@@ -122,11 +122,11 @@
     {% endwith %}
 
     <div class="sec-hdr">
-      <h2>Worker Enquiry History</h2>
-      <p>All replies stay inside MigrantSafe so you can track them safely in one place.</p>
+      <h2 data-t="section_title">Worker Enquiry History</h2>
+      <p data-t="section_sub">All replies stay inside MigrantSafe so you can track them safely in one place.</p>
     </div>
 
-    <div class="warn-box">
+    <div class="warn-box" data-t="warn_box">
       Do not share passport copies, visa scans, bank details, or other sensitive personal documents in enquiry messages or replies.
     </div>
 
@@ -139,20 +139,20 @@
             <span class="ec-sub">{{ e['subject'] }} · {{ e['category'] }}</span>
           </div>
           <span class="pill {{ 'pill-open' if e['status'] == 'open' else 'pill-replied' if e['status'] == 'replied' else 'pill-closed' }}">
-            {{ 'Open' if e['status'] == 'open' else 'Replied' if e['status'] == 'replied' else 'Closed' }}
+            <span data-status="{{ e['status'] }}">{{ 'Open' if e['status'] == 'open' else 'Replied' if e['status'] == 'replied' else 'Closed' }}</span>
           </span>
         </div>
         <div class="ec-message">{{ e['message'] }}</div>
         <div class="ec-meta">
-          <span>Sent: {{ e['created_at'][:16] if e['created_at'] else '—' }}</span>
-          {% if e['state'] %}<span>Location: {{ e['state'] }}</span>{% endif %}
+          <span><span data-t="sent_label">Sent</span>: {{ e['created_at'][:16] if e['created_at'] else '—' }}</span>
+          {% if e['state'] %}<span><span data-t="location_label">Location</span>: {{ e['state'] }}</span>{% endif %}
         </div>
         {% if e['reply_message'] %}
         <div class="reply-box">
-          <strong>Agent Reply</strong>
+          <strong data-t="agent_reply">Agent Reply</strong>
           <div class="ec-message" style="color:var(--text)">{{ e['reply_message'] }}</div>
           <div class="ec-meta">
-            <span>Updated: {{ e['replied_at'][:16] if e['replied_at'] else '—' }}</span>
+            <span><span data-t="updated_label">Updated</span>: {{ e['replied_at'][:16] if e['replied_at'] else '—' }}</span>
           </div>
         </div>
         {% endif %}
@@ -161,13 +161,80 @@
     {% else %}
     <div class="empty-state">
       <div class="ei">✉️</div>
-      <h3>No enquiries sent yet</h3>
-      <p>Open an agent page and use the Send Enquiry button to contact an agent safely through MigrantSafe.</p>
-      <a href="{{ url_for('agents') }}" class="btn btn-primary" style="margin-top:18px">Browse Agents</a>
+      <h3 data-t="empty_title">No enquiries sent yet</h3>
+      <p data-t="empty_sub">Open an agent page and use the Send Enquiry button to contact an agent safely through MigrantSafe.</p>
+      <a href="{{ url_for('agents') }}" class="btn btn-primary" style="margin-top:18px" data-t="browse_agents">Browse Agents</a>
     </div>
     {% endif %}
   </div>
 </main>
+<script>
+const PAGE_TRANSLATIONS = {
+  en: {
+    lang_label:'Language', sb_main:'Main', sb_home:'Home', sb_agents:'Find Agents', sb_report:'Report an Agent',
+    sb_chatbot:'AI Chatbot', sb_guide:'Migration Guide', sb_account:'Account', sb_profile:'My Profile',
+    sb_jobs:'Job Listings', sb_myreports:'My Reports', sb_myenquiries:'My Enquiries', sb_back:'Back to Homepage',
+    role_label:'Migrant Worker', logout:'← Log Out', page_title:'My Enquiries',
+    page_sub:'Messages you sent to agents inside MigrantSafe', section_title:'Worker Enquiry History',
+    section_sub:'All replies stay inside MigrantSafe so you can track them safely in one place.',
+    warn_box:'Do not share passport copies, visa scans, bank details, or other sensitive personal documents in enquiry messages or replies.',
+    sent_label:'Sent', location_label:'Location', agent_reply:'Agent Reply', updated_label:'Updated',
+    empty_title:'No enquiries sent yet',
+    empty_sub:'Open an agent page and use the Send Enquiry button to contact an agent safely through MigrantSafe.',
+    browse_agents:'Browse Agents', status_open:'Open', status_replied:'Replied', status_closed:'Closed'
+  },
+  ms: {
+    lang_label:'Bahasa', sb_main:'Utama', sb_home:'Laman Utama', sb_agents:'Cari Ejen', sb_report:'Laporkan Ejen',
+    sb_chatbot:'Chatbot AI', sb_guide:'Panduan Migrasi', sb_account:'Akaun', sb_profile:'Profil Saya',
+    sb_jobs:'Senarai Kerja', sb_myreports:'Laporan Saya', sb_myenquiries:'Pertanyaan Saya', sb_back:'Kembali ke Laman Utama',
+    role_label:'Pekerja Asing', logout:'← Log Keluar', page_title:'Pertanyaan Saya',
+    page_sub:'Mesej yang anda hantar kepada ejen dalam MigrantSafe', section_title:'Sejarah Pertanyaan Pekerja',
+    section_sub:'Semua balasan kekal di dalam MigrantSafe supaya anda boleh menjejakinya dengan selamat di satu tempat.',
+    warn_box:'Jangan kongsi salinan pasport, imbasan visa, butiran bank, atau dokumen peribadi sensitif lain dalam mesej pertanyaan atau balasan.',
+    sent_label:'Dihantar', location_label:'Lokasi', agent_reply:'Balasan Ejen', updated_label:'Dikemas kini',
+    empty_title:'Belum ada pertanyaan dihantar',
+    empty_sub:'Buka halaman ejen dan gunakan butang Hantar Pertanyaan untuk menghubungi ejen dengan selamat melalui MigrantSafe.',
+    browse_agents:'Lihat Ejen', status_open:'Dibuka', status_replied:'Dibalas', status_closed:'Ditutup'
+  },
+  bn: {
+    lang_label:'ভাষা', sb_main:'প্রধান', sb_home:'হোম', sb_agents:'এজেন্ট খুঁজুন', sb_report:'এজেন্ট রিপোর্ট',
+    sb_chatbot:'AI চ্যাটবট', sb_guide:'মাইগ্রেশন গাইড', sb_account:'অ্যাকাউন্ট', sb_profile:'আমার প্রোফাইল',
+    sb_jobs:'চাকরির তালিকা', sb_myreports:'আমার রিপোর্ট', sb_myenquiries:'আমার অনুসন্ধান', sb_back:'হোমপেজে ফিরুন',
+    role_label:'অভিবাসী শ্রমিক', logout:'← লগ আউট', page_title:'আমার অনুসন্ধান',
+    page_sub:'MigrantSafe-এর ভিতরে এজেন্টদের পাঠানো আপনার বার্তা', section_title:'শ্রমিক অনুসন্ধানের ইতিহাস',
+    section_sub:'সব উত্তর MigrantSafe-এর ভিতরেই থাকে, তাই আপনি নিরাপদে এক জায়গায় এগুলো ট্র্যাক করতে পারেন।',
+    warn_box:'অনুসন্ধান বার্তা বা উত্তরে পাসপোর্ট কপি, ভিসা স্ক্যান, ব্যাংক তথ্য, বা অন্য সংবেদনশীল ব্যক্তিগত নথি শেয়ার করবেন না।',
+    sent_label:'পাঠানো হয়েছে', location_label:'অবস্থান', agent_reply:'এজেন্টের উত্তর', updated_label:'আপডেট',
+    empty_title:'এখনও কোনো অনুসন্ধান পাঠানো হয়নি',
+    empty_sub:'এজেন্ট পেজ খুলে Send Enquiry বোতাম ব্যবহার করে MigrantSafe-এর মাধ্যমে নিরাপদে এজেন্টের সাথে যোগাযোগ করুন।',
+    browse_agents:'এজেন্ট দেখুন', status_open:'খোলা', status_replied:'উত্তর দেওয়া হয়েছে', status_closed:'বন্ধ'
+  }
+};
+
+function setLang(lang) {
+  const current = PAGE_TRANSLATIONS[lang] ? lang : 'en';
+  const cfg = PAGE_TRANSLATIONS[current];
+  document.documentElement.lang = current;
+  const select = document.getElementById('sidebarLangSelect');
+  if (select) select.value = current;
+  document.querySelectorAll('[data-t]').forEach((el) => {
+    const key = el.getAttribute('data-t');
+    if (cfg[key] !== undefined) el.textContent = cfg[key];
+  });
+  document.querySelectorAll('[data-status]').forEach((el) => {
+    const key = `status_${el.getAttribute('data-status')}`;
+    if (cfg[key] !== undefined) el.textContent = cfg[key];
+  });
+  try { localStorage.setItem('migrantSafeLang', current); } catch (e) {}
+  if (typeof applyFooterLang === 'function') applyFooterLang(current);
+}
+
+window.addEventListener('load', () => {
+  let saved = 'en';
+  try { saved = localStorage.getItem('migrantSafeLang') || 'en'; } catch (e) {}
+  setLang(saved);
+});
+</script>
 {% include '_footer.html' %}
 </body>
 </html>

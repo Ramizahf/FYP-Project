@@ -144,7 +144,7 @@
   <button class="sb-item" data-profile-nav data-page-link="profile" onclick="go('profile',this)"><span class="sb-icon">👤</span> <span data-t="sb_profile">My Profile</span></button>
   <button class="sb-item" data-page-link="jobs" onclick="go('jobs',this)"><span class="sb-icon">💼</span> <span data-t="sb_jobs">Job Listings</span></button>
   <a href="{{ url_for('my_reports') }}" class="sb-item"><span class="sb-icon">📋</span> <span data-t="sb_myreports">My Reports</span></a>
-  <a href="{{ url_for('my_enquiries') }}" class="sb-item"><span class="sb-icon">✉️</span> <span>My Enquiries</span></a>
+  <a href="{{ url_for('my_enquiries') }}" class="sb-item"><span class="sb-icon">✉️</span> <span data-t="sb_myenquiries">My Enquiries</span></a>
   <a href="{{ url_for('index') }}" class="sb-item"><span class="sb-icon">🌐</span> <span data-t="sb_back">Back to Homepage</span></a>
   <div class="sb-footer">
     <div class="sb-user">
@@ -354,7 +354,7 @@ const T = {
   en: {
     sb_main:'Main', sb_home:'Home', sb_agents:'Find Agents', sb_report:'Report an Agent',
     sb_chatbot:'AI Chatbot', sb_guide:'Migration Guide', sb_account:'Account',
-    sb_profile:'My Profile', sb_jobs:'Job Listings', sb_myreports:'My Reports', sb_back:'Back to Homepage',
+    sb_profile:'My Profile', sb_jobs:'Job Listings', sb_myreports:'My Reports', sb_myenquiries:'My Enquiries', sb_back:'Back to Homepage',
     lang_label:'Language',
     role_label:'Migrant Worker', logout:'← Log Out',
     page_dashboard:'Dashboard', page_home:'Home', page_profile:'My Profile',
@@ -381,7 +381,7 @@ const T = {
   ms: {
     sb_main:'Utama', sb_home:'Laman Utama', sb_agents:'Cari Ejen', sb_report:'Laporkan Ejen',
     sb_chatbot:'Chatbot AI', sb_guide:'Panduan Migrasi', sb_account:'Akaun',
-    sb_profile:'Profil Saya', sb_jobs:'Senarai Kerja', sb_myreports:'Laporan Saya', sb_back:'Kembali ke Laman Utama',
+    sb_profile:'Profil Saya', sb_jobs:'Senarai Kerja', sb_myreports:'Laporan Saya', sb_myenquiries:'Pertanyaan Saya', sb_back:'Kembali ke Laman Utama',
     lang_label:'Bahasa',
     role_label:'Pekerja Asing', logout:'← Log Keluar',
     page_dashboard:'Dashboard', page_home:'Laman Utama', page_profile:'Profil Saya',
@@ -408,7 +408,7 @@ const T = {
   bn: {
     sb_main:'প্রধান', sb_home:'হোম', sb_agents:'এজেন্ট খুঁজুন', sb_report:'এজেন্ট রিপোর্ট',
     sb_chatbot:'AI চ্যাটবট', sb_guide:'মাইগ্রেশন গাইড', sb_account:'অ্যাকাউন্ট',
-    sb_profile:'আমার প্রোফাইল', sb_jobs:'চাকরির তালিকা', sb_myreports:'আমার রিপোর্ট', sb_back:'হোমপেজে ফিরুন',
+    sb_profile:'আমার প্রোফাইল', sb_jobs:'চাকরির তালিকা', sb_myreports:'আমার রিপোর্ট', sb_myenquiries:'আমার অনুসন্ধান', sb_back:'হোমপেজে ফিরুন',
     lang_label:'ভাষা',
     role_label:'অভিবাসী শ্রমিক', logout:'← লগ আউট',
     page_dashboard:'Dashboard', page_home:'হোম', page_profile:'আমার প্রোফাইল',
@@ -430,7 +430,7 @@ const T = {
     job_preferences_title:'কাজের পছন্দ', save_job_preferences_btn:'কাজের পছন্দ সংরক্ষণ করুন →',
     jobs_page_title:'চাকরির তালিকা', jobs_page_sub:'রিক্রুটমেন্ট এজেন্টদের প্রকাশিত সহজ চাকরির সুযোগ।',
     no_jobs:'এখনও কোনো চাকরির তালিকা প্রকাশ করা হয়নি।',
-    job_card_kicker:'à¦¨à¦¤à§à¦¨ à¦¸à§à¦¯à§‹à¦—', job_card_agency:'à¦à¦œà§‡à¦¨à§à¦¸à¦¿', job_card_location:'à¦…à¦¬à¦¸à§à¦¥à¦¾à¦¨', job_card_posted:'à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤',
+    job_card_kicker:'নতুন সুযোগ', job_card_agency:'এজেন্সি', job_card_location:'অবস্থান', job_card_posted:'প্রকাশিত',
   }
 };
 
@@ -447,10 +447,12 @@ const TOUR_STEPS = [
 let tourIndex = -1;
 
 function setLang(lang) {
-  currentLang = lang;
+  currentLang = T[lang] ? lang : 'en';
+  try { localStorage.setItem('migrantSafeLang', currentLang); } catch (e) {}
+  document.documentElement.lang = currentLang === 'bn' ? 'bn' : currentLang === 'ms' ? 'ms' : 'en';
   const langSelect = document.getElementById('sidebarLangSelect');
-  if (langSelect) langSelect.value = lang;
-  const D = T[lang];
+  if (langSelect) langSelect.value = currentLang;
+  const D = T[currentLang];
   document.querySelectorAll('[data-t]').forEach(el => {
     const k = el.getAttribute('data-t');
     if (D[k] !== undefined) el.textContent = D[k];
@@ -602,6 +604,9 @@ document.getElementById('tourBack').addEventListener('click', previousTourStep);
 document.getElementById('tourOverlay').addEventListener('click', () => endTour(true));
 
 window.addEventListener('load', () => {
+  let savedLang = 'en';
+  try { savedLang = localStorage.getItem('migrantSafeLang') || 'en'; } catch (e) {}
+  setLang(T[savedLang] ? savedLang : 'en');
   go(initialPage, null);
   window.setTimeout(startTour, 500);
 });
