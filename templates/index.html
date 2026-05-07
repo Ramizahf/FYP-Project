@@ -410,9 +410,9 @@
             <path d="M12 3.4c2.2 2.1 3.4 5.1 3.4 8.6s-1.2 6.5-3.4 8.6M12 3.4C9.8 5.5 8.6 8.5 8.6 12s1.2 6.5 3.4 8.6"></path>
           </svg>
         </div>
-        <h2 class="language-card-title" id="languageCardTitle">Choose Your Language</h2>
-        <p class="language-card-sub">Select your preferred language to get started.</p>
-        <div class="language-options" role="listbox" aria-label="Choose language" data-guide="language-selector">
+        <h2 class="language-card-title" id="languageCardTitle" data-t="lang_card_title">Choose Your Language</h2>
+        <p class="language-card-sub" data-t="lang_card_sub">Select your preferred language to get started.</p>
+        <div class="language-options" role="listbox" aria-label="Choose language" data-t-aria="lang_card_aria" data-guide="language-selector">
           <button type="button" class="language-option active" data-lang="en" onclick="setLang('en')" onkeydown="handleLanguageKey(event, 'en')" aria-selected="true">
             English <span class="language-option-arrow" aria-hidden="true">→</span>
           </button>
@@ -571,7 +571,7 @@
 <!-- ═══════════════════════════════════════
      TRANSLATION ENGINE
 ═══════════════════════════════════════ -->
-<button type="button" class="guide-replay" id="guideReplayBtn" aria-label="Show guide">🧭 Show Guide</button>
+<button type="button" class="guide-replay" id="guideReplayBtn" aria-label="Show guide" data-t="guide_show" data-t-aria="guide_show_aria">🧭 Show Guide</button>
 <div class="guide-overlay" id="guideOverlay" hidden></div>
 <div class="guide-spotlight" id="guideSpotlight" hidden aria-hidden="true"></div>
 <div class="guide-arrow" id="guideArrow" aria-hidden="true">↓</div>
@@ -587,8 +587,8 @@
     <button type="button" class="guide-btn primary" id="guideNext">Next</button>
   </div>
 </div>
-<a href="{{ url_for('chatbot') }}" class="chatbot-float-label">Chat with us!</a>
-<a href="{{ url_for('chatbot') }}" class="chatbot-float" aria-label="Open chatbot" data-guide="chatbot-btn">
+<a href="{{ url_for('chatbot') }}" class="chatbot-float-label" data-t="chat_float_label">Chat with us!</a>
+<a href="{{ url_for('chatbot') }}" class="chatbot-float" aria-label="Open chatbot" data-t-aria="chat_float_aria" data-guide="chatbot-btn">
   <img src="{{ url_for('static', filename='img/chatbot-floating-icon.png') }}" alt="" width="581" height="430" decoding="async"/>
 </a>
 <script>
@@ -604,6 +604,7 @@ const T = {
     hero_sub:"🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.",
     cta1:"Get Started — It's Free", cta2:"See How It Works",
     st1:"Languages Supported", st2:"Confidential Reporting", st3:"AI Chatbot Guidance",
+    lang_card_title:"Choose Your Language", lang_card_sub:"Select your preferred language to get started.", lang_card_aria:"Choose language",
     vc1l:"Agent check", vc1b:"Is this agent verified?",
     vc2l:"MigrantSafe", vc2q:"Yes, this agent is verified.", vc2a:"2–4 weeks after medical check ✓",
     vc3l:"Report help", vc3n:"How do I report fraud?", vc3s:"Guidance", vc3b:"You can submit a report in your language.",
@@ -660,6 +661,7 @@ const T = {
     ft_copy:"© 2026 MigrantSafe",
     ft_sdg:"SDG 8 — Decent Work & Economic Growth",
     guide_kicker:"Quick Guide",
+    guide_show:"🧭 Show Guide", guide_show_aria:"Show guide", chat_float_label:"Chat with us!", chat_float_aria:"Open chatbot",
     guide_back:"Back", guide_skip:"Skip", guide_next:"Next", guide_done:"Done", guide_step:"Step", guide_of:"of",
     guide_lang_title:"Select Your Language", guide_lang_text:"Choose English, Bahasa Melayu, or Bangla. The guide will continue in your selected language.",
     guide_register_title:"Register Account", guide_register_text:"Create your free account to use MigrantSafe.",
@@ -677,9 +679,10 @@ const T = {
     nav_login:"Log Masuk", nav_reg:"Daftar",
     badge:"Melindungi Pekerja Asing di Malaysia",
     h1a:"Cari ", h1b:"Ejen Dipercayai", h1c:".", h1d:"Bekerja ", h1e:"dengan Selamat", h1f:"Ketahui Hak Anda.",
-    hero_sub:"🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.",
+    hero_sub:"🔍 Sahkan ejen pengambilan.<br/>⚠️ Laporkan penipuan.<br/>💬 Dapatkan panduan dalam bahasa anda.",
     cta1:"Mulakan — Percuma", cta2:"Lihat Cara Ia Berfungsi",
-    st1:"Languages Supported", st2:"Confidential Reporting", st3:"AI Chatbot Guidance",
+    st1:"Bahasa Disokong", st2:"Laporan Sulit", st3:"Panduan Chatbot AI",
+    lang_card_title:"Pilih Bahasa Anda", lang_card_sub:"Pilih bahasa pilihan anda untuk bermula.", lang_card_aria:"Pilih bahasa",
     vc1l:"Semakan ejen", vc1b:"Adakah ejen ini disahkan?",
     vc2l:"MigrantSafe", vc2q:"Ya, ejen ini telah disahkan.", vc2a:"2–4 minggu selepas pemeriksaan perubatan ✓",
     vc3l:"Bantuan laporan", vc3n:"Bagaimana saya laporkan penipuan?", vc3s:"Panduan", vc3b:"Anda boleh hantar laporan dalam bahasa anda.",
@@ -736,6 +739,7 @@ const T = {
     ft_copy:"© 2026 MigrantSafe",
     ft_sdg:"SDG 8 — Kerja Layak & Pertumbuhan Ekonomi",
     guide_kicker:"Panduan Ringkas",
+    guide_show:"🧭 Tunjuk Panduan", guide_show_aria:"Tunjuk panduan", chat_float_label:"Sembang dengan kami!", chat_float_aria:"Buka chatbot",
     guide_back:"Kembali", guide_skip:"Langkau", guide_next:"Seterusnya", guide_done:"Selesai", guide_step:"Langkah", guide_of:"daripada",
     guide_lang_title:"Pilih Bahasa Anda", guide_lang_text:"Pilih English, Bahasa Melayu, atau Bangla. Panduan akan diteruskan dalam bahasa pilihan anda.",
     guide_register_title:"Daftar Akaun", guide_register_text:"Cipta akaun percuma anda untuk menggunakan MigrantSafe.",
@@ -753,9 +757,10 @@ const T = {
     nav_login:"লগ ইন", nav_reg:"নিবন্ধন",
     badge:"মালয়েশিয়ায় অভিবাসী শ্রমিকদের সুরক্ষা",
     h1a:"বিশ্বস্ত ", h1b:"এজেন্ট", h1c:" খুঁজুন।", h1d:"", h1e:"নিরাপদে কাজ করুন", h1f:"আপনার অধিকার জানুন।",
-    hero_sub:"🔍 Verify recruitment agents.<br/>⚠️ Report fraud.<br/>💬 Get guidance in your language.",
+    hero_sub:"🔍 রিক্রুটমেন্ট এজেন্ট যাচাই করুন।<br/>⚠️ প্রতারণা রিপোর্ট করুন।<br/>💬 আপনার ভাষায় গাইডেন্স পান।",
     cta1:"শুরু করুন — বিনামূল্যে", cta2:"কীভাবে কাজ করে দেখুন",
-    st1:"Languages Supported", st2:"Confidential Reporting", st3:"AI Chatbot Guidance",
+    st1:"ভাষা সমর্থিত", st2:"গোপনীয় রিপোর্টিং", st3:"AI চ্যাটবট গাইডেন্স",
+    lang_card_title:"আপনার ভাষা নির্বাচন করুন", lang_card_sub:"শুরু করতে আপনার পছন্দের ভাষা নির্বাচন করুন।", lang_card_aria:"ভাষা নির্বাচন করুন",
     vc1l:"এজেন্ট যাচাই", vc1b:"এই এজেন্টটি কি যাচাইকৃত?",
     vc2l:"MigrantSafe", vc2q:"হ্যাঁ, এই এজেন্ট যাচাইকৃত।", vc2a:"মেডিকেলের পর ২–৪ সপ্তাহ ✓",
     vc3l:"রিপোর্ট সহায়তা", vc3n:"আমি কীভাবে প্রতারণা রিপোর্ট করব?", vc3s:"গাইডেন্স", vc3b:"আপনি আপনার ভাষায় রিপোর্ট জমা দিতে পারেন।",
@@ -812,6 +817,7 @@ const T = {
     ft_copy:"© ২০২৬ MigrantSafe",
     ft_sdg:"SDG ৮ — সম্মানজনক কাজ ও অর্থনৈতিক প্রবৃদ্ধি",
     guide_kicker:"দ্রুত গাইড",
+    guide_show:"🧭 গাইড দেখুন", guide_show_aria:"গাইড দেখুন", chat_float_label:"আমাদের সাথে চ্যাট করুন!", chat_float_aria:"চ্যাটবট খুলুন",
     guide_back:"পেছনে", guide_skip:"এড়িয়ে যান", guide_next:"পরবর্তী", guide_done:"শেষ", guide_step:"ধাপ", guide_of:"এর",
     guide_lang_title:"আপনার ভাষা নির্বাচন করুন", guide_lang_text:"English, Bahasa Melayu, অথবা বাংলা বেছে নিন। এরপর গাইড আপনার নির্বাচিত ভাষায় চলবে।",
     guide_register_title:"অ্যাকাউন্ট নিবন্ধন করুন", guide_register_text:"MigrantSafe ব্যবহার করতে বিনামূল্যে অ্যাকাউন্ট তৈরি করুন।",
@@ -859,6 +865,10 @@ function applyLang(l) {
   document.querySelectorAll('[data-t-ph]').forEach(el => {
     const k = el.getAttribute('data-t-ph');
     if (D[k] !== undefined) el.placeholder = D[k];
+  });
+  document.querySelectorAll('[data-t-aria]').forEach(el => {
+    const k = el.getAttribute('data-t-aria');
+    if (D[k] !== undefined) el.setAttribute('aria-label', D[k]);
   });
   // chatbot placeholder separately
   const inp = document.getElementById('chatInput');
