@@ -115,6 +115,7 @@
 
       <form method="POST" action="{{ url_for('submit_enquiry', agent_id=agent['id']) }}" class="form-grid">
         <input type="hidden" name="agent_id" value="{{ agent['id'] }}"/>
+        <input type="hidden" name="submission_token" value="{{ form_data.submission_token }}"/>
         <div class="fg">
           <label for="subject">Subject</label>
           <input id="subject" type="text" name="subject" maxlength="150" placeholder="Short title for your question" value="{{ form_data.subject if form_data else '' }}" required/>
@@ -133,13 +134,23 @@
           <textarea id="message" name="message" placeholder="Write your question here. Keep it clear and simple." required>{{ form_data.message if form_data else '' }}</textarea>
         </div>
         <div class="actions">
-          <button type="submit" class="btn btn-primary">Send Enquiry</button>
+          <button type="submit" class="btn btn-primary" data-submit-label="Send Enquiry" data-submitting-label="Sending...">Send Enquiry</button>
           <a href="{{ url_for('agent_detail', agent_id=agent['id']) }}" class="btn btn-outline">Cancel</a>
         </div>
       </form>
     </div>
   </div>
 </main>
+<script>
+  document.querySelectorAll('form.form-grid').forEach((form) => {
+    form.addEventListener('submit', () => {
+      const button = form.querySelector('button[type="submit"]');
+      if (!button) return;
+      button.disabled = true;
+      button.textContent = button.dataset.submittingLabel || 'Sending...';
+    });
+  });
+</script>
 {% include '_footer.html' %}
 </body>
 </html>

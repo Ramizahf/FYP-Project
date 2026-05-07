@@ -14,7 +14,7 @@ from auth_utils import (
     normalize_email,
     role_required,
 )
-from db import execute_db, query_db, row_to_dict, rows_to_dicts
+from db import IntegrityError, execute_db, query_db, row_to_dict, rows_to_dicts
 
 
 ROLE_LABELS = {
@@ -592,6 +592,7 @@ def submit_enquiry():
         'subject': request.form.get('subject', '').strip(),
         'category': request.form.get('category', '').strip(),
         'message': request.form.get('message', '').strip(),
+        'submission_token': request.form.get('submission_token', '').strip() or uuid4().hex,
     }
 
     if request.method == 'POST':
@@ -617,11 +618,19 @@ def submit_enquiry():
             for error in errors:
                 flash(error, 'danger')
         else:
-            execute_db(
+            existing_enquiry = query_db(
                 """
-                INSERT INTO enquiries
-                    (worker_id, agent_id, subject, category, message)
-                VALUES (?, ?, ?, ?, ?)
+                SELECT id
+                FROM enquiries
+                WHERE worker_id = ?
+                  AND agent_id = ?
+                  AND subject = ?
+                  AND category = ?
+                  AND message = ?
+                  AND status = 'open'
+                  AND reply_message IS NULL
+                ORDER BY created_at DESC
+                LIMIT 1
                 """,
                 (
                     session['user_id'],
@@ -629,9 +638,32 @@ def submit_enquiry():
                     form_data['subject'],
                     form_data['category'],
                     form_data['message'],
-                )
+                ),
+                one=True,
             )
-            flash('Your enquiry has been sent through MigrantSafe. Please wait for the agent reply here.', 'success')
+            if existing_enquiry:
+                flash('This enquiry was already sent and is waiting for the agent reply.', 'warning')
+                return redirect(url_for('my_enquiries'))
+
+            try:
+                execute_db(
+                    """
+                    INSERT INTO enquiries
+                        (worker_id, agent_id, subject, category, message, idempotency_key)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        session['user_id'],
+                        agent['id'],
+                        form_data['subject'],
+                        form_data['category'],
+                        form_data['message'],
+                        form_data['submission_token'],
+                    )
+                )
+                flash('Your enquiry has been sent through MigrantSafe. Please wait for the agent reply here.', 'success')
+            except IntegrityError:
+                flash('This enquiry was already sent and is waiting for the agent reply.', 'warning')
             return redirect(url_for('my_enquiries'))
 
     return render_template(

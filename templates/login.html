@@ -67,7 +67,7 @@
     .form-sub{font-size:.98rem;color:#5f686d;line-height:1.6;text-align:center;margin:0 auto 34px;max-width:440px}
     .form-group{margin-bottom:24px}
     label{display:block;font-size:.92rem;font-weight:600;color:#20282b;margin-bottom:12px}
-    select,input[type=email],input[type=password]{width:100%;border:1px solid rgba(13,110,110,.32);border-radius:12px;padding:17px 18px 17px 56px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);background:rgba(255,255,255,.94);outline:none;transition:border-color .2s,box-shadow .2s,background .2s;-webkit-appearance:none}
+    select,input[type=email],input[type=password],.auth-input{width:100%;border:1px solid rgba(13,110,110,.32);border-radius:12px;padding:17px 18px 17px 56px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--text);background:rgba(255,255,255,.94);outline:none;transition:border-color .2s,box-shadow .2s,background .2s;-webkit-appearance:none}
     select:focus,input:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(13,110,110,.08);background:var(--white)}
     input.error,select.error{border-color:var(--error)}
     .field-error{font-size:.75rem;color:var(--error);margin-top:4px;display:none}
@@ -200,10 +200,10 @@
             <span class="input-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
             </span>
-            <input type="password" id="password" name="password"
+            <input type="password" id="password" name="password" class="auth-input"
                    placeholder="Enter your password"
                    autocomplete="current-password" required/>
-            <button type="button" class="pw-toggle" onclick="togglePw(this)" id="l-show">Show</button>
+            <button type="button" class="pw-toggle" onclick="togglePw(this)" id="l-show" aria-label="Show password" aria-pressed="false">Show</button>
           </div>
         </div>
         <button type="submit" class="btn-submit" id="l-submit">Log In →</button>
@@ -289,14 +289,27 @@
     set('l-submit', T.submit); set('l-noacc', T.noacc); set('l-reglink', T.reglink);
     set('nav-reg', T.navreg);
     const showBtn = document.getElementById('l-show');
-    if (showBtn) showBtn.textContent = T.show;
+    if (showBtn) {
+      const isVisible = document.getElementById('password')?.type === 'text';
+      showBtn.textContent = isVisible ? T.hide : T.show;
+      showBtn.setAttribute('aria-label', isVisible ? (T.hide || 'Hide') + ' password' : (T.show || 'Show') + ' password');
+    }
   }
 
   function togglePw(btn) {
     const inp = document.getElementById('password');
     const T = LANG_LOGIN[currentLang];
-    if (inp.type === 'password') { inp.type = 'text';     btn.textContent = T.hide || 'Hide'; }
-    else                         { inp.type = 'password'; btn.textContent = T.show || 'Show'; }
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      btn.textContent = T.hide || 'Hide';
+      btn.setAttribute('aria-label', (T.hide || 'Hide') + ' password');
+      btn.setAttribute('aria-pressed', 'true');
+    } else {
+      inp.type = 'password';
+      btn.textContent = T.show || 'Show';
+      btn.setAttribute('aria-label', (T.show || 'Show') + ' password');
+      btn.setAttribute('aria-pressed', 'false');
+    }
   }
 
   window.addEventListener('DOMContentLoaded', () => {

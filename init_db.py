@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS enquiries (
     subject       TEXT    NOT NULL,
     category      TEXT    NOT NULL,
     message       TEXT    NOT NULL,
+    idempotency_key TEXT UNIQUE,
     reply_message TEXT,
     status        TEXT    NOT NULL DEFAULT 'open'
                   CHECK(status IN ('open', 'replied', 'closed')),
@@ -341,6 +342,13 @@ def init_db():
     cur.execute(
         "CREATE INDEX IF NOT EXISTS idx_enquiries_agent_id_status_created_at "
         "ON enquiries(agent_id, status, created_at DESC)"
+    )
+    enquiry_cols = {c[1] for c in cur.execute("PRAGMA table_info(enquiries)").fetchall()}
+    if 'idempotency_key' not in enquiry_cols:
+        cur.execute("ALTER TABLE enquiries ADD COLUMN idempotency_key TEXT")
+    cur.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_enquiries_idempotency_key "
+        "ON enquiries(idempotency_key) WHERE idempotency_key IS NOT NULL"
     )
     cur.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_worker_job_preferences_worker_id "

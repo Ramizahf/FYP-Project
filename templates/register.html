@@ -442,22 +442,19 @@
   function checkStrength(val) {
     const fill = document.getElementById('strengthFill');
     const text = document.getElementById('strengthText');
+    const hasMinLength = val.length >= 8;
+    const hasUppercase = /[A-Z]/.test(val);
+    const hasNumber = /[0-9]/.test(val);
+    const hasSymbol = /[^A-Za-z0-9]/.test(val);
     let score = 0;
-    if (val.length >= 8)           score++;
-    if (/[A-Z]/.test(val))         score++;
-    if (/[0-9]/.test(val))         score++;
-    if (/[^A-Za-z0-9]/.test(val))  score++;
+    if (hasMinLength) score++;
+    if (hasUppercase) score++;
+    if (hasNumber) score++;
+    if (hasSymbol) score++;
     const colors = ['', '#c0392b','#e8833a','#f0c040','#1a9a55'];
-    const labels = {
-      en: ['','Weak — add numbers or symbols','Fair — add uppercase letters','Good — add a special character','Strong password ✓'],
-      ms: ['','Lemah — tambah nombor atau simbol','Sederhana — tambah huruf besar','Baik — tambah watak khas','Kata laluan kuat ✓'],
-      bn: ['','দুর্বল — সংখ্যা বা চিহ্ন যোগ করুন','মাঝারি — বড় হাতের অক্ষর যোগ করুন','ভালো — বিশেষ চিহ্ন যোগ করুন','শক্তিশালী পাসওয়ার্ড ✓']
-    };
-    const strengthLabels = labels[currentRegLang] || labels.en;
     fill.style.width      = score * 25 + '%';
     fill.style.background = colors[score] || '';
-    text.textContent      = val.length ? strengthLabels[score] : (currentRegLang === 'bn' ? 'কমপক্ষে ৮ অক্ষর ব্যবহার করুন' : currentRegLang === 'ms' ? 'Gunakan sekurang-kurangnya 8 aksara' : 'Use at least 8 characters');
-    text.style.color      = colors[score] || 'var(--muted)';
+
     if (!val.length) {
       text.textContent = currentRegLang === 'bn'
         ? 'কমপক্ষে ৮ অক্ষর, একটি বড় হাতের অক্ষর এবং একটি সংখ্যা'
@@ -465,7 +462,42 @@
         ? 'Min. 8 aksara, satu huruf besar, satu nombor'
         : 'Min. 8 characters, one uppercase letter, one number';
       text.style.color = 'var(--muted)';
+      return;
     }
+
+    if (!hasMinLength) {
+      const remaining = 8 - val.length;
+      text.textContent = currentRegLang === 'bn'
+        ? `আরও ${remaining} অক্ষর যোগ করুন`
+        : currentRegLang === 'ms'
+        ? `Tambah ${remaining} aksara lagi`
+        : `Add ${remaining} more character${remaining === 1 ? '' : 's'}`;
+    } else if (!hasUppercase) {
+      text.textContent = currentRegLang === 'bn'
+        ? 'একটি বড় হাতের অক্ষর যোগ করুন'
+        : currentRegLang === 'ms'
+        ? 'Tambah satu huruf besar'
+        : 'Add an uppercase letter';
+    } else if (!hasNumber) {
+      text.textContent = currentRegLang === 'bn'
+        ? 'একটি সংখ্যা যোগ করুন'
+        : currentRegLang === 'ms'
+        ? 'Tambah satu nombor'
+        : 'Add a number';
+    } else if (!hasSymbol) {
+      text.textContent = currentRegLang === 'bn'
+        ? 'ভালো পাসওয়ার্ড - আরও শক্তিশালী করতে একটি চিহ্ন যোগ করতে পারেন'
+        : currentRegLang === 'ms'
+        ? 'Kata laluan baik - pilihan: tambah simbol untuk lebih kuat'
+        : 'Good password - optional: add a symbol to make it stronger';
+    } else {
+      text.textContent = currentRegLang === 'bn'
+        ? 'শক্তিশালী পাসওয়ার্ড'
+        : currentRegLang === 'ms'
+        ? 'Kata laluan kuat'
+        : 'Strong password';
+    }
+    text.style.color = colors[score] || 'var(--muted)';
   }
 
   // ── MULTILINGUAL ──────────────────────────────────────────

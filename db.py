@@ -167,6 +167,7 @@ POSTGRES_SCHEMA = (
         subject       TEXT NOT NULL,
         category      TEXT NOT NULL,
         message       TEXT NOT NULL,
+        idempotency_key TEXT UNIQUE,
         reply_message TEXT,
         status        TEXT NOT NULL DEFAULT 'open'
                       CHECK(status IN ('open', 'replied', 'closed')),
@@ -231,6 +232,13 @@ def ensure_database_schema():
                 with conn.cursor() as cur:
                     for statement in POSTGRES_SCHEMA:
                         cur.execute(statement)
+                    enquiry_cols = _table_columns(cur, 'enquiries')
+                    if 'idempotency_key' not in enquiry_cols:
+                        cur.execute("ALTER TABLE enquiries ADD COLUMN idempotency_key TEXT")
+                    cur.execute(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS idx_enquiries_idempotency_key "
+                        "ON enquiries(idempotency_key) WHERE idempotency_key IS NOT NULL"
+                    )
                 conn.commit()
             finally:
                 conn.close()
@@ -301,6 +309,7 @@ def ensure_database_schema():
                 subject       TEXT    NOT NULL,
                 category      TEXT    NOT NULL,
                 message       TEXT    NOT NULL,
+                idempotency_key TEXT UNIQUE,
                 reply_message TEXT,
                 status        TEXT    NOT NULL DEFAULT 'open'
                               CHECK(status IN ('open', 'replied', 'closed')),
@@ -315,6 +324,13 @@ def ensure_database_schema():
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_enquiries_agent_id_status_created_at "
             "ON enquiries(agent_id, status, created_at DESC)"
+        )
+        enquiry_cols = _table_columns(cur, 'enquiries')
+        if 'idempotency_key' not in enquiry_cols:
+            cur.execute("ALTER TABLE enquiries ADD COLUMN idempotency_key TEXT")
+        cur.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_enquiries_idempotency_key "
+            "ON enquiries(idempotency_key) WHERE idempotency_key IS NOT NULL"
         )
         report_cols = _table_columns(cur, 'reports')
         if 'agent_staff_name' not in report_cols:
