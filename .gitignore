@@ -14,3 +14,6 @@ uploads/
 
 # VS Code settings
 .vscode/
+
+server.err.log
+server.out.log

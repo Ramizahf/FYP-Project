@@ -95,15 +95,15 @@ def _table_columns(cur, table_name):
 POSTGRES_SCHEMA = (
     """
     CREATE TABLE IF NOT EXISTS users (
-        id            BIGSERIAL PRIMARY KEY,
-        full_name     TEXT NOT NULL,
-        email         TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        role          TEXT NOT NULL CHECK(role IN ('worker', 'agent', 'admin')),
-        country       TEXT,
-        phone         TEXT,
-        google_sub    TEXT UNIQUE,
-        created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+        id                  BIGSERIAL PRIMARY KEY,
+        full_name           TEXT NOT NULL,
+        email               TEXT NOT NULL UNIQUE,
+        password_hash       TEXT NOT NULL,
+        role                TEXT NOT NULL CHECK(role IN ('worker', 'agent', 'admin')),
+        country             TEXT,
+        phone               TEXT,
+        google_sub          TEXT UNIQUE,
+        created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
     """,
     """

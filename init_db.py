@@ -21,15 +21,15 @@ from config import Config
 
 CREATE_USERS = """
 CREATE TABLE IF NOT EXISTS users (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    full_name     TEXT    NOT NULL,
-    email         TEXT    NOT NULL UNIQUE,
-    password_hash TEXT    NOT NULL,
-    role          TEXT    NOT NULL CHECK(role IN ('worker', 'agent', 'admin')),
-    country       TEXT,
-    phone         TEXT,
-    google_sub    TEXT    UNIQUE,
-    created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name           TEXT    NOT NULL,
+    email               TEXT    NOT NULL UNIQUE,
+    password_hash       TEXT    NOT NULL,
+    role                TEXT    NOT NULL CHECK(role IN ('worker', 'agent', 'admin')),
+    country             TEXT,
+    phone               TEXT,
+    google_sub          TEXT    UNIQUE,
+    created_at          TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 """
 
@@ -397,7 +397,8 @@ def init_db():
             continue
         pw_hash = generate_password_hash(plain_pw)
         cur.execute(
-            "INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)",
+            "INSERT INTO users (full_name, email, password_hash, role) "
+            "VALUES (?, ?, ?, ?)",
             (full_name, email, pw_hash, role)
         )
         print(f"  ✓ Created user: {email}  [{role}]")

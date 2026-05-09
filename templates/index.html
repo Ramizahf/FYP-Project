@@ -285,9 +285,7 @@
 
     /* SDG */
     .sdg-section{background:var(--cream);display:flex;align-items:center;gap:60px}
-    .sdg-badge-box{flex-shrink:0;width:160px;height:160px;border-radius:24px;background:linear-gradient(135deg,#0D6E6E,#E8833A);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;box-shadow:0 16px 40px rgba(13,110,110,.25)}
-    .sdg-badge-box .sdg-num{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900}
-    .sdg-badge-box .sdg-lbl{font-size:.68rem;font-weight:600;letter-spacing:.08em;opacity:.85;text-align:center;padding:0 10px}
+    .sdg-badge-img{flex-shrink:0;width:160px;height:160px;object-fit:cover;box-shadow:0 16px 40px rgba(177,24,77,.18)}
     .sdg-content p{font-size:.95rem;color:var(--muted);line-height:1.7;margin-top:12px;max-width:580px}
 
     /* CTA */
@@ -545,7 +543,7 @@
 
 <!-- SDG -->
 <section class="sdg-section reveal">
-  <div class="sdg-badge-box"><div class="sdg-num">8</div><div class="sdg-lbl">SDG DECENT WORK &amp; GROWTH</div></div>
+  <img class="sdg-badge-img" src="{{ url_for('static', filename='img/sdg-8.png') }}" alt="UN Sustainable Development Goal 8: Decent Work and Economic Growth" width="160" height="160" loading="lazy" decoding="async"/>
   <div class="sdg-content">
     <div class="section-tag" data-t="sdg_tag">Our Mission</div>
     <h2 class="section-title" style="font-size:1.9rem" data-t="sdg_h">Aligned with UN SDG 8</h2>
