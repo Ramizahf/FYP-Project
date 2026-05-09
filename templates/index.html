@@ -228,7 +228,6 @@
     .how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;margin-top:52px}
     .step-card{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:32px 24px;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s}
     .step-card:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(13,110,110,.1)}
-    .step-card::before{content:attr(data-num);position:absolute;top:-10px;right:16px;font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;line-height:1;color:rgba(13,110,110,.06)}
     .step-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px}
     .step-card h3{font-size:1.05rem;font-weight:600;margin-bottom:8px;color:var(--dark)}
     .step-card p{font-size:.88rem;color:var(--muted);line-height:1.6}
@@ -433,13 +432,12 @@
   <div class="reveal">
     <div class="section-tag" data-t="how_tag">Simple Steps</div>
     <h2 class="section-title" data-t="how_h">How MigrantSafe Works</h2>
-    <p class="section-sub" data-t="how_p">Anyone can use this platform — no technical skills needed. Just follow these 5 simple steps.</p>
   </div>
   <div class="how-grid">
-    <div class="step-card reveal" data-num="01"><div class="step-icon" style="background:#e6f4f4">🧑‍💼</div><h3 data-t="s1h">Create Your Account</h3><p data-t="s1p">Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.</p></div>
-    <div class="step-card reveal" data-num="02"><div class="step-icon" style="background:#fff3e6">🔍</div><h3 data-t="s2h">Search for Agents</h3><p data-t="s2p">Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.</p></div>
-    <div class="step-card reveal" data-num="03"><div class="step-icon" style="background:#e6f4f4">🚨</div><h3 data-t="s3h">Report Bad Actors</h3><p data-t="s3p">If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.</p></div>
-    <div class="step-card reveal" data-num="04"><div class="step-icon" style="background:#fff3e6;padding:10px"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"/></div><h3 data-t="s4h">Ask the Chatbot</h3><p data-t="s4p">Have a question about visas, contracts, or fees? Ask our AI chatbot in English, Malay, or Bangla — anytime.</p></div>
+    <div class="step-card reveal"><div class="step-icon" style="background:#e6f4f4">🧑‍💼</div><h3 data-t="s1h">Create Your Account</h3><p data-t="s1p">Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.</p></div>
+    <div class="step-card reveal"><div class="step-icon" style="background:#fff3e6">🔍</div><h3 data-t="s2h">Search for Agents</h3><p data-t="s2p">Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.</p></div>
+    <div class="step-card reveal"><div class="step-icon" style="background:#e6f4f4">🚨</div><h3 data-t="s3h">Report Bad Actors</h3><p data-t="s3p">If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.</p></div>
+    <div class="step-card reveal"><div class="step-icon" style="background:#fff3e6;padding:10px"><img src="{{ url_for('static', filename='img/chatbot-icon.png') }}" alt="" class="chatbot-icon-img" width="581" height="430" decoding="async"/></div><h3 data-t="s4h">Ask the Chatbot</h3><p data-t="s4p">Have a question about visas, contracts, or fees? Ask our AI chatbot in English, Malay, or Bangla — anytime.</p></div>
   </div>
 </section>
 
@@ -611,7 +609,6 @@ const T = {
     vc4l:"Live support", vc4q:"Safe migration assistant", vc4a:"Answers about agents, documents, fees, and worker rights.", vc5a:"Designed to guide workers clearly and calmly before problems become serious.",
     lang_label:"Available in:",
     how_tag:"Simple Steps", how_h:"How MigrantSafe Works",
-    how_p:"Anyone can use this platform — no technical skills needed. Just follow these 5 simple steps.",
     s1h:"Create Your Account",    s1p:"Register as a migrant worker or recruitment agent. It's completely free and takes under 2 minutes.",
     s2h:"Search for Agents",      s2p:"Browse our database of recruitment agencies. See their verification status — Verified, Pending, or Reported.",
     s3h:"Report Bad Actors",      s3p:"If an agent cheats or misleads you, fill out a simple report form. Admins review it and update the agent's status.",
@@ -689,7 +686,6 @@ const T = {
     vc4l:"Sokongan langsung", vc4q:"Pembantu migrasi selamat", vc4a:"Jawapan tentang ejen, dokumen, yuran, dan hak pekerja.", vc5a:"Direka untuk membimbing pekerja dengan jelas dan tenang sebelum masalah menjadi serius.",
     lang_label:"Tersedia dalam:",
     how_tag:"Langkah Mudah", how_h:"Cara MigrantSafe Berfungsi",
-    how_p:"Sesiapa pun boleh menggunakan platform ini — tiada kemahiran teknikal diperlukan. Ikuti sahaja 5 langkah mudah ini.",
     s1h:"Buat Akaun Anda",      s1p:"Daftar sebagai pekerja asing atau ejen pengambilan. Ia percuma sepenuhnya dan mengambil masa kurang dari 2 minit.",
     s2h:"Cari Ejen",            s2p:"Layari pangkalan data agensi pengambilan kami. Lihat status pengesahan mereka — Disahkan, Belum Disahkan, atau Dilaporkan.",
     s3h:"Laporkan Ejen Palsu",  s3p:"Jika ejen menipu atau mengelirukan anda, isi borang laporan mudah. Admin akan menyemaknya dan mengemas kini status ejen.",
@@ -767,7 +763,6 @@ const T = {
     vc4l:"লাইভ সাপোর্ট", vc4q:"নিরাপদ মাইগ্রেশন অ্যাসিস্ট্যান্ট", vc4a:"এজেন্ট, নথি, ফি, এবং শ্রমিক অধিকার নিয়ে উত্তর।", vc5a:"সমস্যা গুরুতর হওয়ার আগে শ্রমিকদের স্পষ্ট ও শান্তভাবে গাইড করার জন্য ডিজাইন করা হয়েছে।",
     lang_label:"পাওয়া যাচ্ছে:",
     how_tag:"সহজ পদক্ষেপ", how_h:"MigrantSafe কীভাবে কাজ করে",
-    how_p:"যে কেউ এই প্ল্যাটফর্ম ব্যবহার করতে পারবেন — কোনো প্রযুক্তিগত দক্ষতার প্রয়োজন নেই। শুধু এই ৫টি সহজ পদক্ষেপ অনুসরণ করুন।",
     s1h:"আপনার অ্যাকাউন্ট তৈরি করুন", s1p:"অভিবাসী শ্রমিক বা নিয়োগ এজেন্ট হিসেবে নিবন্ধন করুন। এটি সম্পূর্ণ বিনামূল্যে এবং ২ মিনিটেরও কম সময় নেয়।",
     s2h:"এজেন্ট খুঁজুন",            s2p:"আমাদের নিয়োগ সংস্থার ডেটাবেস ব্রাউজ করুন। তাদের যাচাইকরণ স্ট্যাটাস দেখুন — যাচাইকৃত, মুলতুবি, বা রিপোর্টেড।",
     s3h:"খারাপ এজেন্ট রিপোর্ট করুন", s3p:"যদি কোনো এজেন্ট আপনাকে প্রতারণা করে, একটি সহজ রিপোর্ট ফর্ম পূরণ করুন। অ্যাডমিন এটি পর্যালোচনা করবে।",
