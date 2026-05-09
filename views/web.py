@@ -1,12 +1,9 @@
 import os
 import re
 import json
-from datetime import datetime
-from uuid import uuid4
 
 from flask import current_app, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
 
 from auth_utils import (
     log_in_user,
@@ -15,6 +12,7 @@ from auth_utils import (
     role_required,
 )
 from db import IntegrityError, execute_db, query_db, row_to_dict, rows_to_dicts
+from evidence_storage import make_report_evidence_record
 
 
 ROLE_LABELS = {
@@ -84,17 +82,8 @@ def validate_report_evidence_uploads(uploads):
 
 
 def save_report_evidence(upload, report_id):
-    """Save report evidence using a generated safe filename."""
-    original_name = secure_filename(upload.filename)
-    if not original_name:
-        extension = upload.filename.rsplit('.', 1)[1].lower()
-        original_name = f"evidence.{extension}"
-    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
-    filename = f"report_{report_id}_{timestamp}_{uuid4().hex[:8]}_{original_name}"
-    upload_dir = current_app.config['REPORT_EVIDENCE_FOLDER']
-    os.makedirs(upload_dir, exist_ok=True)
-    upload.save(os.path.join(upload_dir, filename))
-    return f"report_evidence/{filename}"
+    """Store report evidence in the database so it survives Vercel deployments."""
+    return make_report_evidence_record(upload, report_id)
 
 
 def save_report_evidence_uploads(uploads, report_id):

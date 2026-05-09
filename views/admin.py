@@ -1,21 +1,17 @@
-import os
-import json
-
-from flask import abort, current_app, flash, redirect, render_template, request, send_from_directory, session, url_for
+from flask import abort, flash, redirect, render_template, request, session, url_for
 
 from auth_utils import role_required
 from db import execute_db, query_db, row_to_dict, rows_to_dicts
+from evidence_storage import (
+    evidence_entry_filename,
+    parse_report_evidence_entries,
+    send_report_evidence_entry,
+)
 
 
 def parse_report_evidence_paths(evidence_path):
     """Return stored report evidence paths as a list."""
-    if not evidence_path:
-        return []
-    try:
-        paths = json.loads(evidence_path)
-    except (TypeError, ValueError):
-        return [evidence_path]
-    return paths if isinstance(paths, list) else []
+    return parse_report_evidence_entries(evidence_path)
 
 
 @role_required('admin')
@@ -47,7 +43,7 @@ def dashboard_admin():
             continue
         report['evidence_paths'] = parse_report_evidence_paths(report.get('evidence_path'))
         report['evidence_filenames'] = [
-            os.path.basename(path) for path in report['evidence_paths']
+            evidence_entry_filename(path) for path in report['evidence_paths']
         ]
         report_history_by_agent.setdefault(agent_id, []).append(report)
         if report.get('status') == 'open':
@@ -194,8 +190,7 @@ def report_evidence(report_id, file_index):
     if file_index < 0 or file_index >= len(evidence_paths):
         abort(404)
 
-    filename = os.path.basename(evidence_paths[file_index])
-    return send_from_directory(current_app.config['REPORT_EVIDENCE_FOLDER'], filename)
+    return send_report_evidence_entry(evidence_paths[file_index])
 
 
 def register_admin_routes(app):
